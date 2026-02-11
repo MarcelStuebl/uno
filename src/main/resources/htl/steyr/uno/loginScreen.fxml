@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<!-- HBox als Root-Element statt BorderPane für die 50/50 Aufteilung -->
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      alignment="CENTER"
+      stylesheets="@style/loginStyle.css">
+
+    <!-- ================= LEFT: Branding ================= -->
+    <StackPane fx:id="brandingPane" styleClass="centerPane"
+               HBox.hgrow="ALWAYS" maxWidth="Infinity">
+
+        <VBox spacing="24" alignment="CENTER">
+
+            <!-- Logo -->
+            <StackPane>
+                <Label text="👤" />
+            </StackPane>
+
+            <!-- Title -->
+            <Label text="UNO Web" styleClass="unoTitle"/>
+
+            <!-- Subtitle -->
+            <Label text="Das klassische Kartenspiel – jetzt online!" styleClass="unoSubtitle"/>
+
+            <!-- Feature Cards -->
+            <VBox spacing="12">
+
+                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="leftLableBorder">
+                    <Label text="🎮" />
+                    <VBox>
+                        <Label text="Multiplayer" styleClass="topLableleft"/>
+                        <Label text="Spiele mit bis zu 4 Freunden" styleClass="Subtitles"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="leftLableBorder">
+                    <Label text="🌍" />
+                    <VBox>
+                        <Label text="Online" styleClass="topLableleft"/>
+                        <Label text="Überall und jederzeit spielen" styleClass="Subtitles"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="leftLableBorder">
+                    <Label text="🏆" />
+                    <VBox>
+                        <Label text="Statistiken" styleClass="topLableleft"/>
+                        <Label text="Verfolge deine Siege" styleClass="Subtitles"/>
+                    </VBox>
+                </HBox>
+
+            </VBox>
+        </VBox>
+    </StackPane>
+
+    <!-- ================= RIGHT: Login ================= -->
+    <StackPane fx:id="loginPane" styleClass="rightPane"
+               HBox.hgrow="ALWAYS" maxWidth="Infinity">
+
+        <VBox spacing="16" alignment="CENTER">
+
+            <!-- Heading -->
+            <Label text="Willkommen zurück!" styleClass="lWelcomeBack"/>
+            <Label text="Melde dich an oder erstelle einen Account" styleClass="Subtitles"/>
+
+            <!-- Username -->
+            <VBox spacing="4">
+                <Label text="Benutzername" styleClass="loginLables"/>
+                <TextField promptText="Dein Benutzername" styleClass="login"/>
+            </VBox>
+
+            <!-- Password -->
+            <VBox spacing="4">
+                <Label text="Passwort" styleClass="loginLables"/>
+                <PasswordField promptText="Dein Passwort" styleClass="login"/>
+            </VBox>
+
+            <!-- Login Button -->
+            <Button text="Anmelden" styleClass="LoginButton"/>
+
+            <!-- Separator -->
+            <HBox spacing="8" alignment="CENTER">
+                <Separator />
+                <Label text="oder" styleClass="Subtitles"/>
+                <Separator />
+            </HBox>
+
+            <!-- Register Button -->
+            <Button text="Account erstellen" styleClass="CreateAccButton"/>
+
+            <!-- Footer -->
+            <Label text="© 2025 UNO Web – HTL Steyr" styleClass="Subtitles"/>
+        </VBox>
+    </StackPane>
+
+</HBox>

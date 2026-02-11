@@ -1,0 +1,85 @@
+.centerPane {
+    -fx-background-color: linear-gradient(
+            from 0% 0% to 100% 100%,
+            rgb(58, 96, 115),
+            rgb(34, 52, 68),
+            rgb(22, 34, 42)
+    );
+}
+
+.rightPane {
+    -fx-background-color: rgb(26, 29, 50);
+}
+
+.unoTitle {
+    -fx-border-color: limegreen;
+    -fx-border-width: 2px;
+
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 40px;
+}
+
+.unoSubtitle {
+    -fx-border-color: pink;
+    -fx-border-width: 2px;
+    -fx-text-fill: white;
+}
+
+.topLableleft {
+    -fx-border-color: purple;
+    -fx-border-width: 2px;
+
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.Subtitles {
+    -fx-border-color: red;
+    -fx-border-width: 2px;
+
+    -fx-text-fill: grey;
+}
+
+.lWelcomeBack {
+    -fx-border-color: yellow;
+    -fx-border-width: 2px;
+
+    -fx-font-size: 28px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.loginLables {
+    -fx-border-color: blue;
+    -fx-border-width: 2px;
+
+    -fx-text-fill: white;
+}
+
+.LoginButton {
+    -fx-border-color: green;
+    -fx-border-width: 2px;
+}
+
+.CreateAccButton {
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+
+.leftLableBorder {
+    -fx-border-color: black;
+    -fx-border-radius: 5;
+    -fx-background-color: rgba(30, 41, 59, 0.6);
+}
+
+.login {
+    -fx-border-radius: 5;
+    -fx-background-color: rgba(0, 0, 0, 0.8)
+}
+
+.loginButton {
+    -fx-border-radius: 5;
+    -fx-background-color: rgba(255, 107, 107, 0.8)
+
+}
