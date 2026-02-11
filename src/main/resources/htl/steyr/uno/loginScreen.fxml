@@ -20,7 +20,7 @@
             <Label styleClass="unoTitle" text="UNO Web" />
             <Label styleClass="unoSubtitle" text="Das klassische Kartenspiel – jetzt online!" />
 
-            <VBox spacing="12" styleClass="featureList">
+            <VBox spacing="12" styleClass="featureList" alignment="CENTER">
 
                 <HBox alignment="CENTER_LEFT" spacing="10" styleClass="leftLableBorder">
                     <Label text="🎮" />

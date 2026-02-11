@@ -47,7 +47,8 @@
     -fx-border-radius: 12;
     -fx-background-radius: 12;
     -fx-padding: 10 14 10 14;
-    -fx-min-width: 250px;
+    -fx-min-width: 520px;
+    -fx-max-width: 520px;
 }
 
 /* Feature list padding */
