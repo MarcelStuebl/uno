@@ -39,7 +39,7 @@ public class ClientSocketConnection implements Closeable {
                     Object obj = in.readObject();
 
                     if (obj instanceof User user) {
-                        System.out.println("Received user: " + user);
+                        System.out.println(user);
                     }
                 }
             } catch (Exception e) {
