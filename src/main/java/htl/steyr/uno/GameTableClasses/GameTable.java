@@ -1,4 +1,4 @@
-package htl.steyr.uno;
+package htl.steyr.uno.GameTableClasses;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,15 +11,12 @@ public class GameTable {
 
     public void open(Stage stage) {
         try {
-            Parent root = FXMLLoader.load(
-                    getClass().getResource("/htl/steyr/uno/gameTable.fxml")
-            );
+            Parent root = FXMLLoader.load(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));
 
             Scene scene = new Scene(root);
-
             stage.setTitle("UNO - Game Table");
             stage.setScene(scene);
-            stage.setFullScreen(true);
+            stage.setMaximized(true);
             stage.show();
 
         } catch (IOException e) {

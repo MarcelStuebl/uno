@@ -1,0 +1,14 @@
+/* Root: Fensterhintergrund */
+.root {
+    -fx-background-color: linear-gradient(to bottom, #1b5e20, #43a047); /* dunkler bis hellgrün */
+}
+
+/* Tisch in der Mitte */
+.table {
+    -fx-background-color: #2e7d32; /* Tischgrün */
+    -fx-background-radius: 30;      /* abgerundete Ecken */
+    -fx-border-color: #1b5e20;      /* dunkler Rand */
+    -fx-border-width: 5;
+    -fx-border-radius: 30;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 15, 0.5, 0, 0);
+}

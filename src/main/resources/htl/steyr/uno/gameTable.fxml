@@ -8,6 +8,10 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="htl.steyr.uno.GameTable"
+            stylesheets="@style/GameTableStyle.css"
+            fx:controller="htl.steyr.uno.GameTableClasses.GameTable"
             prefHeight="400.0" prefWidth="600.0">
+    <AnchorPane fx:id="table" styleClass="table" prefWidth="800" prefHeight="400"
+                layoutX="200" layoutY="200">
+    </AnchorPane>
 </AnchorPane>
