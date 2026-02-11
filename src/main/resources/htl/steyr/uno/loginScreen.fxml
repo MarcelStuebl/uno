@@ -52,31 +52,70 @@
 
     <!-- ================= RIGHT: Login ================= -->
     <StackPane fx:id="loginPane" alignment="CENTER" maxWidth="Infinity" styleClass="rightPane" HBox.hgrow="ALWAYS">
-
-        <VBox fx:id="hideLogin" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard">
-
+      <VBox fx:id="showCreateAcc" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard">
+         <children>
             <Label styleClass="lWelcomeBack" text="Willkommen zurück!" />
             <Label styleClass="Subtitles" text="Melde dich an oder erstelle einen Account" />
+            <VBox spacing="6">
+               <children>
+                  <Label styleClass="loginLables" text="Benutzername" />
+                  <TextField fx:id="welcomeBackUserName" promptText="Dein Benutzername" styleClass="login" />
+               </children>
+            </VBox>
+            <VBox spacing="6">
+               <children>
+                  <Label styleClass="loginLables" text="Passwort" />
+                  <PasswordField fx:id="welcomeBackPasswd" promptText="Dein Passwort" styleClass="login" />
+               </children>
+            </VBox>
+            <Button prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Anmelden" />
+            <HBox alignment="CENTER" spacing="8">
+               <children>
+                  <Separator />
+                  <Label styleClass="Subtitles" text="oder" />
+                  <Separator />
+               </children>
+            </HBox>
+            <Button fx:id="createAcc" onAction="#onCreateAccountButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Account erstellen" />
+            <Label styleClass="Subtitles" text="© 2026 UNO Web – HTL Steyr" />
+         </children>
+      </VBox>
+
+        <VBox fx:id="showNewAccScreen" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard" visible="false">
+
+            <Label styleClass="lWelcomeBack" text="Neues Konto erstellen!" />
+         <VBox spacing="6">
+            <children>
+               <Label styleClass="loginLables" text="Vorname" />
+               <TextField fx:id="newAccFirstName" promptText="Dein Vorname" styleClass="login" />
+            </children>
+         </VBox>
+         <VBox spacing="6">
+            <children>
+               <Label styleClass="loginLables" text="Nachname" />
+               <TextField fx:id="newAccLastName" promptText="Dein Nachname" styleClass="login" />
+            </children>
+         </VBox>
 
             <VBox spacing="6">
                 <Label styleClass="loginLables" text="Benutzername" />
-                <TextField promptText="Dein Benutzername" styleClass="login" />
+                <TextField fx:id="newAccUserName" promptText="Dein Benutzername" styleClass="login" />
             </VBox>
 
             <VBox spacing="6">
                 <Label styleClass="loginLables" text="Passwort" />
-                <PasswordField promptText="Dein Passwort" styleClass="login" />
+                <PasswordField fx:id="newAccPassword" promptText="Dein Passwort" styleClass="login" />
             </VBox>
 
-            <Button prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Anmelden" />
+            <Button prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Account erstellen" />
 
             <HBox alignment="CENTER" spacing="8">
                 <Separator />
                 <Label styleClass="Subtitles" text="oder" />
                 <Separator />
             </HBox>
-
-            <Button fx:id="createAcc" onAction="#onCreateButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Account erstellen" />
+         <Label styleClass="Subtitles" text="Du hast bereits einen Account?" />
+         <Button fx:id="showLogin" onAction="#backToLogin" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Anmelden" />
 
             <Label styleClass="Subtitles" text="© 2026 UNO Web – HTL Steyr" />
         </VBox>
