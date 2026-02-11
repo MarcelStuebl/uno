@@ -1,0 +1,110 @@
+.centerPane {
+    -fx-background-color: linear-gradient(
+            from 0% 0% to 100% 100%,
+            rgb(58, 96, 115),
+            rgb(34, 52, 68),
+            rgb(22, 34, 42)
+    );
+    -fx-padding: 80 0 80 0;
+}
+
+.rightPane {
+    -fx-background-color: linear-gradient(
+            from 0% 0% to 100% 100%,
+            rgb(18, 18, 36),
+            rgb(24, 24, 46)
+    );
+    -fx-padding: 80 0 80 0;
+}
+
+/* Title */
+.unoTitle {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 34px;
+}
+
+.unoSubtitle {
+    -fx-text-fill: #b5b9c8;
+    -fx-font-size: 12px;
+}
+
+.topLableleft {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.Subtitles {
+    -fx-text-fill: #8f93a3;
+    -fx-font-size: 11px;
+}
+
+/* Left cards */
+.leftLableBorder {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 10 14 10 14;
+    -fx-min-width: 250px;
+}
+
+/* Feature list padding */
+.featureList {
+    -fx-padding: 0 24 0 24;
+}
+
+/* Right side */
+.lWelcomeBack {
+    -fx-font-size: 26px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.loginLables {
+    -fx-text-fill: #cfcfe6;
+    -fx-font-size: 12px;
+}
+
+/* Login card */
+.loginCard {
+    -fx-padding: 32 36 32 36;
+    -fx-background-color: rgba(26, 29, 50, 0.85);
+    -fx-background-radius: 24;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-width: 1px;
+    -fx-border-radius: 24;
+    -fx-max-width: 360px;
+    -fx-min-width: 360px;
+}
+
+/* Input fields */
+.login {
+    -fx-background-color: rgba(0, 0, 0, 0.45);
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #8f93a3;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 10 12 10 12;
+}
+
+/* Buttons */
+.loginButton {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+    -fx-background-color: rgba(255, 90, 90, 0.95);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.CreateAccButton {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-width: 1px;
+    -fx-background-color: rgba(0, 0, 0, 0);
+}
