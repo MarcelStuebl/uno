@@ -10,7 +10,7 @@ import htl.steyr.uno.server.exceptions.user.UserNotFoundException;
 
 import java.sql.SQLException;
 
-public class TestDBConnecton {
+public class TestDBConnection {
 
     public static void main(String[] args) {
         DatabaseUser dbUser = new DatabaseUser();

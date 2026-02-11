@@ -59,7 +59,7 @@ public class DatabaseUser {
     public User getUser(String username, String password) throws SQLException {
         User user = getUser(username);
             if (verifyPassword(password, user.getPasswordHash(), user.getPasswordSalt())) {
-                return user;
+                return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin());
             } else {
                 throw new InvalidPasswordException();
             }
