@@ -1,18 +1,59 @@
 package htl.steyr.uno;
 
+import java.sql.Timestamp;
+
 public class User {
 
     private int id;
     private String username;
     private String lastName;
     private String firstName;
+    private int gamesWon;
+    private int gamesLost;
+    private Timestamp createdAt;
+    private Timestamp lastLogin;
+    private String passwordHash;
+    private String passwordSalt;
 
-    public User(int id, String username, String lastName, String firstName) {
+
+    public User(int id, String username, String lastName, String firstName, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin, String passwordHash, String passwordSalt) {
         setId(id);
         setUsername(username);
         setLastName(lastName);
         setFirstName(firstName);
+        setGamesWon(gamesWon);
+        setGamesLost(gamesLost);
+        setCreatedAt(createdAt);
+        setLastLogin(lastLogin);
+        setPasswordHash(passwordHash);
+        setPasswordSalt(passwordSalt);
     }
+
+    public User(int id, String username, String lastName, String firstName, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin) {
+        setId(id);
+        setUsername(username);
+        setLastName(lastName);
+        setFirstName(firstName);
+        setGamesWon(gamesWon);
+        setGamesLost(gamesLost);
+        setCreatedAt(createdAt);
+        setLastLogin(lastLogin);
+    }
+
+    public User(String username, String lastName, String firstName, String Password) {
+        setUsername(username);
+        setLastName(lastName);
+        setFirstName(firstName);
+        generatePasswordHashAndSalt(Password);
+    }
+
+    private void generatePasswordHashAndSalt(String password) {
+        String salt = PasswordUtil.generateSalt();
+        String hash = PasswordUtil.hashPassword(password, salt);
+        setPasswordSalt(salt);
+        setPasswordHash(hash);
+    }
+
 
 
     public int getId() {
@@ -43,7 +84,47 @@ public class User {
         this.firstName = firstName;
     }
 
+    public int getGamesWon() {
+        return gamesWon;
+    }
+    public void setGamesWon(int gamesWon) {
+        this.gamesWon = gamesWon;
+    }
 
+    public int getGamesLost() {
+        return gamesLost;
+    }
+    public void setGamesLost(int gamesLost) {
+        this.gamesLost = gamesLost;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getLastLogin() {
+        return lastLogin;
+    }
+    public void setLastLogin(Timestamp lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public String getPasswordSalt() {
+        return passwordSalt;
+    }
+    public void setPasswordSalt(String passwordSalt) {
+        this.passwordSalt = passwordSalt;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
 }
 
 
