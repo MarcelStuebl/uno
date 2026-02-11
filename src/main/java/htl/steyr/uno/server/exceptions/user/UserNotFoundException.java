@@ -1,7 +1,11 @@
-package htl.steyr.uno.server.exceptions;
+package htl.steyr.uno.server.exceptions.user;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {
-        System.out.println("UserNotFoundException: " + message);
+        super("UserNotFoundException: " + message);
     }
 }
+
+
+
+

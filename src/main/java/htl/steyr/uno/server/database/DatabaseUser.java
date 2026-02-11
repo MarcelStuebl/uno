@@ -2,8 +2,9 @@ package htl.steyr.uno.server.database;
 
 import htl.steyr.uno.PasswordUtil;
 import htl.steyr.uno.User;
-import htl.steyr.uno.server.exceptions.InvalidPasswordException;
-import htl.steyr.uno.server.exceptions.UserNotFoundException;
+import htl.steyr.uno.server.exceptions.user.InvalidPasswordException;
+import htl.steyr.uno.server.exceptions.user.UserAlreadyExistsException;
+import htl.steyr.uno.server.exceptions.user.UserNotFoundException;
 
 import java.sql.*;
 
@@ -12,8 +13,9 @@ public class DatabaseUser {
     /**
      * Retrieves a user by their username from the database.
      * @param username The username of the user to retrieve.
-     * @return A User object representing the user, or null if not found.
+     * @return A User object representing the user.
      * @throws SQLException if a database access error occurs.
+     * @throws UserNotFoundException if no user with the given username is found.
      */
     private User getUser(String username) throws SQLException {
         String query = "SELECT id, username, last_name, first_name, games_won, games_lost, created_at, last_login, password_hash, password_salt FROM user WHERE username = ?";
@@ -46,6 +48,14 @@ public class DatabaseUser {
     }
 
 
+    /**
+     * Retrieves a user by their username and verifies the provided password.
+     * @param username The username of the user to retrieve.
+     * @param password The password to verify against the stored hash and salt.
+     * @return A User object representing the user if the password is correct.
+     * @throws SQLException if a database access error occurs.
+     * @throws InvalidPasswordException if the provided password is incorrect.
+     */
     public User getUser(String username, String password) throws SQLException {
         User user = getUser(username);
             if (verifyPassword(password, user.getPasswordHash(), user.getPasswordSalt())) {
@@ -56,6 +66,13 @@ public class DatabaseUser {
     }
 
 
+    /**
+     * Verifies a password against the stored hash and salt.
+     * @param password The password to verify.
+     * @param storedHash The stored password hash.
+     * @param storedSalt The stored password salt.
+     * @return true if the password is correct, false otherwise.
+     */
     private boolean verifyPassword(String password, String storedHash, String storedSalt) {
         String hashToVerify = PasswordUtil.hashPassword(password, storedSalt);
         return hashToVerify.equals(storedHash);
@@ -69,7 +86,7 @@ public class DatabaseUser {
      */
     public void addUser(User user) throws SQLException {
         if (userExists(user)) {
-            throw new SQLException("Benutzer mit diesem Benutzernamen existiert bereits.");
+            throw new UserAlreadyExistsException(user.getUsername());
         }
 
         String query = "INSERT INTO user (username, last_name, first_name, created_at, last_login, password_hash, password_salt) VALUES (?, ?, ?, ?, ?, ?, ?)";

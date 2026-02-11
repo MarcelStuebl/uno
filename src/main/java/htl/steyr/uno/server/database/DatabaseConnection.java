@@ -1,5 +1,6 @@
 package htl.steyr.uno.server.database;
 
+import htl.steyr.uno.server.exceptions.database.DatabaseException;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.sql.Connection;
@@ -31,8 +32,8 @@ public class DatabaseConnection {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            } catch (ClassNotFoundException e) {
-                throw new SQLException("MySQL JDBC Driver nicht gefunden", e);
+            } catch (Exception e) {
+                throw new DatabaseException("JDBC-Treiber nicht gefunden");
             }
         }
         return connection;
