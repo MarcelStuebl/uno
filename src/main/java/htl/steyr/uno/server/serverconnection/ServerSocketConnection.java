@@ -1,18 +1,17 @@
 package htl.steyr.uno.server.serverconnection;
 
 import htl.steyr.uno.User;
-import htl.steyr.uno.client.Message;
+import htl.steyr.uno.client.requests.CreateAccountRequest;
+import htl.steyr.uno.client.requests.LoginRequest;
 import htl.steyr.uno.server.database.DatabaseUser;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 public class ServerSocketConnection implements PublisherInterface{
 
@@ -52,13 +51,19 @@ public class ServerSocketConnection implements PublisherInterface{
                     Object obj = in.readObject();
                     notifySubscribers(obj);
 
-                    if (obj instanceof Message) {
-                        Message msg = (Message) obj;
-                        String username = msg.message;
+                    if (obj instanceof LoginRequest) {
+                        LoginRequest request = (LoginRequest) obj;
                         DatabaseUser db = new DatabaseUser();
-                        User user = db.getUser(username, "admin");
+                        User user = db.getUser(request.getUsername(), request.getPassword());
 
                         sendMessage(user);
+                    } else if (obj instanceof CreateAccountRequest) {
+                        CreateAccountRequest request = (CreateAccountRequest) obj;
+                        User user = new User(request.getUsername(), request.getLastName(), request.getFirstName(), request.getPassword());
+                        DatabaseUser db = new DatabaseUser();
+                        db.addUser(user);
+                        User createdUser = db.getUser(request.getUsername(), request.getPassword());
+                        sendMessage(createdUser);
                     }
 
                 }

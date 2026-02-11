@@ -1,5 +1,8 @@
 package htl.steyr.uno.client;
 
+import htl.steyr.uno.client.requests.CreateAccountRequest;
+import htl.steyr.uno.client.requests.LoginRequest;
+
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -17,11 +20,26 @@ public class Client {
 
         try (Scanner console = new Scanner(System.in)) {
             while (true) {
-                String line = console.nextLine();
-                if (line.equalsIgnoreCase("/quit")) break;
+//                System.out.println("Enter username:");
+//                String username = console.nextLine();
+//                if (username.equalsIgnoreCase("/quit")) break;
+//
+//                System.out.println("Enter password:");
+//                String password = console.nextLine();
+//                if (password.equalsIgnoreCase("/quit")) break;
+//
+//                LoginRequest msg = new LoginRequest(username, password);
+//                conn.sendMessage(msg);
+//                break;
 
-                Message msg = new Message(line);
+                String username = "testuser";
+                String password = "123";
+                String firstName = "Test";
+                String lastName = "User";
+                CreateAccountRequest msg = new CreateAccountRequest(username, lastName, firstName, password);
                 conn.sendMessage(msg);
+                String input = console.nextLine();
+                break;
             }
         }
 
