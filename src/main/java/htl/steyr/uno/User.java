@@ -1,8 +1,9 @@
 package htl.steyr.uno;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class User {
+public class User implements Serializable {
 
     private int id;
     private String username;
@@ -54,6 +55,22 @@ public class User {
         setPasswordHash(hash);
     }
 
+
+    @Override
+    public String toString() {
+        String output = "";
+        output += "ID: " + getId() + "\n";
+        output += "Username: " + getUsername() + "\n";
+        output += "Last Name: " + getLastName() + "\n";
+        output += "First Name: " + getFirstName() + "\n";
+        output += "Games Won: " + getGamesWon() + "\n";
+        output += "Games Lost: " + getGamesLost() + "\n";
+        output += "Created At: " + getCreatedAt() + "\n";
+        output += "Last Login: " + getLastLogin() + "\n";
+        output += "Password Hash: " + getPasswordHash() + "\n";
+        output += "Password Salt: " + getPasswordSalt() + "\n";
+        return output;
+    }
 
 
     public int getId() {
