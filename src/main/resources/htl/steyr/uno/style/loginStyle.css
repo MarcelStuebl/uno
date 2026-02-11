@@ -5,81 +5,106 @@
             rgb(34, 52, 68),
             rgb(22, 34, 42)
     );
+    -fx-padding: 80 0 80 0;
 }
 
 .rightPane {
-    -fx-background-color: rgb(26, 29, 50);
+    -fx-background-color: linear-gradient(
+            from 0% 0% to 100% 100%,
+            rgb(18, 18, 36),
+            rgb(24, 24, 46)
+    );
+    -fx-padding: 80 0 80 0;
 }
 
+/* Title */
 .unoTitle {
-    -fx-border-color: limegreen;
-    -fx-border-width: 2px;
-
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size: 40px;
+    -fx-font-size: 34px;
 }
 
 .unoSubtitle {
-    -fx-border-color: pink;
-    -fx-border-width: 2px;
-    -fx-text-fill: white;
+    -fx-text-fill: #b5b9c8;
+    -fx-font-size: 12px;
 }
 
 .topLableleft {
-    -fx-border-color: purple;
-    -fx-border-width: 2px;
-
     -fx-text-fill: white;
     -fx-font-weight: bold;
+    -fx-font-size: 12px;
 }
 
 .Subtitles {
-    -fx-border-color: red;
-    -fx-border-width: 2px;
-
-    -fx-text-fill: grey;
+    -fx-text-fill: #8f93a3;
+    -fx-font-size: 11px;
 }
 
-.lWelcomeBack {
-    -fx-border-color: yellow;
-    -fx-border-width: 2px;
+/* Left cards */
+.leftLableBorder {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 10 14 10 14;
+    -fx-min-width: 250px;
+}
 
-    -fx-font-size: 28px;
+/* Feature list padding */
+.featureList {
+    -fx-padding: 0 24 0 24;
+}
+
+/* Right side */
+.lWelcomeBack {
+    -fx-font-size: 26px;
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
 .loginLables {
-    -fx-border-color: blue;
-    -fx-border-width: 2px;
-
-    -fx-text-fill: white;
+    -fx-text-fill: #cfcfe6;
+    -fx-font-size: 12px;
 }
 
-.LoginButton {
-    -fx-border-color: green;
-    -fx-border-width: 2px;
+/* Login card */
+.loginCard {
+    -fx-padding: 32 36 32 36;
+    -fx-background-color: rgba(26, 29, 50, 0.85);
+    -fx-background-radius: 24;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-width: 1px;
+    -fx-border-radius: 24;
+    -fx-max-width: 360px;
+    -fx-min-width: 360px;
+}
+
+/* Input fields */
+.login {
+    -fx-background-color: rgba(0, 0, 0, 0.45);
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #8f93a3;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 10 12 10 12;
+}
+
+/* Buttons */
+.loginButton {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+    -fx-background-color: rgba(255, 90, 90, 0.95);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
 }
 
 .CreateAccButton {
-    -fx-border-color: black;
-    -fx-border-width: 2px;
-}
-
-.leftLableBorder {
-    -fx-border-color: black;
-    -fx-border-radius: 5;
-    -fx-background-color: rgba(30, 41, 59, 0.6);
-}
-
-.login {
-    -fx-border-radius: 5;
-    -fx-background-color: rgba(0, 0, 0, 0.8)
-}
-
-.loginButton {
-    -fx-border-radius: 5;
-    -fx-background-color: rgba(255, 107, 107, 0.8)
-
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-width: 1px;
+    -fx-background-color: rgba(0, 0, 0, 0);
 }

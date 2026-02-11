@@ -15,9 +15,8 @@ public class HelloApplication extends Application {
         stage.setTitle("Login");
         stage.setScene(scene);
         stage.setMaximized(true);
-
-
-
         stage.show();
+
+
     }
 }
