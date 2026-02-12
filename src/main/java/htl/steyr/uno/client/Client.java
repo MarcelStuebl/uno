@@ -20,26 +20,27 @@ public class Client {
 
         try (Scanner console = new Scanner(System.in)) {
             while (true) {
-//                System.out.println("Enter username:");
-//                String username = console.nextLine();
-//                if (username.equalsIgnoreCase("/quit")) break;
-//
-//                System.out.println("Enter password:");
-//                String password = console.nextLine();
-//                if (password.equalsIgnoreCase("/quit")) break;
-//
-//                LoginRequest msg = new LoginRequest(username, password);
-//                conn.sendMessage(msg);
-//                break;
+                System.out.println("Enter username:");
+                String username = console.nextLine();
+                if (username.equalsIgnoreCase("/quit")) break;
 
-                String username = "testuser";
-                String password = "123";
-                String firstName = "Test";
-                String lastName = "User";
-                CreateAccountRequest msg = new CreateAccountRequest(username, lastName, firstName, password);
+                System.out.println("Enter password:");
+                String password = console.nextLine();
+                if (password.equalsIgnoreCase("/quit")) break;
+
+                LoginRequest msg = new LoginRequest(username, password);
                 conn.sendMessage(msg);
                 String input = console.nextLine();
                 break;
+
+//                String username = "testuser";
+//                String password = "123";
+//                String firstName = "Test";
+//                String lastName = "User";
+//                CreateAccountRequest msg = new CreateAccountRequest(username, lastName, firstName, password);
+//                conn.sendMessage(msg);
+//                String input = console.nextLine();
+//                break;
             }
         }
 

@@ -59,6 +59,7 @@ public class DatabaseUser {
     public User getUser(String username, String password) throws SQLException {
         User user = getUser(username);
             if (verifyPassword(password, user.getPasswordHash(), user.getPasswordSalt())) {
+                updateLastLogin(user.getId());
                 return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin());
             } else {
                 throw new InvalidPasswordException();
@@ -134,6 +135,21 @@ public class DatabaseUser {
     }
 
 
+    /**
+     * Updates the last login timestamp for a user in the database.
+     * @param userId The ID of the user to update.
+     * @throws SQLException if a database access error occurs.
+     */
+    private void updateLastLogin(int userId) throws SQLException {
+        String query = "UPDATE user SET last_login = ? WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+        }
+    }
 
 
 }
