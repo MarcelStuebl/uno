@@ -1,7 +1,6 @@
 package htl.steyr.uno.client;
 
-import htl.steyr.uno.client.requests.CreateAccountRequest;
-import htl.steyr.uno.client.requests.LoginRequest;
+import htl.steyr.uno.client.requests.*;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -33,10 +32,10 @@ public class Client {
                 String input = console.nextLine();
                 break;
 
-//                String username = "testuser";
-//                String password = "123";
-//                String firstName = "Test";
-//                String lastName = "User";
+//                String username = "a";
+//                String password = "a";
+//                String firstName = "A-User";
+//                String lastName = "AAAAA";
 //                CreateAccountRequest msg = new CreateAccountRequest(username, lastName, firstName, password);
 //                conn.sendMessage(msg);
 //                String input = console.nextLine();
