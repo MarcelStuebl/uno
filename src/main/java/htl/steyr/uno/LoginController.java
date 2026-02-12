@@ -32,7 +32,6 @@ public class LoginController {
         welcomeBackUserName.clear();
     }
 
-
     @FXML
     private void backToLogin(ActionEvent actionEvent) {
         showNewAccScreen.setVisible(false);
