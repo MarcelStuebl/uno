@@ -1,4 +1,4 @@
-package htl.steyr.uno;
+package htl.steyr.uno.GameTableClasses;
 
 public class Card {
     //CardValue 0 bis 9 stands for the Number on the Card

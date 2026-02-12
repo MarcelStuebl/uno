@@ -1,6 +1,5 @@
-package htl.steyr.uno;
+package htl.steyr.uno.GameTableClasses;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Player {

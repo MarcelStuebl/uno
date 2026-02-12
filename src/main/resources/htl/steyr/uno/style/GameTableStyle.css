@@ -1,0 +1,12 @@
+.root {
+    -fx-background-color: linear-gradient(to bottom, #1b5e20, #2e7d32);
+}
+
+.table {
+    -fx-background-color: #145a1f;
+    -fx-background-radius: 400;
+    -fx-border-color: #0d3d14;
+    -fx-border-width: 12;
+    -fx-border-radius: 400;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 40, 0.5, 0, 0);
+}
