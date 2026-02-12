@@ -6,11 +6,11 @@ import javafx.stage.Stage;
 public class GameTableTest extends Application {
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage stage) {
 
         // open gameTable as regular Object
         GameTable gameTable = new GameTable();
-        gameTable.open(primaryStage);
+        gameTable.open(stage);
     }
 
     public static void main(String[] args) {

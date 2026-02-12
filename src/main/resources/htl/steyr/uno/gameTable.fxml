@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           stylesheets="@style/GameTableStyle.css"
+           fx:id="root">
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@style/GameTableStyle.css"
-            fx:controller="htl.steyr.uno.GameTableClasses.GameTable"
-            prefHeight="400.0" prefWidth="600.0">
-    <AnchorPane fx:id="table" styleClass="table" prefWidth="800" prefHeight="400"
-                layoutX="200" layoutY="200">
-    </AnchorPane>
-</AnchorPane>
+    <!-- Tisch -->
+    <Pane fx:id="table"
+          styleClass="table"
+          StackPane.alignment="CENTER"/>
+
+</StackPane>
