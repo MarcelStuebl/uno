@@ -48,6 +48,15 @@ public class User implements Serializable {
         generatePasswordHashAndSalt(Password);
     }
 
+    public User(String username, String lastName, String firstName) {
+        setUsername(username);
+        setLastName(lastName);
+        setFirstName(firstName);
+    }
+
+    public User(){
+    }
+
     private void generatePasswordHashAndSalt(String password) {
         String salt = PasswordUtil.generateSalt();
         String hash = PasswordUtil.hashPassword(password, salt);

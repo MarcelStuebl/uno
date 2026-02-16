@@ -1,4 +1,4 @@
-package htl.steyr.uno.client.requests;
+package htl.steyr.uno.requests.client;
 
 import java.io.Serializable;
 

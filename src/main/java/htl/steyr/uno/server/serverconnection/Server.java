@@ -14,6 +14,7 @@ public class Server {
     private Thread acceptThread;
     private boolean running;
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
+    private final List<Lobby> lobbies = Collections.synchronizedList(new ArrayList<>());
 
 
     public void start() throws IOException {
@@ -26,14 +27,7 @@ public class Server {
                 try {
                     Socket s = serverSocket.accept();
 
-                    ServerSocketConnection client = new ServerSocketConnection(s);
-
-                    client.addSubscriber(event -> {
-                        String line = String.valueOf(event.message());
-                        System.out.println("[" + s.getRemoteSocketAddress() + "] " + line);
-                        client.sendMessage("Server received: " + line);
-                    });
-
+                    ServerSocketConnection client = new ServerSocketConnection(s, this);
                     client.startReceiving();
 
                     connections.add(client);
@@ -46,6 +40,10 @@ public class Server {
         acceptThread.start();
     }
 
+    public void getMessage(Object message) {
+        System.out.println("Received message: " + message);
+    }
+
     public static void main(String[] args) throws IOException {
         Server server = new Server();
         server.start();
@@ -56,6 +54,10 @@ public class Server {
         running = false;
         acceptThread.interrupt();
         serverSocket.close();
+    }
+
+    public List<Lobby> getLobbies() {
+        return lobbies;
     }
 
 }

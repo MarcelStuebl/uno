@@ -20,7 +20,7 @@ public class DatabaseUser {
     private User getUser(String username) throws SQLException {
         String query = "SELECT id, username, last_name, first_name, games_won, games_lost, created_at, last_login, password_hash, password_salt FROM user WHERE username = ?";
 
-        User user = null;
+        User user = new User();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, username);
@@ -41,9 +41,6 @@ public class DatabaseUser {
                 }
             }
         }
-        if (user == null){
-            throw new UserNotFoundException(username);
-        }
         return user;
     }
 
@@ -62,7 +59,7 @@ public class DatabaseUser {
                 updateLastLogin(user.getId());
                 return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin());
             } else {
-                throw new InvalidPasswordException();
+                return new User();
             }
     }
 
