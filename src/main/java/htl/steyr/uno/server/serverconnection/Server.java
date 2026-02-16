@@ -31,7 +31,7 @@ public class Server {
                     client.startReceiving();
 
                     connections.add(client);
-                    System.out.println("New connection from " + s.getRemoteSocketAddress());
+                    System.out.println("[" + s.getRemoteSocketAddress() + "] New connection");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -41,7 +41,7 @@ public class Server {
     }
 
     public void getMessage(Object message) {
-        System.out.println("Received message: " + message);
+        System.out.println(message);
     }
 
     public static void main(String[] args) throws IOException {

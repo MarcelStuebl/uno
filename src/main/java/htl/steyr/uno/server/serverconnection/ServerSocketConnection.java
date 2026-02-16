@@ -52,7 +52,7 @@ public class ServerSocketConnection{
             try {
                 while (running) {
                     Object obj = in.readObject();
-                    server.getMessage(obj);
+                    server.getMessage("[" + socket.getRemoteSocketAddress() + "] " + obj);
 
                     if (obj instanceof LoginRequest) {
                         loginRequest((LoginRequest) obj);
