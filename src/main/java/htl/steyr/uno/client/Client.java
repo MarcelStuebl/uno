@@ -53,7 +53,7 @@ public class Client {
     }
 
     private void createLobby() {
-        CreateLobbyRequest msg = new CreateLobbyRequest();
+        CreateLobbyRequest msg = new CreateLobbyRequest(conn.getUser());
         conn.sendMessage(msg);
     }
 
