@@ -1,10 +1,7 @@
 package htl.steyr.uno.server.serverconnection;
 
 import htl.steyr.uno.User;
-import htl.steyr.uno.requests.client.CreateAccountRequest;
-import htl.steyr.uno.requests.client.CreateLobbyRequest;
-import htl.steyr.uno.requests.client.JoinLobbyRequest;
-import htl.steyr.uno.requests.client.LoginRequest;
+import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.server.database.DatabaseUser;
 
 import java.io.IOException;
