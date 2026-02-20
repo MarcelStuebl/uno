@@ -88,4 +88,10 @@ public class ClientSocketConnection implements Closeable {
         running = false;
         try { socket.close(); } catch (Exception ignored) {}
     }
+
+    public User getUser() {
+        return user;
+    }
+
+
 }
