@@ -1,8 +1,6 @@
 package htl.steyr.uno.client;
 
-import htl.steyr.uno.requests.client.CreateLobbyRequest;
-import htl.steyr.uno.requests.client.JoinLobbyRequest;
-import htl.steyr.uno.requests.client.LoginRequest;
+import htl.steyr.uno.requests.client.*;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -67,6 +65,23 @@ public class Client {
             return;
         }
         JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId);
+        conn.sendMessage(msg);
+    }
+
+    private void createAccount() {
+        System.out.println("Enter username:");
+        String username = console.nextLine();
+
+        System.out.println("Enter first name:");
+        String firstName = console.nextLine();
+
+        System.out.println("Enter last name:");
+        String lastName = console.nextLine();
+
+        System.out.println("Enter password:");
+        String password = console.nextLine();
+
+        CreateAccountRequest msg = new CreateAccountRequest(username, firstName, lastName, password);
         conn.sendMessage(msg);
     }
 
