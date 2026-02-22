@@ -43,5 +43,5 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:release
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/marcelstuebl/uno:release
+            ghcr.io/marcelstuebl/uno:${{ github.sha }}
