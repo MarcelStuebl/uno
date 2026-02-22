@@ -5,6 +5,9 @@ import java.io.Serializable;
 public class LoginFailedResponse implements Serializable {
 
 
+    /**
+     * Create a new LoginFailedResponse.
+     */
     public LoginFailedResponse() {
     }
 

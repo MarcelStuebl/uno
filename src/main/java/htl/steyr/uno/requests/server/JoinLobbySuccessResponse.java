@@ -5,6 +5,9 @@ import java.io.Serializable;
 public class JoinLobbySuccessResponse implements Serializable {
 
 
+    /**
+     * Create a new JoinLobbySuccessResponse.
+     */
     public JoinLobbySuccessResponse() {
     }
 

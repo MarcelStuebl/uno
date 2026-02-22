@@ -10,6 +10,14 @@ public class CreateAccountRequest implements Serializable {
     private String password;
 
 
+    /**
+     * Create a new CreateAccountRequest with the given parameters.
+     *
+     * @param username  the username of the new account
+     * @param lastName  the last name of the user
+     * @param firstName the first name of the user
+     * @param password  the password for the new account
+     */
     public CreateAccountRequest(String username, String lastName, String firstName, String password) {
         setUsername(username);
         setLastName(lastName);

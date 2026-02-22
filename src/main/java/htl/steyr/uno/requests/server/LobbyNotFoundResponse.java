@@ -8,6 +8,12 @@ public class LobbyNotFoundResponse implements Serializable {
 
     private User user;
 
+
+    /**
+     * Create a new LobbyNotFoundResponse for the given user.
+     *
+     * @param user
+     */
     public LobbyNotFoundResponse(User user) {
         setUser(user);
     }

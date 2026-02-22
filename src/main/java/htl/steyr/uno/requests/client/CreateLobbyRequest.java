@@ -8,6 +8,12 @@ public class CreateLobbyRequest implements Serializable {
 
     private User user;
 
+
+    /**
+     * Create a new CreateLobbyRequest for the given user.
+     *
+     * @param user the user who wants to create a lobby
+     */
     public CreateLobbyRequest(User user) {
         setUser(user);
     }

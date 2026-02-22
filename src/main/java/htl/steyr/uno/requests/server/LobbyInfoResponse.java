@@ -12,6 +12,12 @@ public class LobbyInfoResponse implements Serializable {
     private Integer status = 0; // 0 = waiting for players, 1 = full, 2 = in game
     private final List<User> users = new ArrayList<>();
 
+    /**
+     * Create a new LobbyInfoResponse with the given lobby ID and status.
+     */
+    public LobbyInfoResponse() {}
+
+
     @Override
     public String toString() {
         return "LobbyInfoResponse{" +

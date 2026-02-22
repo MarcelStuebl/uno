@@ -15,6 +15,15 @@ public class Lobby {
     private final LobbyInfoResponse lobbyInfoResponse = new LobbyInfoResponse();
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
 
+
+    /**
+     * Creates a new lobby with a random ID and adds it to the server's list of lobbies.
+     * The lobby ID is generated randomly and checked for uniqueness against existing lobbies on the server.
+     * If a duplicate ID is generated, the process is repeated until a unique ID is found.
+     * The lobby is initialized with a status of 0 (waiting for players) and the lobby information is updated accordingly.
+     * The new lobby is then added to the server's list of lobbies.
+     * @param server
+     */
     public Lobby(Server server) {
         this.server = server;
         lobbyId = (int) (Math.random() * 100000);
