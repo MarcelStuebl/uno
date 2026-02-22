@@ -1,7 +1,10 @@
 package htl.steyr.uno.server.serverconnection;
 
 import htl.steyr.uno.User;
-import htl.steyr.uno.requests.client.*;
+import htl.steyr.uno.requests.client.CreateAccountRequest;
+import htl.steyr.uno.requests.client.CreateLobbyRequest;
+import htl.steyr.uno.requests.client.JoinLobbyRequest;
+import htl.steyr.uno.requests.client.LoginRequest;
 import htl.steyr.uno.requests.server.*;
 import htl.steyr.uno.server.database.DatabaseUser;
 
@@ -11,7 +14,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 
-public class ServerSocketConnection{
+public class ServerSocketConnection {
 
     private final Server server;
     private final Socket socket;
@@ -98,18 +101,25 @@ public class ServerSocketConnection{
     }
 
     private void createLobbyRequest(CreateLobbyRequest obj) {
-            Lobby lobby = new Lobby(server);
-            lobby.addConnection(this);
-            lobby.updateJoined();
+        Lobby lobby = new Lobby(server);
+        lobby.addConnection(this);
+        CreateLobbySuccessResponse msg = new CreateLobbySuccessResponse();
+        sendMessage(msg);
+        sendLogMessage(msg);
+        lobby.updateJoined();
     }
 
     private void joinLobbyRequest(JoinLobbyRequest obj) {
         Lobby lobby = server.getLobbies().stream().filter(l -> l.getLobbyId() == obj.getLobbyId()).findFirst().orElse(null);
-        if (lobby != null) {
+        if (lobby != null && lobby.canJoin()) {
             lobby.addConnection(this);
             lobby.updateJoined();
+        } else if (lobby != null && !lobby.canJoin()) {
+            LobbyJoinRefusedResponse msg = new LobbyJoinRefusedResponse(getUser(), lobby.getLobbyInfoResponse());
+            sendMessage(msg);
+            sendLogMessage(msg);
         } else {
-            InvalidJoinLobbyResponse msg = new InvalidJoinLobbyResponse(getUser());
+            LobbyNotFoundResponse msg = new LobbyNotFoundResponse(getUser());
             sendMessage(msg);
             sendLogMessage(msg);
         }

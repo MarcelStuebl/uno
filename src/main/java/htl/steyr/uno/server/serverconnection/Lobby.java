@@ -11,6 +11,7 @@ public class Lobby {
 
     private final Server server;
     private Integer lobbyId;
+    private Integer status = 0; // 0 = waiting for players, 1 = full, 2 = in game
     private final LobbyInfoResponse lobbyInfoResponse = new LobbyInfoResponse();
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
 
@@ -31,13 +32,32 @@ public class Lobby {
 
         synchronized (connections) {
             for (var c : connections) msg.addUser(c.getUser());
+            if (getStatus() != 2) checkStatus();
+            msg.setStatus(getStatus());
             for (var c : connections) c.sendMessage(msg);
         }
     }
 
+    private void checkStatus() {
+        if (connections.size() >= 2) {
+            setStatus(1);
+        } else {
+            setStatus(0);
+        }
+    }
 
+    public void setStatus(Integer status) {
+        this.status = status;
+        lobbyInfoResponse.setStatus(status);
+    }
 
+    public Integer getStatus() {
+        return status;
+    }
 
+    public boolean canJoin() {
+        return status == 0;
+    }
 
 
 
@@ -66,7 +86,6 @@ public class Lobby {
         return lobbyId;
     }
 
-
     public String getConnectedPlayers() {
         StringBuilder sb = new StringBuilder();
         for (ServerSocketConnection conn : connections) {
@@ -76,7 +95,7 @@ public class Lobby {
         return sb.toString();
     }
 
-    public LobbyInfoResponse getLobbyInfoRequest() {
+    public LobbyInfoResponse getLobbyInfoResponse() {
         return lobbyInfoResponse;
     }
 

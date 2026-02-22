@@ -1,10 +1,7 @@
 package htl.steyr.uno.client;
 
 import htl.steyr.uno.User;
-import htl.steyr.uno.requests.server.InvalidJoinLobbyResponse;
-import htl.steyr.uno.requests.server.LobbyInfoResponse;
-import htl.steyr.uno.requests.server.LoginFailedResponse;
-import htl.steyr.uno.requests.server.LoginSuccessResponse;
+import htl.steyr.uno.requests.server.*;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -55,8 +52,14 @@ public class ClientSocketConnection implements Closeable {
                         logInFailed(msg);
                     } else if (obj instanceof LobbyInfoResponse msg) {
                         gotLobby(msg);
-                    } else if (obj instanceof InvalidJoinLobbyResponse msg) {
-                        invalidJoinLobby(msg);
+                    } else if (obj instanceof JoinLobbySuccessResponse msg) {
+                        joinLobbySuccess(msg);
+                    } else if (obj instanceof LobbyNotFoundResponse msg) {
+                        lobbyNotFound(msg);
+                    } else if (obj instanceof LobbyJoinRefusedResponse msg) {
+                        lobbyJoinRefused(msg);
+                    } else if (obj instanceof CreateLobbySuccessResponse msg) {
+                        createLobbySuccess(msg);
                     } else {
                         System.out.println("Received unknown message: " + obj);
                     }
@@ -96,9 +99,28 @@ public class ClientSocketConnection implements Closeable {
         }
     }
 
-    private void invalidJoinLobby(InvalidJoinLobbyResponse lobby) {
+    private void lobbyNotFound(LobbyNotFoundResponse lobby) {
         System.out.println("Invalid lobby ID. Please try again.");
         client.joinOrCreateLobby();
+    }
+
+    private void lobbyJoinRefused(LobbyJoinRefusedResponse msg) {
+        if (msg.getLobbyInfo().getStatus() == 1) {
+            System.out.println("Lobby is full. Please try again.");
+        } else if (msg.getLobbyInfo().getStatus() == 2) {
+            System.out.println("Game already started. Please try again.");
+        } else {
+            System.out.println("Unknown error. Please try again.");
+        }
+        client.joinOrCreateLobby();
+    }
+
+    private void createLobbySuccess(CreateLobbySuccessResponse msg) {
+        System.out.println("Lobby created successfully.");
+    }
+
+    private void joinLobbySuccess(JoinLobbySuccessResponse msg) {
+        System.out.println("Joined lobby successfully.");
     }
 
     @Override
