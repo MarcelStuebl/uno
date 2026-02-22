@@ -1,6 +1,6 @@
 package htl.steyr.uno.server.serverconnection;
 
-import htl.steyr.uno.requests.server.LobbyInfoRequest;
+import htl.steyr.uno.requests.server.LobbyInfoResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +11,7 @@ public class Lobby {
 
     private final Server server;
     private Integer lobbyId;
-    private final LobbyInfoRequest lobbyInfoRequest = new LobbyInfoRequest();
+    private final LobbyInfoResponse lobbyInfoResponse = new LobbyInfoResponse();
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
 
     public Lobby(Server server) {
@@ -21,12 +21,12 @@ public class Lobby {
             lobbyId = (int) (Math.random() * 100000);
         }
         System.out.println("Created lobby with ID: " + lobbyId);
-        lobbyInfoRequest.setLobbyId(lobbyId);
+        lobbyInfoResponse.setLobbyId(lobbyId);
         server.getLobbies().add(this);
     }
 
     public void updateJoined() {
-        LobbyInfoRequest msg = new LobbyInfoRequest();
+        LobbyInfoResponse msg = new LobbyInfoResponse();
         msg.setLobbyId(lobbyId);
 
         synchronized (connections) {
@@ -76,8 +76,8 @@ public class Lobby {
         return sb.toString();
     }
 
-    public LobbyInfoRequest getLobbyInfoRequest() {
-        return lobbyInfoRequest;
+    public LobbyInfoResponse getLobbyInfoRequest() {
+        return lobbyInfoResponse;
     }
 
 }

@@ -59,7 +59,7 @@ public class DatabaseUser {
                 updateLastLogin(user.getId());
                 return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin());
             } else {
-                return new User();
+                return null;
             }
     }
 

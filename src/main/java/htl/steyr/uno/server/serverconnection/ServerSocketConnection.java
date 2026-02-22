@@ -79,7 +79,14 @@ public class ServerSocketConnection{
     private void loginRequest(LoginRequest request) throws SQLException {
         DatabaseUser db = new DatabaseUser();
         user = db.getUser(request.getUsername(), request.getPassword());
-        sendMessage(user);
+        Object msg;
+        if (user == null) {
+            msg = new LoginFailedResponse();
+        } else {
+            msg = new LoginSuccessResponse(user);
+        }
+        sendMessage(msg);
+        sendLogMessage(msg);
     }
 
     private void createAccountRequest(CreateAccountRequest request) throws SQLException {
@@ -102,7 +109,7 @@ public class ServerSocketConnection{
             lobby.addConnection(this);
             lobby.updateJoined();
         } else {
-            InvalidJoinLobbyRequest msg = new InvalidJoinLobbyRequest(getUser());
+            InvalidJoinLobbyResponse msg = new InvalidJoinLobbyResponse(getUser());
             sendMessage(msg);
             sendLogMessage(msg);
         }

@@ -1,11 +1,15 @@
 package htl.steyr.uno.client;
 
 import htl.steyr.uno.User;
-import htl.steyr.uno.requests.client.JoinLobbyRequest;
-import htl.steyr.uno.requests.server.InvalidJoinLobbyRequest;
-import htl.steyr.uno.requests.server.LobbyInfoRequest;
+import htl.steyr.uno.requests.server.InvalidJoinLobbyResponse;
+import htl.steyr.uno.requests.server.LobbyInfoResponse;
+import htl.steyr.uno.requests.server.LoginFailedResponse;
+import htl.steyr.uno.requests.server.LoginSuccessResponse;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class ClientSocketConnection implements Closeable {
@@ -17,7 +21,7 @@ public class ClientSocketConnection implements Closeable {
     private Thread receiveThread;
     private volatile boolean running;
     private User user;
-    private LobbyInfoRequest lobby;
+    private LobbyInfoResponse lobby;
 
     public ClientSocketConnection(String host, int port, Client client) throws IOException {
         this.socket = new Socket(host, port);
@@ -45,15 +49,17 @@ public class ClientSocketConnection implements Closeable {
 
                     Object obj = in.readObject();
 
-                    if (obj instanceof User user) {
-                        gotUser(user);
-                    } else if (obj instanceof LobbyInfoRequest lobbyInfoRequest) {
-                        gotLobby(lobbyInfoRequest);
-                    } else if (obj instanceof InvalidJoinLobbyRequest) {
-                        invalidJoinLobby((InvalidJoinLobbyRequest) obj);
+                    if (obj instanceof LoginSuccessResponse msg) {
+                        logInSuccess(msg);
+                    } else if (obj instanceof LoginFailedResponse msg) {
+                        logInFailed(msg);
+                    } else if (obj instanceof LobbyInfoResponse msg) {
+                        gotLobby(msg);
+                    } else if (obj instanceof InvalidJoinLobbyResponse msg) {
+                        invalidJoinLobby(msg);
+                    } else {
+                        System.out.println("Received unknown message: " + obj);
                     }
-
-
 
 
                 }
@@ -64,19 +70,22 @@ public class ClientSocketConnection implements Closeable {
         receiveThread.start();
     }
 
-    private void gotUser(User user) {
-        this.user = user;
+    private void logInSuccess(LoginSuccessResponse msg) {
+        this.user = msg.getUser();
 
-        if (user.getUsername() != null) {
-            System.out.println(user);
-            System.out.println("Login successful.");
-        } else {
-            System.out.println("Login failed.");
-            client.logIn();
-        }
+        System.out.println(user);
+        System.out.println("Login successful.");
+
+
+        client.joinOrCreateLobby();
     }
 
-    private void gotLobby(LobbyInfoRequest lobby) {
+    private void logInFailed(LoginFailedResponse msg) {
+        System.out.println("Login failed. Please try again.");
+        client.logIn();
+    }
+
+    private void gotLobby(LobbyInfoResponse lobby) {
         this.lobby = lobby;
 
         if (lobby.getUsers() != null) {
@@ -87,7 +96,7 @@ public class ClientSocketConnection implements Closeable {
         }
     }
 
-    private void invalidJoinLobby(InvalidJoinLobbyRequest lobby) {
+    private void invalidJoinLobby(InvalidJoinLobbyResponse lobby) {
         System.out.println("Invalid lobby ID. Please try again.");
         client.joinOrCreateLobby();
     }
@@ -95,7 +104,10 @@ public class ClientSocketConnection implements Closeable {
     @Override
     public void close() throws IOException {
         running = false;
-        try { socket.close(); } catch (Exception ignored) {}
+        try {
+            socket.close();
+        } catch (Exception ignored) {
+        }
     }
 
     public User getUser() {

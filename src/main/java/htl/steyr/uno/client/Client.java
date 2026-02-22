@@ -20,8 +20,6 @@ public class Client {
         System.out.println("---------------------------------------------");
 
         logIn();
-        joinOrCreateLobby();
-
 
     }
 

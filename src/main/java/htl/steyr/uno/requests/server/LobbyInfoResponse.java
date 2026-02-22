@@ -6,14 +6,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LobbyInfoRequest implements Serializable {
+public class LobbyInfoResponse implements Serializable {
 
     private Integer lobbyId;
     private final List<User> users = new ArrayList<>();
 
     @Override
     public String toString() {
-        return "LobbyInfoRequest{" +
+        return "LobbyInfoResponse{" +
                 "lobbyId=" + lobbyId +
                 ", users=" + users +
                 '}';

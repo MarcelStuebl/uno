@@ -4,18 +4,18 @@ import htl.steyr.uno.User;
 
 import java.io.Serializable;
 
-public class InvalidJoinLobbyRequest implements Serializable {
+public class InvalidJoinLobbyResponse implements Serializable {
 
     private User user;
 
-    public InvalidJoinLobbyRequest(User user) {
+    public InvalidJoinLobbyResponse(User user) {
         setUser(user);
     }
 
 
     @Override
     public String toString() {
-        return "InvalidJoinLobbyRequest{" +
+        return "InvalidJoinLobbyResponse{" +
                 "username='" + getUser().getUsername() +
                 "'}";
     }
