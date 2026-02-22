@@ -118,7 +118,6 @@ public class ServerSocketConnection {
      * @throws SQLException
      */
     private void loginRequest(LoginRequest request) throws SQLException {
-        System.out.println("Login attempt: " + request.getUsername());
         DatabaseUser db = new DatabaseUser();
         user = db.getUser(request.getUsername(), request.getPassword());
         Object msg;

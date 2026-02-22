@@ -55,7 +55,6 @@ public class DatabaseUser {
      */
     public User getUser(String username, String password) throws SQLException {
         User user = getUser(username);
-        System.out.println("User found: " + user);
             if (verifyPassword(password, user.getPasswordHash(), user.getPasswordSalt())) {
                 updateLastLogin(user.getId());
                 return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin());
