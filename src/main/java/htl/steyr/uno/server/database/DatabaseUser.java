@@ -1,6 +1,6 @@
 package htl.steyr.uno.server.database;
 
-import htl.steyr.uno.PasswordUtil;
+import htl.steyr.uno.server.PasswordUtil;
 import htl.steyr.uno.User;
 import htl.steyr.uno.server.exceptions.user.InvalidPasswordException;
 import htl.steyr.uno.server.exceptions.user.UserAlreadyExistsException;

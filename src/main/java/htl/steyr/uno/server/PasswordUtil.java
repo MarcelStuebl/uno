@@ -1,4 +1,4 @@
-package htl.steyr.uno;
+package htl.steyr.uno.server;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
