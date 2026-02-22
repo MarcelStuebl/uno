@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class Client {
 
-    private String host = "127.0.0.1";
+    private String host = "10.10.2.1";
     private int port = 59362;
     private ClientSocketConnection conn;
     Scanner console = new Scanner(System.in);
