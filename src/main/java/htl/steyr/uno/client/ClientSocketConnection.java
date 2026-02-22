@@ -1,6 +1,8 @@
 package htl.steyr.uno.client;
 
 import htl.steyr.uno.User;
+import htl.steyr.uno.requests.client.JoinLobbyRequest;
+import htl.steyr.uno.requests.server.InvalidJoinLobbyRequest;
 import htl.steyr.uno.requests.server.LobbyInfoRequest;
 
 import java.io.*;
@@ -47,6 +49,8 @@ public class ClientSocketConnection implements Closeable {
                         gotUser(user);
                     } else if (obj instanceof LobbyInfoRequest lobbyInfoRequest) {
                         gotLobby(lobbyInfoRequest);
+                    } else if (obj instanceof InvalidJoinLobbyRequest) {
+                        invalidJoinLobby((InvalidJoinLobbyRequest) obj);
                     }
 
 
@@ -81,6 +85,11 @@ public class ClientSocketConnection implements Closeable {
             System.out.println("Lobby operation failed.");
             client.joinOrCreateLobby();
         }
+    }
+
+    private void invalidJoinLobby(InvalidJoinLobbyRequest lobby) {
+        System.out.println("Invalid lobby ID. Please try again.");
+        client.joinOrCreateLobby();
     }
 
     @Override

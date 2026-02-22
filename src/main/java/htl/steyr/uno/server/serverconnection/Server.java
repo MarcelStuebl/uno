@@ -40,7 +40,7 @@ public class Server {
         acceptThread.start();
     }
 
-    public void getMessage(Object message) {
+    public void setLogMessage(Object message) {
         System.out.println(message);
     }
 

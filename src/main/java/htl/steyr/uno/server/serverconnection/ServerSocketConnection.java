@@ -2,6 +2,7 @@ package htl.steyr.uno.server.serverconnection;
 
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
+import htl.steyr.uno.requests.server.*;
 import htl.steyr.uno.server.database.DatabaseUser;
 
 import java.io.IOException;
@@ -43,13 +44,17 @@ public class ServerSocketConnection{
         }
     }
 
+    private void sendLogMessage(Object msg) {
+        server.setLogMessage("[" + socket.getRemoteSocketAddress() + "] " + msg);
+    }
+
     public void startReceiving() {
         running = true;
         receivethread = new Thread(() -> {
             try {
                 while (running) {
                     Object obj = in.readObject();
-                    server.getMessage("[" + socket.getRemoteSocketAddress() + "] " + obj);
+                    sendLogMessage(obj);
 
                     if (obj instanceof LoginRequest) {
                         loginRequest((LoginRequest) obj);
@@ -97,7 +102,9 @@ public class ServerSocketConnection{
             lobby.addConnection(this);
             lobby.updateJoined();
         } else {
-            sendMessage("Lobby not found");
+            InvalidJoinLobbyRequest msg = new InvalidJoinLobbyRequest(getUser());
+            sendMessage(msg);
+            sendLogMessage(msg);
         }
     }
 
