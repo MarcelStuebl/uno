@@ -1,5 +1,6 @@
 package htl.steyr.uno.client;
 
+import htl.steyr.uno.LoginController;
 import htl.steyr.uno.requests.client.*;
 
 import java.io.IOException;
@@ -10,7 +11,12 @@ public class Client {
     private String host = "xserv.stuebl.eu";
     private int port = 59362;
     private ClientSocketConnection conn;
-    Scanner console = new Scanner(System.in);
+    private Scanner console = new Scanner(System.in);
+    private LoginController controller;
+
+    public Client(LoginController controller) {
+        this.controller = controller;
+    }
 
     public void start() throws IOException {
         conn = new ClientSocketConnection(host, port, this);
@@ -18,33 +24,11 @@ public class Client {
 
         System.out.println("Connected to " + host + ":" + port);
         System.out.println("---------------------------------------------");
-
-
     }
 
-    public void logIn() {
-        System.out.println("Enter username:");
-        String username = console.nextLine();
-
-        System.out.println("Enter password:");
-        String password = console.nextLine();
-
+    public void logIn(String username, String password) {
         LoginRequest msg = new LoginRequest(username, password);
         conn.sendMessage(msg);
-    }
-
-    public void joinOrCreateLobby() {
-        System.out.println("j - Join lobby");
-        System.out.println("c - Create lobby");
-        String choice = console.nextLine();
-        if (choice.equalsIgnoreCase("j")) {
-            joinLobby();
-        } else if (choice.equalsIgnoreCase("c")) {
-            createLobby();
-        } else {
-            System.out.println("Invalid choice");
-            joinOrCreateLobby();
-        }
     }
 
     public void createLobby() {
@@ -52,13 +36,10 @@ public class Client {
         conn.sendMessage(msg);
     }
 
-    public void joinLobby() {
-        System.out.println("Enter lobby ID:");
-        String id = console.nextLine();
-        Integer lobbyId = Integer.parseInt(id);
+    public void joinLobby(int lobbyId) {
         if (lobbyId < 1) {
             System.out.println("Invalid lobby ID");
-            joinLobby();
+
             return;
         }
         JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId);
@@ -72,6 +53,10 @@ public class Client {
 
     public ClientSocketConnection getConn() {
         return conn;
+    }
+
+    public LoginController getController() {
+        return controller;
     }
 
 }

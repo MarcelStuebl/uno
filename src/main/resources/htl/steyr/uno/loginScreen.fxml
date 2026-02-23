@@ -115,7 +115,7 @@
                 <Separator />
             </HBox>
          <Label styleClass="Subtitles" text="Du hast bereits einen Account?" />
-         <Button fx:id="showLogin" onAction="#backToLogin" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Anmelden" />
+         <Button fx:id="showLogin" onAction="#backToLoginButtonPressed" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Anmelden" />
 
             <Label styleClass="Subtitles" text="© 2026 UNO – HTL Steyr" />
         </VBox>

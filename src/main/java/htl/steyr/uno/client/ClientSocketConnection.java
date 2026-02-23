@@ -106,8 +106,7 @@ public class ClientSocketConnection implements Closeable {
         System.out.println(user);
         System.out.println("Login successful.");
 
-
-        client.joinOrCreateLobby();
+        client.getController().logInSuccess(user);
     }
 
 
@@ -119,7 +118,6 @@ public class ClientSocketConnection implements Closeable {
      */
     private void logInFailed(LoginFailedResponse msg) {
         System.out.println("Login failed. Please try again.");
-        client.logIn();
     }
 
 
@@ -137,7 +135,6 @@ public class ClientSocketConnection implements Closeable {
             System.out.println(lobby);
         } else {
             System.out.println("Lobby operation failed.");
-            client.joinOrCreateLobby();
         }
     }
 
@@ -150,7 +147,6 @@ public class ClientSocketConnection implements Closeable {
      */
     private void lobbyNotFound(LobbyNotFoundResponse lobby) {
         System.out.println("Invalid lobby ID. Please try again.");
-        client.joinOrCreateLobby();
     }
 
 
@@ -168,7 +164,6 @@ public class ClientSocketConnection implements Closeable {
         } else {
             System.out.println("Unknown error. Please try again.");
         }
-        client.joinOrCreateLobby();
     }
 
 
@@ -193,8 +188,7 @@ public class ClientSocketConnection implements Closeable {
 
 
     private void createAccountSuccess(CreateAccountSuccessResponse msg) {
-        System.out.println("Account created successfully. Please log in.");
-        client.logIn();
+        client.getController().createAccountSuccess(msg);
     }
 
 

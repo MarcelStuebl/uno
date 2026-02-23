@@ -1,6 +1,7 @@
 package htl.steyr.uno;
 
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.server.CreateAccountSuccessResponse;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,7 +34,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        client = new Client();
+        client = new Client(this);
         try {
             client.start();
         } catch (IOException e) {
@@ -51,7 +52,11 @@ public class LoginController implements Initializable {
     }
 
     @FXML
-    private void backToLogin(ActionEvent actionEvent) {
+    private void backToLoginButtonPressed() {
+        backToLogin();
+    }
+
+    private void backToLogin() {
         showNewAccScreen.setVisible(false);
         showCreateAcc.setVisible(true);
         newAccPassword.clear();
@@ -59,6 +64,8 @@ public class LoginController implements Initializable {
         newAccLastName.clear();
         newAccFirstName.clear();
     }
+
+
 
     public void onCreateNewAccountButtonClicked(ActionEvent actionEvent) {
         String username = newAccUserName.getText();
@@ -85,7 +92,6 @@ public class LoginController implements Initializable {
             System.out.println("Error: Last name cannot contain numbers or special characters.");
         } else {
             client.createAccount(username, firstName, lastName, password);
-            backToLogin(actionEvent);
         }
     }
 
@@ -102,6 +108,18 @@ public class LoginController implements Initializable {
             System.out.println("Error: Username cannot be empty.");
         } else if (password.isEmpty()) {
             System.out.println("Error: Password cannot be empty.");
+        } else {
+            client.logIn(username, password);
         }
+    }
+
+    public void createAccountSuccess(CreateAccountSuccessResponse msg) {
+        System.out.println("Account created successfully: " + msg.getUser());
+        backToLogin();
+    }
+
+    public void logInSuccess(User user) {
+        System.out.println("Logged in successfully: " + user);
+
     }
 }
