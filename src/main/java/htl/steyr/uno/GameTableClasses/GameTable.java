@@ -31,6 +31,7 @@ public class GameTable {
             stage.setScene(new Scene(root));
             stage.setTitle("UNO - Game Table");
             stage.setMaximized(true);
+            stage.setResizable(false);
             stage.show();
 
             addCloseButton(root, stage);   // ← ausgelagert
@@ -58,12 +59,7 @@ public class GameTable {
         enemies.add(new Enemy("Sophie", false, 3));
 
         // 🔹 Player erstellen
-        Player player = new Player(
-                "Max",        // Username
-                true,         // ist am Zug
-                myHand,       // Karten
-                enemies       // Gegner
-        );
+        Player player = new Player("Max",true,myHand,enemies);
 
         // 🔹 Testausgabe
         player.testPrintHand();
