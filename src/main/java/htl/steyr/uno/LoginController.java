@@ -4,12 +4,15 @@ import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.CreateAccountSuccessResponse;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -17,6 +20,7 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
+    @FXML public Button anmeldeButton;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
@@ -42,7 +46,6 @@ public class LoginController implements Initializable {
         }
     }
 
-
     @FXML
     private void onCreateAccountButtonClicked(ActionEvent actionEvent) {
         showCreateAcc.setVisible(false);
@@ -64,8 +67,6 @@ public class LoginController implements Initializable {
         newAccLastName.clear();
         newAccFirstName.clear();
     }
-
-
 
     public void onCreateNewAccountButtonClicked(ActionEvent actionEvent) {
         String username = newAccUserName.getText();
@@ -95,7 +96,7 @@ public class LoginController implements Initializable {
         }
     }
 
-    public void onLoginButtonClicked(ActionEvent actionEvent) {
+    public void onLoginButtonClicked(ActionEvent actionEvent) throws IOException {
         String username = welcomeBackUserName.getText();
         String password = welcomeBackPasswd.getText();
 
@@ -110,6 +111,7 @@ public class LoginController implements Initializable {
             System.out.println("Error: Password cannot be empty.");
         } else {
             client.logIn(username, password);
+            switchScene();
         }
     }
 
@@ -120,6 +122,19 @@ public class LoginController implements Initializable {
 
     public void logInSuccess(User user) {
         System.out.println("Logged in successfully: " + user);
-
     }
+
+    public void switchScene () throws IOException {
+        Stage stage = new Stage();
+        Stage thisStage = (Stage) anmeldeButton.getScene().getWindow();
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("CreateLobby.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        stage.setTitle("LobbyErstellen");
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.setResizable(false);
+        stage.show();
+        thisStage.close();
+    }
+
 }

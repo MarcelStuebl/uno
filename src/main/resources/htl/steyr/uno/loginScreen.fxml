@@ -68,7 +68,7 @@
                   <PasswordField fx:id="welcomeBackPasswd" promptText="Dein Passwort" styleClass="login" />
                </children>
             </VBox>
-            <Button onAction="#onLoginButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Anmelden" />
+            <Button fx:id="anmeldeButton" onAction="#onLoginButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Anmelden" />
             <HBox alignment="CENTER" spacing="8">
                <children>
                   <Separator />
