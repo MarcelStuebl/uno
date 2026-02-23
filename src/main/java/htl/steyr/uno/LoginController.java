@@ -1,8 +1,7 @@
 package htl.steyr.uno;
 
 import htl.steyr.uno.client.Client;
-import htl.steyr.uno.requests.server.CreateAccountSuccessResponse;
-import htl.steyr.uno.requests.server.LoginFailedResponse;
+import htl.steyr.uno.requests.server.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -42,6 +41,12 @@ public class LoginController implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        Platform.runLater(() -> {
+            loginPane.getScene().getWindow().setOnCloseRequest(event -> {
+                onSceneClose();
+            });
+        });
     }
 
 
@@ -129,6 +134,12 @@ public class LoginController implements Initializable {
         System.out.println("Login failed. Please try again.");
     }
 
+
+    private void onSceneClose() {
+        if (client.getConn() != null) {
+            client.getConn().close();
+        }
+    }
 
 
 }
