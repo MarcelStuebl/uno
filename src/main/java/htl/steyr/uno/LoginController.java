@@ -9,33 +9,19 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class LoginController {
-
-
-    @FXML
-    private Button showLogin;
-    @FXML
-    private VBox showNewAccScreen;
-    @FXML
-    private Button createAcc;
-    @FXML
-    private VBox showCreateAcc;
-    @FXML
-    private StackPane loginPane;
-    @FXML
-    private StackPane brandingPane;
-    @FXML
-    private PasswordField newAccPassword;
-    @FXML
-    private TextField newAccUserName;
-    @FXML
-    private TextField newAccLastName;
-    @FXML
-    private TextField newAccFirstName;
-    @FXML
-    private PasswordField welcomeBackPasswd;
-    @FXML
-    private TextField welcomeBackUserName;
-
+    
+    @FXML private Button showLogin;
+    @FXML private VBox showNewAccScreen;
+    @FXML private Button createAcc;
+    @FXML private VBox showCreateAcc;
+    @FXML private StackPane loginPane;
+    @FXML private StackPane brandingPane;
+    @FXML private PasswordField newAccPassword;
+    @FXML private TextField newAccUserName;
+    @FXML private TextField newAccLastName;
+    @FXML private TextField newAccFirstName;
+    @FXML private PasswordField welcomeBackPasswd;
+    @FXML private TextField welcomeBackUserName;
 
     @FXML
     private void onCreateAccountButtonClicked(ActionEvent actionEvent) {
