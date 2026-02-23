@@ -145,7 +145,7 @@ public class ServerSocketConnection {
         DatabaseUser db = new DatabaseUser();
         db.addUser(user);
         User createdUser = db.getUser(request.getUsername(), request.getPassword());
-        sendMessage(createdUser);
+        sendMessage(new CreateAccountSuccessResponse(createdUser));
     }
 
 

@@ -80,6 +80,7 @@ public class ClientSocketConnection implements Closeable {
                         case LobbyNotFoundResponse msg -> lobbyNotFound(msg);
                         case LobbyJoinRefusedResponse msg -> lobbyJoinRefused(msg);
                         case CreateLobbySuccessResponse msg -> createLobbySuccess(msg);
+                        case CreateAccountSuccessResponse msg -> createAccountSuccess(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -188,6 +189,12 @@ public class ClientSocketConnection implements Closeable {
      */
     private void joinLobbySuccess(JoinLobbySuccessResponse msg) {
         System.out.println("Joined lobby successfully.");
+    }
+
+
+    private void createAccountSuccess(CreateAccountSuccessResponse msg) {
+        System.out.println("Account created successfully. Please log in.");
+        client.logIn();
     }
 
 
