@@ -22,7 +22,7 @@ public class GameTable {
     }
 
 
-    private void makeTable(Stage stage) {
+    public void makeTable(Stage stage) {
         StackPane root = null;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));
@@ -40,18 +40,9 @@ public class GameTable {
         }
 
 //test-------------------------------
-        Player player1 = new Player();
-        ArrayList<Card> hand = new ArrayList<>();
-        hand.add(new Card(3, "red"));
-        hand.add(new Card(7, "blue"));
-        hand.add(new Card(12, "green")); // Draw 2
-        hand.add(new Card(0, "yellow"));
-        hand.add(new Card(10, "red"));   // Skip
-        hand.add(new Card(13, "black")); // Choose colour
-        hand.add(new Card(5, "green"));
-        player1.setPlayerHand(hand);
 
     }
+
     private void addCloseButton(StackPane root, Stage stage) {
 
         Button closeBtn = new Button();
