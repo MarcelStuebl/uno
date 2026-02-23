@@ -72,22 +72,15 @@ public class ClientSocketConnection implements Closeable {
                      * type of response from the server, such as login success, login failure, lobby information,
                      * etc. If an unknown message type is received, it will print a message to the console.
                      */
-                    if (obj instanceof LoginSuccessResponse msg) {
-                        logInSuccess(msg);
-                    } else if (obj instanceof LoginFailedResponse msg) {
-                        logInFailed(msg);
-                    } else if (obj instanceof LobbyInfoResponse msg) {
-                        gotLobby(msg);
-                    } else if (obj instanceof JoinLobbySuccessResponse msg) {
-                        joinLobbySuccess(msg);
-                    } else if (obj instanceof LobbyNotFoundResponse msg) {
-                        lobbyNotFound(msg);
-                    } else if (obj instanceof LobbyJoinRefusedResponse msg) {
-                        lobbyJoinRefused(msg);
-                    } else if (obj instanceof CreateLobbySuccessResponse msg) {
-                        createLobbySuccess(msg);
-                    } else {
-                        System.out.println("Received unknown message: " + obj);
+                    switch (obj) {
+                        case LoginSuccessResponse msg -> logInSuccess(msg);
+                        case LoginFailedResponse msg -> logInFailed(msg);
+                        case LobbyInfoResponse msg -> gotLobby(msg);
+                        case JoinLobbySuccessResponse msg -> joinLobbySuccess(msg);
+                        case LobbyNotFoundResponse msg -> lobbyNotFound(msg);
+                        case LobbyJoinRefusedResponse msg -> lobbyJoinRefused(msg);
+                        case CreateLobbySuccessResponse msg -> createLobbySuccess(msg);
+                        case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
 
