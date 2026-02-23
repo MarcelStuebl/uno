@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class Client {
 
-    private String host = "10.10.2.1";
+    private String host = "xserv.stuebl.eu";
     private int port = 59362;
     private ClientSocketConnection conn;
     Scanner console = new Scanner(System.in);
@@ -19,7 +19,6 @@ public class Client {
         System.out.println("Connected to " + host + ":" + port);
         System.out.println("---------------------------------------------");
 
-        logIn();
 
     }
 
@@ -48,12 +47,12 @@ public class Client {
         }
     }
 
-    private void createLobby() {
+    public void createLobby() {
         CreateLobbyRequest msg = new CreateLobbyRequest(conn.getUser());
         conn.sendMessage(msg);
     }
 
-    private void joinLobby() {
+    public void joinLobby() {
         System.out.println("Enter lobby ID:");
         String id = console.nextLine();
         Integer lobbyId = Integer.parseInt(id);
@@ -66,22 +65,13 @@ public class Client {
         conn.sendMessage(msg);
     }
 
-    private void createAccount() {
-        System.out.println("Enter username:");
-        String username = console.nextLine();
-
-        System.out.println("Enter first name:");
-        String firstName = console.nextLine();
-
-        System.out.println("Enter last name:");
-        String lastName = console.nextLine();
-
-        System.out.println("Enter password:");
-        String password = console.nextLine();
-
+    public void createAccount(String username, String firstName, String lastName, String password) {
         CreateAccountRequest msg = new CreateAccountRequest(username, firstName, lastName, password);
         conn.sendMessage(msg);
     }
 
+    public ClientSocketConnection getConn() {
+        return conn;
+    }
 
 }
