@@ -18,7 +18,5 @@ public class HelloApplication extends Application {
         //stage.setFullScreen(true);
         stage.setMaximized(true);
         stage.show();
-
-
     }
 }
