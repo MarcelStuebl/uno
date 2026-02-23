@@ -2,6 +2,7 @@ package htl.steyr.uno;
 
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.CreateAccountSuccessResponse;
+import htl.steyr.uno.requests.server.LoginFailedResponse;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -115,14 +116,21 @@ public class LoginController implements Initializable {
     }
 
     public void createAccountSuccess(CreateAccountSuccessResponse msg) {
-        System.out.println("Account created successfully in LoginController:" + msg.getUser());
+        System.out.println("Account created successfully in LoginController:" + msg.getUser().getUsername());
         Platform.runLater(this::backToLogin);
     }
 
     public void logInSuccess(User user) {
-        System.out.println("Logged in successfully in LoginController: " + user);
+        System.out.println("Logged in successfully in LoginController: " + user.getUsername());
 
     }
+
+    public void logInFailed(LoginFailedResponse msg) {
+        System.out.println("Login failed. Please try again.");
+    }
+
+
+
 }
 
 

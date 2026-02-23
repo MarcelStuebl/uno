@@ -102,10 +102,6 @@ public class ClientSocketConnection implements Closeable {
      */
     private void logInSuccess(LoginSuccessResponse msg) {
         this.user = msg.getUser();
-
-        System.out.println(user);
-        System.out.println("Login successful.");
-
         client.getController().logInSuccess(user);
     }
 
@@ -117,7 +113,7 @@ public class ClientSocketConnection implements Closeable {
      * @param msg the login failed response containing error information
      */
     private void logInFailed(LoginFailedResponse msg) {
-        System.out.println("Login failed. Please try again.");
+        client.getController().logInFailed(msg);
     }
 
 

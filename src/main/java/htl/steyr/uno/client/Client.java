@@ -39,7 +39,9 @@ public class Client {
     public void joinLobby(int lobbyId) {
         if (lobbyId < 1) {
             System.out.println("Invalid lobby ID");
-
+            /*
+             * @todo show error message in UI
+             */
             return;
         }
         JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId);
