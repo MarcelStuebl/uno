@@ -92,7 +92,7 @@ public class LoginController implements Initializable {
         } else if (lastName.matches(".*\\d.*") || lastName.matches(".*[!@#$%^&*()_/].*")) {
             System.out.println("Error: Last name cannot contain numbers or special characters.");
         } else {
-            client.createAccount(username, firstName, lastName, password);
+            client.createAccount(username, lastName, firstName, password);
         }
     }
 
@@ -127,7 +127,7 @@ public class LoginController implements Initializable {
     public void switchScene () throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) anmeldeButton.getScene().getWindow();
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("CreateLobby.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("lobby.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("LobbyErstellen");
         stage.setScene(scene);

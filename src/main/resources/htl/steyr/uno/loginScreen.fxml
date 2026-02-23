@@ -20,7 +20,7 @@
             <Label styleClass="unoTitle" text="UNO" />
             <Label styleClass="unoSubtitle" text="Das klassische Kartenspiel – jetzt als App!" />
 
-            <VBox spacing="12" styleClass="featureList" alignment="center">
+            <VBox alignment="center" spacing="12" styleClass="featureList">
 
                 <HBox alignment="CENTER_LEFT" spacing="10" styleClass="leftLableBorder">
                     <Label text="🎮" />
@@ -68,7 +68,7 @@
                   <PasswordField fx:id="welcomeBackPasswd" promptText="Dein Passwort" styleClass="login" />
                </children>
             </VBox>
-            <Button fx:id="anmeldeButton" onAction="#onLoginButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Anmelden" />
+            <Button fx:id="anmeldeButton" defaultButton="true" onAction="#onLoginButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Anmelden" />
             <HBox alignment="CENTER" spacing="8">
                <children>
                   <Separator />
@@ -107,7 +107,7 @@
                 <PasswordField fx:id="newAccPassword" promptText="Dein Passwort" styleClass="login" />
             </VBox>
 
-            <Button onAction="#onCreateNewAccountButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Account erstellen" />
+            <Button defaultButton="true" onAction="#onCreateNewAccountButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Account erstellen" />
 
             <HBox alignment="CENTER" spacing="8">
                 <Separator />
