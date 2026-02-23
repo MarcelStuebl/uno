@@ -1,12 +1,21 @@
 .root {
-    -fx-background-color: linear-gradient(to bottom, #1b5e20, #2e7d32);
+    -fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
 }
 
 .table {
-    -fx-background-color: #145a1f;
-    -fx-background-radius: 400;
-    -fx-border-color: #0d3d14;
-    -fx-border-width: 12;
-    -fx-border-radius: 400;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 40, 0.5, 0, 0);
+    -fx-background-color: radial-gradient(
+            center 50% 50%, radius 100%,
+            #1e8449 0%,
+            #196f3d 60%,
+            #145a32 100%
+    );
+
+    -fx-background-radius: 500;
+    -fx-border-radius: 500;
+
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-width: 6;
+
+    -fx-effect:
+            dropshadow(gaussian, rgba(0,0,0,0.6), 60, 0.4, 0, 20);
 }
