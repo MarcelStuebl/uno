@@ -30,7 +30,7 @@ public class GameTable {
 
             stage.setScene(new Scene(root));
             stage.setTitle("UNO - Game Table");
-            stage.setFullScreen(true);
+            stage.setMaximized(true);
             stage.show();
 
             addCloseButton(root, stage);   // ← ausgelagert
@@ -39,19 +39,37 @@ public class GameTable {
             e.printStackTrace();
         }
 
-//test-------------------------------
-        Player player1 = new Player();
-        ArrayList<Card> hand = new ArrayList<>();
-        hand.add(new Card(3, "red"));
-        hand.add(new Card(7, "blue"));
-        hand.add(new Card(12, "green")); // Draw 2
-        hand.add(new Card(0, "yellow"));
-        hand.add(new Card(10, "red"));   // Skip
-        hand.add(new Card(13, "black")); // Choose colour
-        hand.add(new Card(5, "green"));
-        player1.setPlayerHand(hand);
+        // 🔹 Eigene Handkarten erstellen
+        ArrayList<Card> myHand = new ArrayList<>();
+        myHand.add(new Card(3, "red"));
+        myHand.add(new Card(11, "green"));   // Reverse
+        myHand.add(new Card(7, "yellow"));
+        myHand.add(new Card(14, "black"));   // Draw 4
+        myHand.add(new Card(0, "blue"));
+        myHand.add(new Card(1, "yellow"));
+        myHand.add(new Card(3, "yellow"));
+        myHand.add(new Card(3, "blue"));
+        myHand.add(new Card(9, "blue"));
+
+        // 🔹 Enemies erstellen
+        ArrayList<Enemy> enemies = new ArrayList<>();
+        enemies.add(new Enemy("Anna", false, 5));
+        enemies.add(new Enemy("Lukas", false, 7));
+        enemies.add(new Enemy("Sophie", false, 3));
+
+        // 🔹 Player erstellen
+        Player player = new Player(
+                "Max",        // Username
+                true,         // ist am Zug
+                myHand,       // Karten
+                enemies       // Gegner
+        );
+
+        // 🔹 Testausgabe
+        player.testPrintHand();
 
     }
+
     private void addCloseButton(StackPane root, Stage stage) {
 
         Button closeBtn = new Button();
@@ -75,6 +93,7 @@ public class GameTable {
 
         root.getChildren().add(closeBtn);
     }
+
 
 
 
