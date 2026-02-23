@@ -98,6 +98,10 @@ public class LoginController implements Initializable {
           Only if username and password are not empty. If the login is successful, transition to the lobby screen. Otherwise, show an error message.
          */
 
-
+        if (username.isEmpty()) {
+            System.out.println("Error: Username cannot be empty.");
+        } else if (password.isEmpty()) {
+            System.out.println("Error: Password cannot be empty.");
+        }
     }
 }
