@@ -68,7 +68,7 @@
                   <PasswordField fx:id="welcomeBackPasswd" promptText="Dein Passwort" styleClass="login" />
                </children>
             </VBox>
-            <Button fx:id="anmeldeButton" defaultButton="true" onAction="#onLoginButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Anmelden" />
+            <Button onAction="#onLoginButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Anmelden" />
             <HBox alignment="CENTER" spacing="8">
                <children>
                   <Separator />
@@ -78,7 +78,7 @@
             </HBox>
             <Button fx:id="createAcc" onAction="#onCreateAccountButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Account erstellen" />
             <Label styleClass="Subtitles" text="© 2026 UNO – HTL Steyr" />
-            <Label fx:id="errorLable" />
+            <Label fx:id="errorLabel" prefHeight="58.0" prefWidth="331.0" styleClass="errorLabel" text="ERROR!!!" visible="false" wrapText="true" />
          </children>
       </VBox>
 
@@ -108,7 +108,7 @@
                 <PasswordField fx:id="newAccPassword" promptText="Dein Passwort" styleClass="login" />
             </VBox>
 
-            <Button defaultButton="true" onAction="#onCreateNewAccountButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Account erstellen" />
+            <Button onAction="#onCreateNewAccountButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Account erstellen" />
 
             <HBox alignment="CENTER" spacing="8">
                 <Separator />
@@ -116,9 +116,10 @@
                 <Separator />
             </HBox>
          <Label styleClass="Subtitles" text="Du hast bereits einen Account?" />
-         <Button fx:id="showLogin" onAction="#backToLoginButtonPressed" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Anmelden" />
+         <Button fx:id="showLogin" onAction="#backToLogin" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Anmelden" />
 
             <Label styleClass="Subtitles" text="© 2026 UNO – HTL Steyr" />
+         <Label fx:id="errorLabelCreateAcc" prefHeight="60.0" prefWidth="282.0" styleClass="errorLabel" text="ERROR!!!" textAlignment="CENTER" visible="false" wrapText="true" />
         </VBox>
     </StackPane>
 
