@@ -1,5 +1,6 @@
 package htl.steyr.uno;
 
+import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.*;
 import javafx.application.Platform;
@@ -168,6 +169,7 @@ public class LoginController implements Initializable {
         stage.setMaximized(true);
         stage.setResizable(false);
         stage.show();
+        onSceneClose();
         thisStage.close();
     }
 

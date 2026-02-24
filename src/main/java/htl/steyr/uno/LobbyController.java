@@ -1,5 +1,6 @@
 package htl.steyr.uno;
 
+import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.client.Client;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -62,8 +63,23 @@ public class LobbyController implements Initializable {
      *
      * Joins a new game with all players that are in the party
      */
-    public void onJoinButtonClicked(ActionEvent actionEvent) {
+    public void onJoinButtonClicked(ActionEvent actionEvent) throws IOException {
+        Stage stage = new Stage();
+        Stage thisStage = (Stage) joinButton.getScene().getWindow();
 
+        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("lobbyWait.fxml"));
+
+        LobbyWaitController controller = new LobbyWaitController(client);
+        loader.setController(controller);
+
+        Scene scene = new Scene(loader.load());
+
+        stage.setTitle("WarteLobby");
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.setResizable(false);
+        stage.show();
+        thisStage.close();
     }
 
     /**
@@ -81,6 +97,7 @@ public class LobbyController implements Initializable {
         stage.setMaximized(true);
         stage.setResizable(false);
         stage.show();
+        onSceneClose();
         thisStage.close();
     }
 
