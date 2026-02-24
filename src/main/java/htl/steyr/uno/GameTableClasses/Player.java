@@ -1,6 +1,14 @@
 package htl.steyr.uno.GameTableClasses;
 
+import javafx.animation.TranslateTransition;
+import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
+
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Player {
     private final String username;
@@ -82,6 +90,58 @@ public class Player {
         }
 
         System.out.println("----------------------");
+    }
+
+
+    public void showPlayerHand(StackPane root, Player player) {
+
+        HBox handBox = new HBox();
+        handBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
+        handBox.setSpacing(-80); // overlap cards
+
+        //logic to put images on cards, set onClickEvents and add everything to the HandBox
+        for (Card c : player.getPlayerHand()) {
+
+            Button cardBtn = new Button();
+
+            // picture of the card
+            String path = "../testMHORETH/yellowCards/" + c.getCardColour() + c.getCardValue() + ".png";
+            ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+            iv.setFitWidth(100);
+            iv.setFitHeight(150);
+            iv.setPreserveRatio(true);
+
+
+            cardBtn.setGraphic(iv);
+            cardBtn.setPadding(javafx.geometry.Insets.EMPTY);
+            cardBtn.setStyle("-fx-background-color: transparent;" + "-fx-border-color: transparent;");
+            cardBtn.setPadding(javafx.geometry.Insets.EMPTY);
+
+            // click event TEST
+            cardBtn.setOnAction(e -> System.out.println("Karte gespielt: " + c.getCardColour() + " " + c.getCardValue()));
+
+            // hover to bring card in foreground
+            cardBtn.setOnMouseEntered(e->{
+                cardBtn.toFront();
+            });
+            cardBtn.setOnMouseEntered(e -> {
+                TranslateTransition tt = new TranslateTransition(Duration.millis(300), cardBtn);
+                tt.setToY(-25);
+                tt.play();
+            });
+            cardBtn.setOnMouseExited(e -> {
+                TranslateTransition tt = new TranslateTransition(Duration.millis(300), cardBtn);
+                tt.setToY(0);
+                tt.play();
+            });
+
+            handBox.getChildren().add(cardBtn);
+        }
+
+        StackPane.setAlignment(handBox, javafx.geometry.Pos.BOTTOM_CENTER);
+        StackPane.setMargin(handBox, new javafx.geometry.Insets(40));
+
+        root.getChildren().add(handBox);
     }
 
 }
