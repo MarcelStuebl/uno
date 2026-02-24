@@ -5,12 +5,15 @@ import htl.steyr.uno.requests.server.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,6 +21,7 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
+    @FXML public Button anmeldeButton;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
@@ -72,8 +76,6 @@ public class LoginController implements Initializable {
         newAccFirstName.clear();
     }
 
-
-
     public void onCreateNewAccountButtonClicked(ActionEvent actionEvent) {
         String username = newAccUserName.getText();
         String password = newAccPassword.getText();
@@ -98,11 +100,11 @@ public class LoginController implements Initializable {
         } else if (lastName.matches(".*\\d.*") || lastName.matches(".*[!@#$%^&*()_/].*")) {
             System.out.println("Error: Last name cannot contain numbers or special characters.");
         } else {
-            client.createAccount(username, firstName, lastName, password);
+            client.createAccount(username, lastName, firstName, password);
         }
     }
 
-    public void onLoginButtonClicked(ActionEvent actionEvent) {
+    public void onLoginButtonClicked(ActionEvent actionEvent) throws IOException {
         String username = welcomeBackUserName.getText();
         String password = welcomeBackPasswd.getText();
 
@@ -141,8 +143,16 @@ public class LoginController implements Initializable {
         }
     }
 
-
+    public void switchScene () throws IOException {
+        Stage stage = new Stage();
+        Stage thisStage = (Stage) anmeldeButton.getScene().getWindow();
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("lobby.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        stage.setTitle("LobbyErstellen");
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.setResizable(false);
+        stage.show();
+        thisStage.close();
+    }
 }
-
-
-
