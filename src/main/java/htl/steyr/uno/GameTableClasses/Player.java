@@ -1,10 +1,13 @@
 package htl.steyr.uno.GameTableClasses;
 
+import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -99,7 +102,6 @@ public class Player {
         handBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
         handBox.setSpacing(-80); // overlap cards
 
-        //logic to put images on cards, set onClickEvents and add everything to the HandBox
         for (Card c : player.getPlayerHand()) {
 
             Button cardBtn = new Button();
@@ -111,28 +113,42 @@ public class Player {
             iv.setFitHeight(150);
             iv.setPreserveRatio(true);
 
-
             cardBtn.setGraphic(iv);
             cardBtn.setPadding(javafx.geometry.Insets.EMPTY);
-            cardBtn.setStyle("-fx-background-color: transparent;" + "-fx-border-color: transparent;");
-            cardBtn.setPadding(javafx.geometry.Insets.EMPTY);
+            cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
             // click event TEST
             cardBtn.setOnAction(e -> System.out.println("Karte gespielt: " + c.getCardColour() + " " + c.getCardValue()));
 
-            // hover to bring card in foreground
-            cardBtn.setOnMouseEntered(e->{
-                cardBtn.toFront();
-            });
+            // Scale transitions for hover
+            ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), cardBtn);
+            ScaleTransition stExit = new ScaleTransition(Duration.millis(200), cardBtn);
+
+            // DropShadow effect
+            DropShadow shadow = new DropShadow();
+            shadow.setRadius(15);
+            shadow.setOffsetX(0);
+            shadow.setOffsetY(0);
+            shadow.setColor(Color.BLACK);
+
             cardBtn.setOnMouseEntered(e -> {
-                TranslateTransition tt = new TranslateTransition(Duration.millis(300), cardBtn);
-                tt.setToY(-25);
-                tt.play();
+                stExit.stop();
+                stEnter.setToX(1.1); // 20% larger
+                stEnter.setToY(1.1);
+                stEnter.playFromStart();
+
+                // Apply shadow
+                cardBtn.setEffect(shadow);
             });
+
             cardBtn.setOnMouseExited(e -> {
-                TranslateTransition tt = new TranslateTransition(Duration.millis(300), cardBtn);
-                tt.setToY(0);
-                tt.play();
+                stEnter.stop();
+                stExit.setToX(1.0); // back to normal size
+                stExit.setToY(1.0);
+                stExit.playFromStart();
+
+                // Remove shadow
+                cardBtn.setEffect(null);
             });
 
             handBox.getChildren().add(cardBtn);
