@@ -63,11 +63,8 @@ public class LoginController implements Initializable {
         showNewAccScreen.setVisible(true);
         welcomeBackPasswd.clear();
         welcomeBackUserName.clear();
-    }
-
-    @FXML
-    private void backToLoginButtonPressed() {
-        backToLogin();
+        errorLabel.setVisible(false);
+        errorLabelCreateAcc.setVisible(false);
     }
 
     @FXML
@@ -78,6 +75,8 @@ public class LoginController implements Initializable {
         newAccUserName.clear();
         newAccLastName.clear();
         newAccFirstName.clear();
+        errorLabel.setVisible(false);
+        errorLabelCreateAcc.setVisible(false);
     }
 
     public void onCreateNewAccountButtonClicked(ActionEvent actionEvent) {
@@ -85,11 +84,6 @@ public class LoginController implements Initializable {
         String password = newAccPassword.getText();
         String firstName = newAccFirstName.getText();
         String lastName = newAccLastName.getText();
-
-        /*
-        @TODO: Implement account creation logic here, such as validating the input and saving the new user to the database.
-          Only if all fields are filled. If the account creation is successful, transition back to the login screen. Otherwise, show an error message.
-         */
 
         if (password.isEmpty()) {
             errorLabelCreateAcc.setText("Password cannot be empty!");
@@ -119,11 +113,6 @@ public class LoginController implements Initializable {
         String username = welcomeBackUserName.getText();
         String password = welcomeBackPasswd.getText();
 
-        /*
-        @TODO: Implement login logic here, such as validating the username and password against the database.
-          Only if username and password are not empty. If the login is successful, transition to the lobby screen. Otherwise, show an error message.
-         */
-
         if (username.isEmpty()) {
             errorLabel.setText("Username cannot be empty!");
             errorLabel.setVisible(true);
@@ -137,13 +126,10 @@ public class LoginController implements Initializable {
     }
 
     public void createAccountSuccess(CreateAccountSuccessResponse msg) {
-        System.out.println("Account created successfully in LoginController:" + msg.getUser().getUsername());
         Platform.runLater(this::backToLogin);
     }
 
     public void logInSuccess(User user) {
-        System.out.println("Logged in successfully in LoginController: " + user.getUsername());
-
         Platform.runLater(() -> {
             try {
                 switchScene();
@@ -154,7 +140,10 @@ public class LoginController implements Initializable {
     }
 
     public void logInFailed(LoginFailedResponse msg) {
-        System.out.println("Login failed. Please try again.");
+        Platform.runLater(() ->{
+            errorLabel.setText("Username or Password wrong!");
+            errorLabel.setVisible(true);
+        });
     }
 
 
