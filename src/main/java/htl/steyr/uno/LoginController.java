@@ -129,7 +129,11 @@ public class LoginController implements Initializable {
 
     public void logInSuccess(User user) {
         System.out.println("Logged in successfully in LoginController: " + user.getUsername());
-
+        try {
+            switchScene();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void logInFailed(LoginFailedResponse msg) {
