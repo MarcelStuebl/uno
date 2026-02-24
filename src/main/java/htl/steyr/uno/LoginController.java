@@ -35,7 +35,7 @@ public class LoginController implements Initializable {
     @FXML private PasswordField welcomeBackPasswd;
     @FXML private TextField welcomeBackUserName;
 
-    Client client;
+    private Client client;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -129,11 +129,14 @@ public class LoginController implements Initializable {
 
     public void logInSuccess(User user) {
         System.out.println("Logged in successfully in LoginController: " + user.getUsername());
-        try {
-            switchScene();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        Platform.runLater(() -> {
+            try {
+                switchScene();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public void logInFailed(LoginFailedResponse msg) {
@@ -147,11 +150,17 @@ public class LoginController implements Initializable {
         }
     }
 
-    public void switchScene () throws IOException {
+    public void switchScene() throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) anmeldeButton.getScene().getWindow();
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("lobby.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
+
+        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("lobby.fxml"));
+
+        LobbyController controller = new LobbyController(client);
+        loader.setController(controller);
+
+        Scene scene = new Scene(loader.load());
+
         stage.setTitle("LobbyErstellen");
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -159,4 +168,13 @@ public class LoginController implements Initializable {
         stage.show();
         thisStage.close();
     }
+
+    public Client getClient() {
+        return client;
+    }
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+
 }

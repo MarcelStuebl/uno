@@ -1,20 +1,50 @@
 package htl.steyr.uno;
 
+import htl.steyr.uno.client.Client;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class LobbyController {
+public class LobbyController implements Initializable {
 
     public Button createPartyButton;
     public Button joinButton;
     public Button logoutButton;
     public Label gerneratedPartyCode;
+
+    private Client client;
+
+
+    public LobbyController(Client client) {
+        this.client = client;
+    }
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        Platform.runLater(() -> {
+            createPartyButton.getScene().getWindow().setOnCloseRequest(event -> {
+                onSceneClose();
+            });
+        });
+
+        System.out.println("Es geht:\n" + client.getConn().getUser());
+    }
+
+    private void onSceneClose() {
+        if (client.getConn() != null) {
+            client.getConn().close();
+        }
+    }
 
 
     /**
@@ -52,4 +82,14 @@ public class LobbyController {
         stage.show();
         thisStage.close();
     }
+
+
+    public Client getClient() {
+        return client;
+    }
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+
 }
