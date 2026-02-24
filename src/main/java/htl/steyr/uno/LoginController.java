@@ -1,6 +1,5 @@
 package htl.steyr.uno;
 
-import htl.steyr.uno.Lobby.LobbyController;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.*;
 import javafx.application.Platform;

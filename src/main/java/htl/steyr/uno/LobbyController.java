@@ -1,6 +1,5 @@
-package htl.steyr.uno.Lobby;
+package htl.steyr.uno;
 
-import htl.steyr.uno.HelloApplication;
 import htl.steyr.uno.client.Client;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -14,6 +13,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
 
 public class LobbyController implements Initializable {
 
@@ -74,7 +74,7 @@ public class LobbyController implements Initializable {
     public void onLogoutButtonClicked(ActionEvent actionEvent) throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) logoutButton.getScene().getWindow();
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("loginScreen.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("UNO-AnmeldeBildschirm");
         stage.setScene(scene);
@@ -84,13 +84,11 @@ public class LobbyController implements Initializable {
         thisStage.close();
     }
 
-
     public Client getClient() {
         return client;
     }
     public void setClient(Client client) {
         this.client = client;
     }
-
 
 }

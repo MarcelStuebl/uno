@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+
+<HBox alignment="CENTER_RIGHT" fx:controller="htl.steyr.uno.LobbyController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <StackPane prefHeight="400.0" prefWidth="422.0">
+         <children>
+            <VBox alignment="TOP_CENTER" prefHeight="349.0" prefWidth="337.0">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="68.0" prefWidth="312.0">
+                     <children>
+                        <Label prefHeight="39.0" prefWidth="106.0" text="Lobby">
+                           <font>
+                              <Font size="28.0" />
+                           </font>
+                        </Label>
+                        <Line endX="121.5" startX="-298.5" strokeWidth="2.0" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" prefHeight="23.0" prefWidth="149.0">
+                     <children>
+                        <Label fx:id="player1Label" text="Spieler 1">
+                           <font>
+                              <Font size="19.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <HBox alignment="TOP_CENTER" prefHeight="17.0" prefWidth="59.0">
+                     <children>
+                        <Label fx:id="player2Label" text="Spieler 2">
+                           <font>
+                              <Font size="19.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </StackPane>
+      <StackPane prefHeight="400.0" prefWidth="179.0">
+         <children>
+            <VBox prefHeight="400.0" prefWidth="200.0">
+               <children>
+                  <AnchorPane prefHeight="405.0" prefWidth="149.0">
+                     <children>
+                        <Button fx:id="playButton" layoutX="14.0" layoutY="114.0" mnemonicParsing="false" onAction="#playButtonClicked" prefHeight="40.0" prefWidth="64.0" text="Spielen" />
+                        <Button fx:id="leaveLobbyButton" layoutX="14.0" layoutY="347.0" mnemonicParsing="false" onAction="#leaveLobbyButtonClicked" prefHeight="40.0" prefWidth="125.0" text="Lobby verlassen" />
+                        <Line endX="100.0" layoutX="83.0" layoutY="54.0" startX="-85.0" strokeWidth="2.0" />
+                        <Line endX="-69.0" endY="252.0" layoutX="69.0" layoutY="148.0" startX="-69.0" startY="-148.0" strokeWidth="2.0" />
+                        <Label fx:id="AccNameDisplayLabel" layoutX="54.0" layoutY="14.0" prefHeight="28.0" prefWidth="81.0" text="Acc Name">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </VBox>
+         </children>
+      </StackPane>
+   </children>
+</HBox>
