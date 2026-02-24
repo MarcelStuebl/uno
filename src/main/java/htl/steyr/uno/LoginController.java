@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
 public class LoginController implements Initializable {
 
     @FXML public Button anmeldeButton;
-    public Label errorLable;
+    @FXML public Label errorLable;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
