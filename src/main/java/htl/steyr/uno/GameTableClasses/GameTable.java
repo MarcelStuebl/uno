@@ -22,7 +22,7 @@ public class GameTable {
     }
 
 
-    public void makeTable(Stage stage) {
+    private void makeTable(Stage stage) {
         StackPane root = null;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));
@@ -30,7 +30,8 @@ public class GameTable {
 
             stage.setScene(new Scene(root));
             stage.setTitle("UNO - Game Table");
-            stage.setFullScreen(true);
+            stage.setMaximized(true);
+            stage.setResizable(false);
             stage.show();
 
             addCloseButton(root, stage);   // ← ausgelagert
@@ -39,33 +40,59 @@ public class GameTable {
             e.printStackTrace();
         }
 
-//test-------------------------------
+        ArrayList<Card> myHand = new ArrayList<>();
+        myHand.add(new Card(0, "yellow"));// Reverse
+        myHand.add(new Card(7, "yellow"));
+        myHand.add(new Card(1, "yellow"));
+        myHand.add(new Card(3, "yellow"));
+        myHand.add(new Card(3, "yellow"));
+        myHand.add(new Card(3, "yellow"));
+        myHand.add(new Card(3, "yellow"));
+        myHand.add(new Card(3, "yellow"));
+
+
+        ArrayList<Enemy> enemies = new ArrayList<>();
+        enemies.add(new Enemy("Anna", false, 5));
+        enemies.add(new Enemy("Lukas", false, 7));
+        enemies.add(new Enemy("Sophie", false, 3));
+
+
+        Player player = new Player("Max",true,myHand,enemies);
+
+
+        player.testPrintHand();
+        player.showPlayerHand(root,player);
+
 
     }
 
     private void addCloseButton(StackPane root, Stage stage) {
 
-        Button closeBtn = new Button();
+        Button closeBtn = new Button("X"); // Symmetrisches X
+        closeBtn.setPrefSize(40, 40);      // klein
+        closeBtn.setPadding(javafx.geometry.Insets.EMPTY);
+        closeBtn.setAlignment(javafx.geometry.Pos.CENTER);
 
-        javafx.scene.image.ImageView iv = new javafx.scene.image.ImageView(
-                new javafx.scene.image.Image(
-                        getClass().getResourceAsStream("/htl/steyr/uno/testMHORETH/closeButton_TEST.png")
-                )
+        // Einfach rot/weiß für Sichtbarkeit
+        closeBtn.setStyle(
+                "-fx-background-color: #d32f2f;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 18;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 20;"  // rund
         );
 
-        iv.setFitWidth(100);
-        iv.setPreserveRatio(true);
-
-        closeBtn.setGraphic(iv);
-        closeBtn.setStyle("-fx-background-color: transparent;");
-        closeBtn.setPadding(javafx.geometry.Insets.EMPTY);
         closeBtn.setOnAction(e -> stage.close());
 
+
+        // Oben rechts im StackPane
         StackPane.setAlignment(closeBtn, javafx.geometry.Pos.TOP_RIGHT);
-        StackPane.setMargin(closeBtn, new javafx.geometry.Insets(15));
+        StackPane.setMargin(closeBtn, new javafx.geometry.Insets(10));
 
         root.getChildren().add(closeBtn);
     }
+
+
 
 
 
