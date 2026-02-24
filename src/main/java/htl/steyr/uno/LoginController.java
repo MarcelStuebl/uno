@@ -24,7 +24,8 @@ import java.util.ResourceBundle;
 public class LoginController implements Initializable {
 
     @FXML public Button anmeldeButton;
-    @FXML public Label errorLable;
+    @FXML public Label errorLabel;
+    @FXML public Label errorLabelCreateAcc;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
@@ -63,13 +64,11 @@ public class LoginController implements Initializable {
         showNewAccScreen.setVisible(true);
         welcomeBackPasswd.clear();
         welcomeBackUserName.clear();
+        errorLabel.setVisible(false);
+        errorLabelCreateAcc.setVisible(false);
     }
 
     @FXML
-    private void backToLoginButtonPressed() {
-        backToLogin();
-    }
-
     private void backToLogin() {
         showNewAccScreen.setVisible(false);
         showCreateAcc.setVisible(true);
@@ -77,6 +76,8 @@ public class LoginController implements Initializable {
         newAccUserName.clear();
         newAccLastName.clear();
         newAccFirstName.clear();
+        errorLabel.setVisible(false);
+        errorLabelCreateAcc.setVisible(false);
     }
 
     public void onCreateNewAccountButtonClicked(ActionEvent actionEvent) {
@@ -85,25 +86,27 @@ public class LoginController implements Initializable {
         String firstName = newAccFirstName.getText();
         String lastName = newAccLastName.getText();
 
-        /*
-        @TODO: Implement account creation logic here, such as validating the input and saving the new user to the database.
-          Only if all fields are filled. If the account creation is successful, transition back to the login screen. Otherwise, show an error message.
-         */
-
         if (password.isEmpty()) {
-            System.out.println("Error: Password cannot be empty.");
+            errorLabelCreateAcc.setText("Password cannot be empty!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (firstName.isEmpty()) {
-            System.out.println("Error: First name cannot be empty.");
+            errorLabelCreateAcc.setText("First name cannot be empty!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (lastName.isEmpty()) {
-            System.out.println("Error: Last name cannot be empty.");
+            errorLabelCreateAcc.setText("Last name cannot be empty!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (!(username.matches("[a-z]+"))) {
-            System.out.println("Error: Username must only contain lowercase letters.");
+            errorLabelCreateAcc.setText("Username must only contain lowercase letters!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (firstName.matches(".*\\d.*") || lastName.matches(".*[!@#$%^&*()_/].*")) {
-            System.out.println("Error: First name cannot contain numbers or special characters.");
+            errorLabelCreateAcc.setText("First name cannot contain numbers or special characters!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (lastName.matches(".*\\d.*") || lastName.matches(".*[!@#$%^&*()_/].*")) {
-            System.out.println("Error: Last name cannot contain numbers or special characters.");
+            errorLabelCreateAcc.setText("Last name cannot contain numbers or special characters!");
+            errorLabelCreateAcc.setVisible(true);
         } else {
             client.createAccount(username, lastName, firstName, password);
+            errorLabelCreateAcc.setVisible(false);
         }
     }
 
@@ -111,28 +114,23 @@ public class LoginController implements Initializable {
         String username = welcomeBackUserName.getText();
         String password = welcomeBackPasswd.getText();
 
-        /*
-        @TODO: Implement login logic here, such as validating the username and password against the database.
-          Only if username and password are not empty. If the login is successful, transition to the lobby screen. Otherwise, show an error message.
-         */
-
         if (username.isEmpty()) {
-            System.out.println("Error: Username cannot be empty.");
+            errorLabel.setText("Username cannot be empty!");
+            errorLabel.setVisible(true);
         } else if (password.isEmpty()) {
-            System.out.println("Error: Password cannot be empty.");
+            errorLabel.setText("Password cannot be empty!");
+            errorLabel.setVisible(true);
         } else {
             client.logIn(username, password);
+            errorLabel.setVisible(false);
         }
     }
 
     public void createAccountSuccess(CreateAccountSuccessResponse msg) {
-        System.out.println("Account created successfully in LoginController:" + msg.getUser().getUsername());
         Platform.runLater(this::backToLogin);
     }
 
     public void logInSuccess(User user) {
-        System.out.println("Logged in successfully in LoginController: " + user.getUsername());
-
         Platform.runLater(() -> {
             try {
                 switchScene();
@@ -143,7 +141,10 @@ public class LoginController implements Initializable {
     }
 
     public void logInFailed(LoginFailedResponse msg) {
-        System.out.println("Login failed. Please try again.");
+        Platform.runLater(() ->{
+            errorLabel.setText("Username or Password wrong!");
+            errorLabel.setVisible(true);
+        });
     }
 
 
@@ -155,7 +156,7 @@ public class LoginController implements Initializable {
 
     public void switchScene() throws IOException {
         Stage stage = new Stage();
-        Stage thisStage = (Stage) anmeldeButton.getScene().getWindow();
+        Stage thisStage = (Stage) errorLabel.getScene().getWindow();
 
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("lobby.fxml"));
 
