@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
@@ -22,6 +23,7 @@ import java.util.ResourceBundle;
 public class LoginController implements Initializable {
 
     @FXML public Button anmeldeButton;
+    public Label errorLable;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;

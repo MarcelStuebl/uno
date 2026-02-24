@@ -78,6 +78,7 @@
             </HBox>
             <Button fx:id="createAcc" onAction="#onCreateAccountButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Account erstellen" />
             <Label styleClass="Subtitles" text="© 2026 UNO – HTL Steyr" />
+            <Label fx:id="errorLable" />
          </children>
       </VBox>
 
