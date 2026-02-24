@@ -1,7 +1,15 @@
+/* Root Hintergrund */
 .root {
     -fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
+
+    /* Seitenabstand links/rechts + oben/unten */
+    -fx-padding: 75px 190px 75px 190px;
+
+    /* Alle Kinder zentrieren */
+    -fx-alignment: center;
 }
 
+/* Tisch in der Mitte */
 .table {
     -fx-background-color: radial-gradient(
             center 50% 50%, radius 100%,
@@ -13,9 +21,31 @@
     -fx-background-radius: 500;
     -fx-border-radius: 500;
 
-    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-color: rgba(255,255,255,0.15);
     -fx-border-width: 6;
 
-    -fx-effect:
-            dropshadow(gaussian, rgba(0,0,0,0.6), 60, 0.4, 0, 20);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 60, 0.4, 0, 20);
+
+    /* Tischgröße */
+    -fx-pref-width: 600px;
+    -fx-pref-height: 400px;
+}
+
+/* Button rechts oben */
+.button {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 20;
+
+    /* Position rechts oben */
+    -fx-alignment: top-right;
+    -fx-margin: 0 0 0 0;
+}
+
+/* Optional: wenn du Hover willst */
+.button:hover {
+    -fx-background-color: #2ecc71;
+    -fx-cursor: hand;
 }
