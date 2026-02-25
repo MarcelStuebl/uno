@@ -20,10 +20,9 @@ import java.util.ResourceBundle;
 
 public class LobbyController implements Initializable {
 
-    public Button createPartyButton;
-    public Button joinButton;
-    public Button logoutButton;
-    public TextField partyCode;
+    @FXML private Button createPartyButton;
+    @FXML private Button joinPartyButton;
+    @FXML private TextField partyCodeField;
 
     private Client client;
     private LobbyInfoResponse lobby;
@@ -57,7 +56,7 @@ public class LobbyController implements Initializable {
      * @param actionEvent Generats a code für a new game
      */
     @FXML
-    public void onCreatePartyButtonClicked(ActionEvent actionEvent) {
+    private void onCreatePartyButtonClicked(ActionEvent actionEvent) {
         System.out.println(client.getConn().getUser());
         client.createLobby();
     }
@@ -78,8 +77,9 @@ public class LobbyController implements Initializable {
     /**
      * @param actionEvent Joins a new game with all players that are in the party
      */
-    public void onJoinButtonClicked(ActionEvent actionEvent) throws IOException {
-        int lobbyId = Integer.parseInt(partyCode.getText());
+    @FXML
+    private void onJoinButtonClicked(ActionEvent actionEvent) throws IOException {
+        int lobbyId = Integer.parseInt(partyCodeField.getText());
         if (lobbyId <= 10000 || lobbyId >= 99999) {
             System.out.println("Invalid lobby ID");
             /*
@@ -97,7 +97,7 @@ public class LobbyController implements Initializable {
 
     private void switchToLobbyWait() throws IOException {
         Stage stage = new Stage();
-        Stage thisStage = (Stage) joinButton.getScene().getWindow();
+        Stage thisStage = (Stage) joinPartyButton.getScene().getWindow();
 
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("lobbyWait.fxml"));
 
@@ -117,9 +117,10 @@ public class LobbyController implements Initializable {
     /**
      * @param actionEvent Logs the acc out / goes back to the login screen
      */
-    public void onLogoutButtonClicked(ActionEvent actionEvent) throws IOException {
+    @FXML
+    private void onLogoutButtonClicked(ActionEvent actionEvent) throws IOException {
         Stage stage = new Stage();
-        Stage thisStage = (Stage) logoutButton.getScene().getWindow();
+        Stage thisStage = (Stage) createPartyButton.getScene().getWindow();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("loginScreen.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("UNO-AnmeldeBildschirm");
@@ -127,7 +128,6 @@ public class LobbyController implements Initializable {
         stage.setMaximized(true);
         stage.setResizable(false);
         stage.show();
-        onSceneClose();
         thisStage.close();
     }
 
