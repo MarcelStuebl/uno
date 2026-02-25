@@ -27,9 +27,9 @@
       <Line endX="5.0" endY="-39.0" layoutX="294.0" layoutY="283.0" startX="5.0" startY="22.0" />
       <Label fx:id="gerneratedPartyCode" layoutX="108.0" layoutY="209.0" text="Erstellter Party Code" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#fafafa00" height="271.0" layoutX="344.0" layoutY="106.0" stroke="BLACK" strokeType="INSIDE" width="196.0" />
-      <Button fx:id="createPartyButton" layoutX="116.0" layoutY="259.0" mnemonicParsing="false" onAction="#onCreatePartyClicked" text="Party erstellen" />
+      <Button fx:id="createPartyButton" layoutX="116.0" layoutY="259.0" mnemonicParsing="false" onAction="#onCreatePartyButtonClicked" text="Party erstellen" />
       <Button fx:id="joinButton" layoutX="410.0" layoutY="259.0" mnemonicParsing="false" onAction="#onJoinButtonClicked" text="Beitreten" />
-      <TextField layoutX="391.0" layoutY="205.0" prefHeight="25.0" prefWidth="101.0" promptText=" Party Code" />
+      <TextField fx:id="partyCode" layoutX="391.0" layoutY="205.0" prefHeight="25.0" prefWidth="101.0" promptText=" Party Code" />
       <Label layoutX="402.0" layoutY="147.0" text="Party beitreten" />
    </children>
 </AnchorPane>

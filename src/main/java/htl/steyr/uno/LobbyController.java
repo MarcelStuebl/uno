@@ -5,6 +5,7 @@ import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -53,31 +54,33 @@ public class LobbyController implements Initializable {
 
 
     /**
-     * @param actionEvent
-     *
-     * Generats a code für a new game
+     * @param actionEvent Generats a code für a new game
      */
-    public void onCreatePartyClicked(ActionEvent actionEvent) {
+    @FXML
+    public void onCreatePartyButtonClicked(ActionEvent actionEvent) {
+        System.out.println(client.getConn().getUser());
         client.createLobby();
     }
 
     public void createOrJoinPartySuccess(LobbyInfoResponse lobby) {
         this.lobby = lobby;
-        try {
-            switchToLobbyWait();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        Platform.runLater(() -> {
+            try {
+                switchToLobbyWait();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
     }
 
     /**
-     * @param actionEvent
-     *
-     * Joins a new game with all players that are in the party
+     * @param actionEvent Joins a new game with all players that are in the party
      */
     public void onJoinButtonClicked(ActionEvent actionEvent) throws IOException {
-        int lobbyId= Integer.parseInt(partyCode.getText());
-        if (lobbyId <= 1000 || lobbyId >= 9999) {
+        int lobbyId = Integer.parseInt(partyCode.getText());
+        if (lobbyId <= 10000 || lobbyId >= 99999) {
             System.out.println("Invalid lobby ID");
             /*
              * @todo show error message in UI
@@ -112,9 +115,7 @@ public class LobbyController implements Initializable {
     }
 
     /**
-     * @param actionEvent
-     *
-     * Logs the acc out / goes back to the login screen
+     * @param actionEvent Logs the acc out / goes back to the login screen
      */
     public void onLogoutButtonClicked(ActionEvent actionEvent) throws IOException {
         Stage stage = new Stage();
@@ -133,6 +134,7 @@ public class LobbyController implements Initializable {
     public Client getClient() {
         return client;
     }
+
     public void setClient(Client client) {
         this.client = client;
     }

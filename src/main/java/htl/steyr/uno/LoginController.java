@@ -170,7 +170,6 @@ public class LoginController implements Initializable {
         stage.setMaximized(true);
         stage.setResizable(false);
         stage.show();
-        onSceneClose();
         thisStage.close();
     }
 

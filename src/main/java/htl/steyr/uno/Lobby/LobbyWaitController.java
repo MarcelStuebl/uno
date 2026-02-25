@@ -44,6 +44,7 @@ public class LobbyWaitController implements Initializable {
         });
 
         System.out.println("Es geht:\n" + client.getConn().getUser());
+        System.out.println("Lobby:\n" + lobby);
     }
 
     private void onSceneClose() {
