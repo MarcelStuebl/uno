@@ -59,7 +59,7 @@ public class LobbyWaitController implements Initializable {
 
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("gameTable.fxml"));
 
-        GameTable controller = new GameTable();
+        GameTable controller = new GameTable(client);
         loader.setController(controller);
 
         Scene scene = new Scene(loader.load());

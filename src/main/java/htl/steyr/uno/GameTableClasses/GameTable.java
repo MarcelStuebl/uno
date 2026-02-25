@@ -1,20 +1,47 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.client.Client;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.scene.control.Button;
 
-import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
-public class GameTable {
+public class GameTable implements Initializable {
+
+    private final Client client;
+    @FXML private StackPane root;
+    private Stage stage;
+
+    public GameTable(Client client) {
+        this.client = client;
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        Platform.runLater(() -> {
+            Stage stage = (Stage) root.getScene().getWindow();
+            open(stage);
+        });
+
+    }
+
+    private void onSceneClose() {
+        if (client.getConn() != null) {
+            client.getConn().close();
+        }
+    }
+
+
+
 
     public void open(Stage stage) {
         makeTable(stage);
@@ -82,6 +109,7 @@ public class GameTable {
         );
 
         closeBtn.setOnAction(e -> stage.close());
+        onSceneClose();
 
 
         // Oben rechts im StackPane
@@ -90,9 +118,6 @@ public class GameTable {
 
         root.getChildren().add(closeBtn);
     }
-
-
-
 
 
 
