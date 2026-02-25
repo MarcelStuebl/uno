@@ -58,7 +58,7 @@ public class GameTable implements Initializable {
             stage.setScene(new Scene(root));
             stage.setTitle("UNO - Game Table");
             stage.setMaximized(true);
-            stage.setResizable(false);
+            stage.setResizable(true);
             stage.show();
 
             addCloseButton(root, stage);   // ← ausgelagert

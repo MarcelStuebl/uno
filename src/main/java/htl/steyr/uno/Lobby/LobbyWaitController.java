@@ -66,8 +66,6 @@ public class LobbyWaitController implements Initializable {
 
         stage.setTitle("UNO");
         stage.setScene(scene);
-        stage.setMaximized(true);
-        stage.setResizable(false);
         stage.show();
         thisStage.close();
     }
