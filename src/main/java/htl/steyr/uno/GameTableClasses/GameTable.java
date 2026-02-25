@@ -41,14 +41,13 @@ public class GameTable {
         }
 
         ArrayList<Card> myHand = new ArrayList<>();
-        myHand.add(new Card(0, "yellow"));// Reverse
-        myHand.add(new Card(7, "yellow"));
-        myHand.add(new Card(1, "yellow"));
-        myHand.add(new Card(3, "yellow"));
-        myHand.add(new Card(3, "yellow"));
-        myHand.add(new Card(3, "yellow"));
-        myHand.add(new Card(3, "yellow"));
-        myHand.add(new Card(3, "yellow"));
+        myHand.add(new Card(5, "red"));
+        myHand.add(new Card(9, "blue"));
+        myHand.add(new Card(2, "green"));
+        myHand.add(new Card(8, "yellow"));
+        myHand.add(new Card(1, "red"));
+        myHand.add(new Card(6, "blue"));
+        myHand.add(new Card(4, "green"));
 
 
         ArrayList<Enemy> enemies = new ArrayList<>();
