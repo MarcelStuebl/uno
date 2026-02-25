@@ -61,7 +61,7 @@ public class GameTable implements Initializable {
             stage.setResizable(true);
             stage.show();
 
-            addCloseButton(root, stage);   // ← ausgelagert
+            addCloseButton(root, stage);  //for readabiity
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,9 +85,14 @@ public class GameTable implements Initializable {
 
         Player player = new Player("Max",true,myHand,enemies);
 
+        CardStack cardStack = new CardStack();
+
+        StackPane.setAlignment(cardStack.getVisual(), javafx.geometry.Pos.CENTER);
+        root.getChildren().add(cardStack.getVisual());
+
+        player.showPlayerHand(root, player);
 
         player.testPrintHand();
-        player.showPlayerHand(root,player);
 
 
     }

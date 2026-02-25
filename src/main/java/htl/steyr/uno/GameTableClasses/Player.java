@@ -117,8 +117,8 @@ public class Player {
             cardBtn.setPadding(javafx.geometry.Insets.EMPTY);
             cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
-            // click event TEST
-            cardBtn.setOnAction(e -> System.out.println("Karte gespielt: " + c.getCardColour() + " " + c.getCardValue()));
+            // click event to put card down
+            cardBtn.setOnAction(e -> layCard(c));
 
             // Scale transitions for hover
             ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), cardBtn);
@@ -158,6 +158,12 @@ public class Player {
         StackPane.setMargin(handBox, new javafx.geometry.Insets(40));
 
         root.getChildren().add(handBox);
+    }
+
+    private void layCard(Card c){
+        System.out.println("Karte gespielt: " + c.getCardColour() + " " + c.getCardValue());
+
+
     }
 
 }
