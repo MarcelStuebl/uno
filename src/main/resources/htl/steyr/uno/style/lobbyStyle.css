@@ -1,0 +1,88 @@
+.background {
+    -fx-background-color: linear-gradient(
+            from 0% 0% to 100% 100%,
+            rgb(18, 18, 36),
+            rgb(24, 24, 46)
+    );
+}
+
+.centerContent {
+    -fx-padding: 40 0 80 0;
+}
+
+.topANDbottom {
+    -fx-background-color: rgba(18, 18, 36, 0.95);
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 16 0 16;
+}
+
+.joinAndCreate {
+    -fx-background-color: rgba(26, 29, 50, 0.85);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 18;
+    -fx-padding: 12 16 12 16;
+}
+
+.welcomeLable {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.UnoTitleTop {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.partyLable {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.subtitle {
+    -fx-text-fill: #8f93a3;
+    -fx-font-size: 11px;
+}
+
+.partyCodeLable {
+    -fx-background-color: rgba(0, 0, 0, 0.45);
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #8f93a3;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 8 10 8 10;
+}
+
+.createPartyButton,
+.joinLobbyButton,
+.logoutButton {
+    -fx-border-radius: 18;
+    -fx-background-radius: 18;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.createPartyButton,
+.joinLobbyButton {
+    -fx-background-color: rgba(255, 90, 90, 0.95);
+}
+
+.logoutButton {
+    -fx-background-color: rgba(0, 0, 0, 0);
+    -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-width: 1px;
+}
+
+.lines {
+    -fx-stroke: rgba(255, 255, 255, 0.15);
+}
+
+.stats {
+    -fx-text-fill: #cfcfe6;
+    -fx-font-size: 11px;
+}
