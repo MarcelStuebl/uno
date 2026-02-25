@@ -2,13 +2,14 @@ package htl.steyr.uno;
 
 import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -21,9 +22,10 @@ public class LobbyController implements Initializable {
     public Button createPartyButton;
     public Button joinButton;
     public Button logoutButton;
-    public Label gerneratedPartyCode;
+    public TextField partyCode;
 
     private Client client;
+    private LobbyInfoResponse lobby;
 
 
     public LobbyController(Client client) {
@@ -39,12 +41,13 @@ public class LobbyController implements Initializable {
             });
         });
 
-        System.out.println("Es geht:\n" + client.getConn().getUser());
+        getClient().setLobbyController(this);
     }
 
+
     private void onSceneClose() {
-        if (client.getConn() != null) {
-            client.getConn().close();
+        if (getClient().getConn() != null) {
+            getClient().getConn().close();
         }
     }
 
@@ -55,7 +58,16 @@ public class LobbyController implements Initializable {
      * Generats a code für a new game
      */
     public void onCreatePartyClicked(ActionEvent actionEvent) {
+        client.createLobby();
+    }
 
+    public void createOrJoinPartySuccess(LobbyInfoResponse lobby) {
+        this.lobby = lobby;
+        try {
+            switchToLobbyWait();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -64,12 +76,29 @@ public class LobbyController implements Initializable {
      * Joins a new game with all players that are in the party
      */
     public void onJoinButtonClicked(ActionEvent actionEvent) throws IOException {
+        int lobbyId= Integer.parseInt(partyCode.getText());
+        if (lobbyId <= 1000 || lobbyId >= 9999) {
+            System.out.println("Invalid lobby ID");
+            /*
+             * @todo show error message in UI
+             */
+        } else {
+            client.joinLobby(lobbyId);
+        }
+    }
+
+    public void lobbyNotFound() {
+        System.out.println("Invalid lobby ID. Please try again.");
+    }
+
+
+    private void switchToLobbyWait() throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) joinButton.getScene().getWindow();
 
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("lobbyWait.fxml"));
 
-        LobbyWaitController controller = new LobbyWaitController(client);
+        LobbyWaitController controller = new LobbyWaitController(client, lobby);
         loader.setController(controller);
 
         Scene scene = new Scene(loader.load());
