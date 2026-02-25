@@ -92,7 +92,7 @@ public class ServerSocketConnection {
                         case CreateAccountRequest createAccountRequest -> createAccountRequest(createAccountRequest);
                         case CreateLobbyRequest createLobbyRequest -> createLobbyRequest(createLobbyRequest);
                         case JoinLobbyRequest joinLobbyRequest -> joinLobbyRequest(joinLobbyRequest);
-                        case null, default -> {System.out.println("Received unknown message: " + obj);}
+                        case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
                 }
