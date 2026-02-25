@@ -87,14 +87,12 @@ public class ServerSocketConnection {
                     Object obj = in.readObject();
                     sendLogMessage(obj);
 
-                    if (obj instanceof LoginRequest) {
-                        loginRequest((LoginRequest) obj);
-                    } else if (obj instanceof CreateAccountRequest) {
-                        createAccountRequest((CreateAccountRequest) obj);
-                    } else if (obj instanceof CreateLobbyRequest) {
-                        createLobbyRequest((CreateLobbyRequest) obj);
-                    } else if (obj instanceof JoinLobbyRequest) {
-                        joinLobbyRequest((JoinLobbyRequest) obj);
+                    switch (obj) {
+                        case LoginRequest loginRequest -> loginRequest(loginRequest);
+                        case CreateAccountRequest createAccountRequest -> createAccountRequest(createAccountRequest);
+                        case CreateLobbyRequest createLobbyRequest -> createLobbyRequest(createLobbyRequest);
+                        case JoinLobbyRequest joinLobbyRequest -> joinLobbyRequest(joinLobbyRequest);
+                        case null, default -> {System.out.println("Received unknown message: " + obj);}
                     }
 
                 }
