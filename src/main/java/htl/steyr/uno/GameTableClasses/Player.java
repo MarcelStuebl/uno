@@ -107,7 +107,7 @@ public class Player {
             Button cardBtn = new Button();
 
             // picture of the card
-            String path = "../testMHORETH/yellowCards/" + c.getCardColour() + c.getCardValue() + ".png";
+            String path = "../Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
             ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
             iv.setFitWidth(100);
             iv.setFitHeight(150);
