@@ -4,6 +4,7 @@ import htl.steyr.uno.GameTableClasses.GameTable;
 import htl.steyr.uno.HelloApplication;
 import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -26,10 +27,12 @@ public class LobbyWaitController implements Initializable {
     public Button leaveLobbyButton;
     public Label AccNameDisplayLabel;
 
-    private Client client;
+    private final Client client;
+    private LobbyInfoResponse lobby;
 
-    public LobbyWaitController(Client client) {
+    public LobbyWaitController(Client client, LobbyInfoResponse lobby) {
         this.client = client;
+        this.lobby = lobby;
     }
 
     @Override
@@ -85,5 +88,12 @@ public class LobbyWaitController implements Initializable {
         stage.setResizable(false);
         stage.show();
         thisStage.close();
+    }
+
+    public LobbyInfoResponse getLobby() {
+        return lobby;
+    }
+    public void setLobby(LobbyInfoResponse lobby) {
+        this.lobby = lobby;
     }
 }
