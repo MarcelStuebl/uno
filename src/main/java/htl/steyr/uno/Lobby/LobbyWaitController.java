@@ -63,8 +63,7 @@ public class LobbyWaitController implements Initializable {
         loader.setController(controller);
 
         Scene scene = new Scene(loader.load());
-
-        stage.setTitle("UNO");
+        
         stage.setScene(scene);
         stage.show();
         thisStage.close();

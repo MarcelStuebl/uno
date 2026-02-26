@@ -61,8 +61,6 @@ public class GameTable implements Initializable {
             stage.setResizable(true);
             stage.show();
 
-            addCloseButton(root, stage);  //for readabiity
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,6 +91,8 @@ public class GameTable implements Initializable {
         player.showPlayerHand(root, player);
 
         player.testPrintHand();
+
+        addCloseButton(root, stage);  //for readabiity
 
 
     }
