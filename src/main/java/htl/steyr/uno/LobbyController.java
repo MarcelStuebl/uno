@@ -33,6 +33,11 @@ public class LobbyController implements Initializable {
     }
 
 
+    /**
+     *  Calls the onSceneClose funktion to close the Client when the Scene is closed
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Platform.runLater(() -> {
@@ -45,6 +50,9 @@ public class LobbyController implements Initializable {
     }
 
 
+    /**
+     * Closes the Client when the Scene is closed
+     */
     private void onSceneClose() {
         if (getClient().getConn() != null) {
             getClient().getConn().close();
@@ -53,7 +61,8 @@ public class LobbyController implements Initializable {
 
 
     /**
-     * @param actionEvent Generats a code für a new game
+     * Generats a new LobbyCode used to join s lobby
+     * @param actionEvent
      */
     @FXML
     private void onCreatePartyButtonClicked(ActionEvent actionEvent) {
@@ -61,6 +70,10 @@ public class LobbyController implements Initializable {
         client.createLobby();
     }
 
+    /**
+     * Calls switchToLobbyWait when create or join was a success
+     * @param lobby
+     */
     public void createOrJoinPartySuccess(LobbyInfoResponse lobby) {
         this.lobby = lobby;
 
@@ -75,7 +88,8 @@ public class LobbyController implements Initializable {
     }
 
     /**
-     * @param actionEvent Joins a new game with all players that are in the party
+     *  Joins a new game with all players that are in the party
+     * @param actionEvent
      */
     @FXML
     private void onJoinButtonClicked(ActionEvent actionEvent) throws IOException {
@@ -90,11 +104,19 @@ public class LobbyController implements Initializable {
         }
     }
 
+    /**
+     * Handles a lobby not found response from the server by notifying the user and prompting
+     * them to join or create a lobby again.
+     */
     public void lobbyNotFound() {
         System.out.println("Invalid lobby ID. Please try again.");
     }
 
 
+    /**
+     * Changes the scene to lobbyWait when joinPartyButton ist clicked
+     * @throws IOException
+     */
     private void switchToLobbyWait() throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) joinPartyButton.getScene().getWindow();
@@ -115,7 +137,8 @@ public class LobbyController implements Initializable {
     }
 
     /**
-     * @param actionEvent Logs the acc out / goes back to the login screen
+     * Logs the acc out / goes back to the login screen when logOutButton is clicked
+     * @param actionEvent
      */
     @FXML
     private void onLogoutButtonClicked(ActionEvent actionEvent) throws IOException {

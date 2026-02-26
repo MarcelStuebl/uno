@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+
 public class LobbyWaitController implements Initializable {
 
 
@@ -30,11 +31,20 @@ public class LobbyWaitController implements Initializable {
     private final Client client;
     private LobbyInfoResponse lobby;
 
+    /**
+     * @param client
+     * @param lobby
+     */
     public LobbyWaitController(Client client, LobbyInfoResponse lobby) {
         this.client = client;
         this.lobby = lobby;
     }
 
+    /**
+     * Calls the onSceneClose funktion to close the Client when the Scene is closed
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Platform.runLater(() -> {
@@ -47,12 +57,20 @@ public class LobbyWaitController implements Initializable {
         System.out.println("Lobby:\n" + lobby);
     }
 
+    /**
+     *
+     */
     private void onSceneClose() {
         if (client.getConn() != null) {
             client.getConn().close();
         }
     }
 
+    /**
+     * Changes the Scene from the WaitingLobby to Gametable when the playButton is clicked
+     * @param actionEvent
+     * @throws IOException
+     */
     public void playButtonClicked(ActionEvent actionEvent) throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) playButton.getScene().getWindow();
@@ -63,12 +81,17 @@ public class LobbyWaitController implements Initializable {
         loader.setController(controller);
 
         Scene scene = new Scene(loader.load());
-        
+
         stage.setScene(scene);
         stage.show();
         thisStage.close();
     }
 
+    /**
+     * Changes the Scene from the WaitingLobby to the Lobby when the leaveButton is clicked
+     * @param actionEvent
+     * @throws IOException
+     */
     public void leaveLobbyButtonClicked(ActionEvent actionEvent) throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) leaveLobbyButton.getScene().getWindow();
