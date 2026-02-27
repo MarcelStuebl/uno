@@ -1,11 +1,14 @@
 package htl.steyr.uno.client;
 
+import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.LoginController;
-import htl.steyr.uno.requests.client.*;
+import htl.steyr.uno.requests.client.CreateAccountRequest;
+import htl.steyr.uno.requests.client.CreateLobbyRequest;
+import htl.steyr.uno.requests.client.JoinLobbyRequest;
+import htl.steyr.uno.requests.client.LoginRequest;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 public class Client {
 
@@ -14,6 +17,7 @@ public class Client {
     private ClientSocketConnection conn;
     private final LoginController loginController;
     private LobbyController lobbyController;
+    private LobbyWaitController lobbyWaitController;
 
     public Client(LoginController controller) {
         this.loginController = controller;
@@ -64,6 +68,13 @@ public class Client {
     }
     public void setLobbyController(LobbyController lobbyController) {
         this.lobbyController = lobbyController;
+    }
+
+    public LobbyWaitController getLobbyWaitController() {
+        return lobbyWaitController;
+    }
+    public void setLobbyWaitController(LobbyWaitController lobbyWaitController) {
+        this.lobbyWaitController = lobbyWaitController;
     }
 
 

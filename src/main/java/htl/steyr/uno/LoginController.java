@@ -161,6 +161,7 @@ public class LoginController implements Initializable {
 
         LobbyController controller = new LobbyController(client);
         loader.setController(controller);
+        controller.getClient().setLobbyController(controller);
 
         Scene scene = new Scene(loader.load());
 
