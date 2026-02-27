@@ -1,17 +1,21 @@
 package htl.steyr.uno;
 
+import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.client.Client;
-import htl.steyr.uno.requests.server.CreateAccountSuccessResponse;
-import htl.steyr.uno.requests.server.LoginFailedResponse;
+import htl.steyr.uno.requests.server.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,6 +23,9 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
+    @FXML public Button anmeldeButton;
+    @FXML public Label errorLabel;
+    @FXML public Label errorLabelCreateAcc;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
@@ -32,7 +39,7 @@ public class LoginController implements Initializable {
     @FXML private PasswordField welcomeBackPasswd;
     @FXML private TextField welcomeBackUserName;
 
-    Client client;
+    private Client client;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -42,6 +49,12 @@ public class LoginController implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        Platform.runLater(() -> {
+            loginPane.getScene().getWindow().setOnCloseRequest(event -> {
+                onSceneClose();
+            });
+        });
     }
 
 
@@ -51,13 +64,11 @@ public class LoginController implements Initializable {
         showNewAccScreen.setVisible(true);
         welcomeBackPasswd.clear();
         welcomeBackUserName.clear();
+        errorLabel.setVisible(false);
+        errorLabelCreateAcc.setVisible(false);
     }
 
     @FXML
-    private void backToLoginButtonPressed() {
-        backToLogin();
-    }
-
     private void backToLogin() {
         showNewAccScreen.setVisible(false);
         showCreateAcc.setVisible(true);
@@ -65,9 +76,9 @@ public class LoginController implements Initializable {
         newAccUserName.clear();
         newAccLastName.clear();
         newAccFirstName.clear();
+        errorLabel.setVisible(false);
+        errorLabelCreateAcc.setVisible(false);
     }
-
-
 
     public void onCreateNewAccountButtonClicked(ActionEvent actionEvent) {
         String username = newAccUserName.getText();
@@ -75,63 +86,98 @@ public class LoginController implements Initializable {
         String firstName = newAccFirstName.getText();
         String lastName = newAccLastName.getText();
 
-        /*
-        @TODO: Implement account creation logic here, such as validating the input and saving the new user to the database.
-          Only if all fields are filled. If the account creation is successful, transition back to the login screen. Otherwise, show an error message.
-         */
-
         if (password.isEmpty()) {
-            System.out.println("Error: Password cannot be empty.");
+            errorLabelCreateAcc.setText("Password cannot be empty!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (firstName.isEmpty()) {
-            System.out.println("Error: First name cannot be empty.");
+            errorLabelCreateAcc.setText("First name cannot be empty!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (lastName.isEmpty()) {
-            System.out.println("Error: Last name cannot be empty.");
+            errorLabelCreateAcc.setText("Last name cannot be empty!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (!(username.matches("[a-z]+"))) {
-            System.out.println("Error: Username must only contain lowercase letters.");
+            errorLabelCreateAcc.setText("Username must only contain lowercase letters!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (firstName.matches(".*\\d.*") || lastName.matches(".*[!@#$%^&*()_/].*")) {
-            System.out.println("Error: First name cannot contain numbers or special characters.");
+            errorLabelCreateAcc.setText("First name cannot contain numbers or special characters!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (lastName.matches(".*\\d.*") || lastName.matches(".*[!@#$%^&*()_/].*")) {
-            System.out.println("Error: Last name cannot contain numbers or special characters.");
+            errorLabelCreateAcc.setText("Last name cannot contain numbers or special characters!");
+            errorLabelCreateAcc.setVisible(true);
         } else {
-            client.createAccount(username, firstName, lastName, password);
+            client.createAccount(username, lastName, firstName, password);
+            errorLabelCreateAcc.setVisible(false);
         }
     }
 
-    public void onLoginButtonClicked(ActionEvent actionEvent) {
+    public void onLoginButtonClicked(ActionEvent actionEvent) throws IOException {
         String username = welcomeBackUserName.getText();
         String password = welcomeBackPasswd.getText();
 
-        /*
-        @TODO: Implement login logic here, such as validating the username and password against the database.
-          Only if username and password are not empty. If the login is successful, transition to the lobby screen. Otherwise, show an error message.
-         */
-
         if (username.isEmpty()) {
-            System.out.println("Error: Username cannot be empty.");
+            errorLabel.setText("Username cannot be empty!");
+            errorLabel.setVisible(true);
         } else if (password.isEmpty()) {
-            System.out.println("Error: Password cannot be empty.");
+            errorLabel.setText("Password cannot be empty!");
+            errorLabel.setVisible(true);
         } else {
             client.logIn(username, password);
+            errorLabel.setVisible(false);
         }
     }
 
     public void createAccountSuccess(CreateAccountSuccessResponse msg) {
-        System.out.println("Account created successfully in LoginController:" + msg.getUser().getUsername());
         Platform.runLater(this::backToLogin);
     }
 
     public void logInSuccess(User user) {
-        System.out.println("Logged in successfully in LoginController: " + user.getUsername());
-
+        Platform.runLater(() -> {
+            try {
+                switchScene();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public void logInFailed(LoginFailedResponse msg) {
-        System.out.println("Login failed. Please try again.");
+        Platform.runLater(() ->{
+            errorLabel.setText("Username or Password wrong!");
+            errorLabel.setVisible(true);
+        });
     }
 
 
+    private void onSceneClose() {
+        if (client.getConn() != null) {
+            client.getConn().close();
+        }
+    }
+
+    public void switchScene() throws IOException {
+        Stage stage = new Stage();
+        Stage thisStage = (Stage) errorLabel.getScene().getWindow();
+
+        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("lobby.fxml"));
+
+        LobbyController controller = new LobbyController(client);
+        loader.setController(controller);
+
+        Scene scene = new Scene(loader.load());
+
+        stage.setTitle("LobbyErstellen");
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.show();
+        thisStage.close();
+    }
+
+    public Client getClient() {
+        return client;
+    }
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
 
 }
-
-
-

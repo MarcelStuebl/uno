@@ -109,3 +109,9 @@
     -fx-border-width: 1px;
     -fx-background-color: rgba(0, 0, 0, 0);
 }
+
+.errorLabel {
+    -fx-text-fill: #ff5a5a;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.2em;
+}

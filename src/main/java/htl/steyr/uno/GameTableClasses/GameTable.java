@@ -1,20 +1,47 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.client.Client;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.scene.control.Button;
 
-import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
-public class GameTable {
+public class GameTable implements Initializable {
+
+    private final Client client;
+    @FXML private StackPane root;
+    private Stage stage;
+
+    public GameTable(Client client) {
+        this.client = client;
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        Platform.runLater(() -> {
+            Stage stage = (Stage) root.getScene().getWindow();
+            open(stage);
+        });
+
+    }
+
+    private void onSceneClose() {
+        if (client.getConn() != null) {
+            client.getConn().close();
+        }
+    }
+
+
+
 
     public void open(Stage stage) {
         makeTable(stage);
@@ -30,52 +57,72 @@ public class GameTable {
 
             stage.setScene(new Scene(root));
             stage.setTitle("UNO - Game Table");
-            stage.setFullScreen(true);
+            stage.setMaximized(true);
+            stage.setResizable(true);
             stage.show();
-
-            addCloseButton(root, stage);   // ← ausgelagert
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-//test-------------------------------
-        Player player1 = new Player();
-        ArrayList<Card> hand = new ArrayList<>();
-        hand.add(new Card(3, "red"));
-        hand.add(new Card(7, "blue"));
-        hand.add(new Card(12, "green")); // Draw 2
-        hand.add(new Card(0, "yellow"));
-        hand.add(new Card(10, "red"));   // Skip
-        hand.add(new Card(13, "black")); // Choose colour
-        hand.add(new Card(5, "green"));
-        player1.setPlayerHand(hand);
+        ArrayList<Card> myHand = new ArrayList<>();
+        myHand.add(new Card(5, "red"));
+        myHand.add(new Card(9, "blue"));
+        myHand.add(new Card(2, "green"));
+        myHand.add(new Card(8, "yellow"));
+        myHand.add(new Card(1, "red"));
+        myHand.add(new Card(6, "blue"));
+        myHand.add(new Card(4, "green"));
+
+
+        ArrayList<Enemy> enemies = new ArrayList<>();
+        enemies.add(new Enemy("Anna", false, 5));
+        enemies.add(new Enemy("Lukas", false, 7));
+        enemies.add(new Enemy("Sophie", false, 3));
+
+
+        Player player = new Player("Max",true,myHand,enemies);
+
+        CardStack cardStack = new CardStack();
+
+        StackPane.setAlignment(cardStack.getVisual(), javafx.geometry.Pos.CENTER);
+        root.getChildren().add(cardStack.getVisual());
+
+        player.showPlayerHand(root, player);
+
+        player.testPrintHand();
+
+        addCloseButton(root, stage);  //for readabiity
+
 
     }
+
     private void addCloseButton(StackPane root, Stage stage) {
 
-        Button closeBtn = new Button();
+        Button closeBtn = new Button("X"); // Symmetrisches X
+        closeBtn.setPrefSize(40, 40);      // klein
+        closeBtn.setPadding(javafx.geometry.Insets.EMPTY);
+        closeBtn.setAlignment(javafx.geometry.Pos.CENTER);
 
-        javafx.scene.image.ImageView iv = new javafx.scene.image.ImageView(
-                new javafx.scene.image.Image(
-                        getClass().getResourceAsStream("/htl/steyr/uno/testMHORETH/closeButton_TEST.png")
-                )
+        // Einfach rot/weiß für Sichtbarkeit
+        closeBtn.setStyle(
+                "-fx-background-color: #d32f2f;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 18;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 20;"  // rund
         );
 
-        iv.setFitWidth(100);
-        iv.setPreserveRatio(true);
-
-        closeBtn.setGraphic(iv);
-        closeBtn.setStyle("-fx-background-color: transparent;");
-        closeBtn.setPadding(javafx.geometry.Insets.EMPTY);
         closeBtn.setOnAction(e -> stage.close());
+        onSceneClose();
 
+
+        // Oben rechts im StackPane
         StackPane.setAlignment(closeBtn, javafx.geometry.Pos.TOP_RIGHT);
-        StackPane.setMargin(closeBtn, new javafx.geometry.Insets(15));
+        StackPane.setMargin(closeBtn, new javafx.geometry.Insets(10));
 
         root.getChildren().add(closeBtn);
     }
-
 
 
 

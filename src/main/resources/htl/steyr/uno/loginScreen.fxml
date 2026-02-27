@@ -20,7 +20,7 @@
             <Label styleClass="unoTitle" text="UNO" />
             <Label styleClass="unoSubtitle" text="Das klassische Kartenspiel – jetzt als App!" />
 
-            <VBox spacing="12" styleClass="featureList" alignment="center">
+            <VBox alignment="center" spacing="12" styleClass="featureList">
 
                 <HBox alignment="CENTER_LEFT" spacing="10" styleClass="leftLableBorder">
                     <Label text="🎮" />
@@ -78,6 +78,7 @@
             </HBox>
             <Button fx:id="createAcc" onAction="#onCreateAccountButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Account erstellen" />
             <Label styleClass="Subtitles" text="© 2026 UNO – HTL Steyr" />
+            <Label fx:id="errorLabel" prefHeight="58.0" prefWidth="331.0" styleClass="errorLabel" text="ERROR!!!" visible="false" wrapText="true" />
          </children>
       </VBox>
 
@@ -115,9 +116,10 @@
                 <Separator />
             </HBox>
          <Label styleClass="Subtitles" text="Du hast bereits einen Account?" />
-         <Button fx:id="showLogin" onAction="#backToLoginButtonPressed" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Anmelden" />
+         <Button fx:id="showLogin" onAction="#backToLogin" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Anmelden" />
 
             <Label styleClass="Subtitles" text="© 2026 UNO – HTL Steyr" />
+         <Label fx:id="errorLabelCreateAcc" prefHeight="60.0" prefWidth="282.0" styleClass="errorLabel" text="ERROR!!!" textAlignment="CENTER" visible="false" wrapText="true" />
         </VBox>
     </StackPane>
 

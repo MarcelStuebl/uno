@@ -27,7 +27,7 @@ public class Lobby {
     public Lobby(Server server) {
         this.server = server;
         lobbyId = (int) (Math.random() * 100000);
-        while (server.getLobbies().stream().anyMatch(lobby -> Objects.equals(lobby.getLobbyId(), lobbyId))) {
+        while (lobbyId < 100000 || lobbyId > 999999 || server.getLobbies().stream().anyMatch(lobby -> Objects.equals(lobby.getLobbyId(), lobbyId))) {
             lobbyId = (int) (Math.random() * 100000);
         }
         System.out.println("Created lobby with ID: " + lobbyId);

@@ -1,5 +1,6 @@
 package htl.steyr.uno.client;
 
+import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.LoginController;
 import htl.steyr.uno.requests.client.*;
 
@@ -12,10 +13,11 @@ public class Client {
     private int port = 59362;
     private ClientSocketConnection conn;
     private Scanner console = new Scanner(System.in);
-    private LoginController controller;
+    private final LoginController loginController;
+    private LobbyController lobbyController;
 
     public Client(LoginController controller) {
-        this.controller = controller;
+        this.loginController = controller;
     }
 
     public void start() throws IOException {
@@ -37,13 +39,6 @@ public class Client {
     }
 
     public void joinLobby(int lobbyId) {
-        if (lobbyId < 1) {
-            System.out.println("Invalid lobby ID");
-            /*
-             * @todo show error message in UI
-             */
-            return;
-        }
         JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId);
         conn.sendMessage(msg);
     }
@@ -57,8 +52,20 @@ public class Client {
         return conn;
     }
 
-    public LoginController getController() {
-        return controller;
+    public LoginController getLoginController() {
+        return loginController;
     }
 
+    public LobbyController getLobbyController() {
+        return lobbyController;
+    }
+    public void setLobbyController(LobbyController lobbyController) {
+        this.lobbyController = lobbyController;
+    }
+
+
 }
+
+
+
+

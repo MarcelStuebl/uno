@@ -102,7 +102,7 @@ public class ClientSocketConnection implements Closeable {
      */
     private void logInSuccess(LoginSuccessResponse msg) {
         this.user = msg.getUser();
-        client.getController().logInSuccess(user);
+        client.getLoginController().logInSuccess(user);
     }
 
 
@@ -113,7 +113,7 @@ public class ClientSocketConnection implements Closeable {
      * @param msg the login failed response containing error information
      */
     private void logInFailed(LoginFailedResponse msg) {
-        client.getController().logInFailed(msg);
+        client.getLoginController().logInFailed(msg);
     }
 
 
@@ -128,7 +128,7 @@ public class ClientSocketConnection implements Closeable {
         this.lobby = lobby;
 
         if (lobby.getUsers() != null) {
-            System.out.println(lobby);
+            client.getLobbyController().createOrJoinPartySuccess(lobby);
         } else {
             System.out.println("Lobby operation failed.");
         }
@@ -142,7 +142,7 @@ public class ClientSocketConnection implements Closeable {
      * @param lobby the lobby not found response indicating that the specified lobby does not exist
      */
     private void lobbyNotFound(LobbyNotFoundResponse lobby) {
-        System.out.println("Invalid lobby ID. Please try again.");
+        client.getLobbyController().lobbyNotFound();
     }
 
 
@@ -184,7 +184,7 @@ public class ClientSocketConnection implements Closeable {
 
 
     private void createAccountSuccess(CreateAccountSuccessResponse msg) {
-        client.getController().createAccountSuccess(msg);
+        client.getLoginController().createAccountSuccess(msg);
     }
 
 
