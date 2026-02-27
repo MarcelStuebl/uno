@@ -9,8 +9,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-
-<HBox alignment="CENTER_RIGHT" stylesheets="style/lobbyWaitStyle.css" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <StackPane prefHeight="400.0" prefWidth="422.0">
          <children>
@@ -18,11 +17,20 @@
                <children>
                   <VBox alignment="CENTER" prefHeight="68.0" prefWidth="312.0">
                      <children>
-                        <Label prefHeight="39.0" prefWidth="106.0" text="Lobby">
-                           <font>
-                              <Font size="28.0" />
-                           </font>
-                        </Label>
+                        <AnchorPane prefHeight="33.0" prefWidth="422.0">
+                           <children>
+                              <Label layoutX="39.0" layoutY="13.0" prefHeight="40.0" prefWidth="180.0" text="Lobby Code:">
+                                 <font>
+                                    <Font size="28.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lobbyCodeLabel" layoutX="197.0" layoutY="13.0" prefHeight="40.0" prefWidth="125.0">
+                                 <font>
+                                    <Font size="28.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
                         <Line endX="121.5" startX="-298.5" strokeWidth="2.0" />
                      </children>
                   </VBox>
@@ -54,9 +62,9 @@
                <children>
                   <AnchorPane prefHeight="405.0" prefWidth="149.0">
                      <children>
-                        <Button fx:id="playButton" layoutX="14.0" layoutY="114.0" mnemonicParsing="false" onAction="#playButtonClicked" prefHeight="40.0" prefWidth="64.0" text="Spielen" styleClass="playButton" />
-                        <Button fx:id="leaveLobbyButton" layoutX="14.0" layoutY="347.0" mnemonicParsing="false" onAction="#leaveLobbyButtonClicked" prefHeight="40.0" prefWidth="125.0" text="Lobby verlassen" />
-                        <Line endX="100.0" layoutX="83.0" layoutY="54.0" startX="-85.0" strokeWidth="2.0" />
+                        <Button fx:id="playButton" layoutX="59.0" layoutY="113.0" mnemonicParsing="false" onAction="#playButtonClicked" prefHeight="40.0" prefWidth="64.0" styleClass="playButton" text="Spielen" />
+                        <Button fx:id="leaveLobbyButton" layoutX="32.0" layoutY="347.0" mnemonicParsing="false" onAction="#leaveLobbyButtonClicked" prefHeight="40.0" prefWidth="125.0" styleClass="leaveButton" text="Lobby verlassen" />
+                        <Line endX="100.0" layoutX="84.0" layoutY="61.0" startX="-85.0" strokeWidth="2.0" />
                         <Line endX="-69.0" endY="252.0" layoutX="69.0" layoutY="148.0" startX="-69.0" startY="-148.0" strokeWidth="2.0" />
                         <Label fx:id="AccNameDisplayLabel" layoutX="54.0" layoutY="14.0" prefHeight="28.0" prefWidth="81.0" text="Acc Name">
                            <font>

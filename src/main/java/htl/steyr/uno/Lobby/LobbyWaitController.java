@@ -21,7 +21,7 @@ import java.util.ResourceBundle;
 
 public class LobbyWaitController implements Initializable {
 
-
+    public Label lobbyCodeLabel;
     public Label player1Label;
     public Label player2Label;
     public Button playButton;
@@ -53,12 +53,9 @@ public class LobbyWaitController implements Initializable {
             });
         });
 
-        if (lobby.getUsers().getFirst().getUsername().equals(client.getConn().getUser().getUsername())) {
-            // This is the host
-            playButton.setVisible(true);
-        } else{
-            playButton.setVisible(false);
-        }
+        String lobbyCode = lobby.getLobbyId().toString();
+        lobbyCodeLabel.setText(lobbyCode);
+
 
         System.out.println("Es geht:\n" + client.getConn().getUser());
         System.out.println("Lobby:\n" + lobby);
@@ -66,8 +63,21 @@ public class LobbyWaitController implements Initializable {
 
 
     public void updateLobbyInfo() {
+        String usernames;
 
+        if (lobby.getUsers().getFirst().getUsername().equals(client.getConn().getUser().getUsername())) {
+            // This is the host
+            playButton.setVisible(true);
 
+            usernames = lobby.getUsers().getLast().getUsername().toString();
+            player1Label.setText(usernames);
+
+        } else{
+            playButton.setVisible(false);
+
+            usernames = lobby.getUsers().getLast().getUsername().toString();
+            player2Label.setText(usernames);
+        }
 
     }
 
