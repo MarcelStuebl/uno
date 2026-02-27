@@ -64,6 +64,13 @@ public class LobbyWaitController implements Initializable {
         System.out.println("Lobby:\n" + lobby);
     }
 
+
+    public void updateLobbyInfo() {
+
+
+
+    }
+
     /**
      *
      */
@@ -124,4 +131,5 @@ public class LobbyWaitController implements Initializable {
     public void setLobby(LobbyInfoResponse lobby) {
         this.lobby = lobby;
     }
+
 }

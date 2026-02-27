@@ -130,6 +130,7 @@ public class ClientSocketConnection implements Closeable {
         if (lobby.getUsers() != null) {
             client.getLobbyController().createOrJoinPartySuccess(lobby);
             client.getLobbyWaitController().setLobby(lobby);
+            client.getLobbyWaitController().updateLobbyInfo();
         } else {
             System.out.println("Lobby operation failed.");
         }
