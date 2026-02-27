@@ -49,6 +49,14 @@ public class Lobby {
         }
     }
 
+
+    public void playerLeft(ServerSocketConnection connection) {
+        connections.remove(connection);
+        updateJoined();
+    }
+
+
+
     private void checkStatus() {
         if (connections.size() >= 2) {
             setStatus(1);
