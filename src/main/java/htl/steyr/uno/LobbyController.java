@@ -125,6 +125,7 @@ public class LobbyController implements Initializable {
 
         LobbyWaitController controller = new LobbyWaitController(client, lobby);
         loader.setController(controller);
+        client.setLobbyWaitController(controller);
 
         Scene scene = new Scene(loader.load());
 

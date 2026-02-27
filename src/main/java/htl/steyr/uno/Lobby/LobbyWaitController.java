@@ -56,6 +56,10 @@ public class LobbyWaitController implements Initializable {
         String lobbyCode = lobby.getLobbyId().toString();
         lobbyCodeLabel.setText(lobbyCode);
 
+        // Display current user's account name
+        AccNameDisplayLabel.setText(client.getConn().getUser().getUsername());
+
+        updateLobbyInfo();
 
         System.out.println("Es geht:\n" + client.getConn().getUser());
         System.out.println("Lobby:\n" + lobby);
@@ -63,22 +67,32 @@ public class LobbyWaitController implements Initializable {
 
 
     public void updateLobbyInfo() {
-        String usernames;
+        System.out.println("Updating lobby info...");
+        String currentUsername = client.getConn().getUser().getUsername();
 
-        if (lobby.getUsers().getFirst().getUsername().equals(client.getConn().getUser().getUsername())) {
-            // This is the host
+        if (lobby.getUsers().getFirst().getUsername().equals(currentUsername)) {
+            // Current user is the host
             playButton.setVisible(true);
 
-            usernames = lobby.getUsers().getLast().getUsername().toString();
-            player1Label.setText(usernames);
+            // Display the host username in player1Label
+            player1Label.setText(lobby.getUsers().getFirst().getUsername());
 
-        } else{
+            // Display the guest username in player2Label if there are 2 players
+            if (lobby.getUsers().size() > 1) {
+                player2Label.setText(lobby.getUsers().getLast().getUsername());
+            } else {
+                player2Label.setText("Wartet auf Spieler...");
+            }
+        } else {
+            // Current user is a guest
             playButton.setVisible(false);
 
-            usernames = lobby.getUsers().getLast().getUsername().toString();
-            player2Label.setText(usernames);
-        }
+            // Display the host username in player1Label
+            player1Label.setText(lobby.getUsers().getFirst().getUsername());
 
+            // Display the guest (current user) username in player2Label
+            player2Label.setText(currentUsername);
+        }
     }
 
     /**
@@ -124,6 +138,8 @@ public class LobbyWaitController implements Initializable {
 
         LobbyController controller = new LobbyController(client);
         loader.setController(controller);
+        client.setLobbyController(controller);
+        client.setLobbyWaitController(null);
 
         Scene scene = new Scene(loader.load());
 
@@ -138,8 +154,10 @@ public class LobbyWaitController implements Initializable {
     public LobbyInfoResponse getLobby() {
         return lobby;
     }
+
     public void setLobby(LobbyInfoResponse lobby) {
         this.lobby = lobby;
+        Platform.runLater(this::updateLobbyInfo);
     }
 
 }
