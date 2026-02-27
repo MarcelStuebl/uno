@@ -44,11 +44,10 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         client = new Client(this);
-        try {
+        Thread clientThread = new Thread(() -> {
             client.start();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        });
+        clientThread.start();
 
         Platform.runLater(() -> {
             loginPane.getScene().getWindow().setOnCloseRequest(event -> {

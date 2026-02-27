@@ -20,12 +20,16 @@ public class Client {
         this.loginController = controller;
     }
 
-    public void start() throws IOException {
-        conn = new ClientSocketConnection(host, port, this);
-        conn.startReceiving();
+    public void start() {
+        try {
+            conn = new ClientSocketConnection(host, port, this);
+            conn.startReceiving();
 
-        System.out.println("Connected to " + host + ":" + port);
-        System.out.println("---------------------------------------------");
+            System.out.println("Connected to " + host + ":" + port);
+            System.out.println("---------------------------------------------");
+        } catch (IOException e) {
+            System.out.println("Failed to connect to " + host + ":" + port);
+        }
     }
 
     public void logIn(String username, String password) {
