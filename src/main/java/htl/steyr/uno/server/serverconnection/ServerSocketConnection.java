@@ -38,6 +38,7 @@ public class ServerSocketConnection {
             out.flush();
             in = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
+            System.out.println("Error setting up connection: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -99,6 +100,7 @@ public class ServerSocketConnection {
             } catch (Exception ignored) {
             } finally {
                 running = false;
+                server.removeConnection(this);
             }
         });
         receivethread.start();

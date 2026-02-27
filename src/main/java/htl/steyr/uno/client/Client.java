@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class Client {
 
-    private String host = "xserv.stuebl.eu";
+    private String host = "localhost";
     private int port = 59362;
     private ClientSocketConnection conn;
     private Scanner console = new Scanner(System.in);

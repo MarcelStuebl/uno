@@ -39,6 +39,17 @@ public class Server {
         System.out.println("Server started on port " + port);
         running = true;
         serverSocket = new ServerSocket(port);
+        Thread thread = new Thread(() -> {
+            while (true) {
+                System.out.println("Connections: " + connections + ", Lobbies: " + lobbies.size());
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        thread.start();
 
         acceptThread = new Thread(() -> {
             while (running) {
@@ -56,6 +67,11 @@ public class Server {
             }
         });
         acceptThread.start();
+    }
+
+
+    public void removeConnection(ServerSocketConnection connection) {
+        connections.remove(connection);
     }
 
 
