@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Lobby {
 
@@ -26,10 +27,11 @@ public class Lobby {
      */
     public Lobby(Server server) {
         this.server = server;
-        lobbyId = (int) (Math.random() * 100000);
-        while (lobbyId < 100000 || lobbyId > 999999 || server.getLobbies().stream().anyMatch(lobby -> Objects.equals(lobby.getLobbyId(), lobbyId))) {
-            lobbyId = (int) (Math.random() * 100000);
-        }
+
+        do {
+            lobbyId = ThreadLocalRandom.current().nextInt(100000, 1000000);
+        } while (server.getLobbies().stream().anyMatch(lobby -> Objects.equals(lobby.getLobbyId(), lobbyId)));
+
         System.out.println("Created lobby with ID: " + lobbyId);
         lobbyInfoResponse.setLobbyId(lobbyId);
         server.getLobbies().add(this);
