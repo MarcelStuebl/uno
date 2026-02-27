@@ -54,10 +54,10 @@ public class LobbyWaitController implements Initializable {
         });
 
         String lobbyCode = lobby.getLobbyId().toString();
-        lobbyCodeLabel.setText(lobbyCode);
+        lobbyCodeLabel.setText("Lobby Code: " + lobbyCode);
 
         // Display current user's account name
-        AccNameDisplayLabel.setText(client.getConn().getUser().getUsername());
+        AccNameDisplayLabel.setText("Account: " + client.getConn().getUser().getUsername());
 
         updateLobbyInfo();
 

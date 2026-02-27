@@ -131,7 +131,7 @@ public class LobbyController implements Initializable {
 
         stage.setTitle("WarteLobby");
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setMaximized(false);
         stage.show();
         thisStage.close();
     }

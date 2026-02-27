@@ -11,20 +11,15 @@
 
 <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <StackPane prefHeight="400.0" prefWidth="422.0">
+      <StackPane alignment="TOP_CENTER" prefHeight="400.0" prefWidth="422.0" styleClass="mainPaine" HBox.hgrow="ALWAYS">
          <children>
             <VBox alignment="TOP_CENTER" prefHeight="349.0" prefWidth="337.0">
                <children>
-                  <VBox alignment="CENTER" prefHeight="68.0" prefWidth="312.0">
+                  <VBox alignment="TOP_CENTER" prefHeight="68.0" prefWidth="312.0">
                      <children>
                         <AnchorPane prefHeight="33.0" prefWidth="422.0">
                            <children>
-                              <Label layoutX="39.0" layoutY="13.0" prefHeight="40.0" prefWidth="180.0" text="Lobby Code:">
-                                 <font>
-                                    <Font size="28.0" />
-                                 </font>
-                              </Label>
-                              <Label fx:id="lobbyCodeLabel" layoutX="197.0" layoutY="13.0" prefHeight="40.0" prefWidth="125.0">
+                              <Label fx:id="lobbyCodeLabel" alignment="CENTER" layoutX="36.0" layoutY="11.0" prefHeight="40.0" prefWidth="351.0" styleClass="labels">
                                  <font>
                                     <Font size="28.0" />
                                  </font>
@@ -36,7 +31,7 @@
                   </VBox>
                   <VBox alignment="TOP_CENTER" prefHeight="23.0" prefWidth="149.0">
                      <children>
-                        <Label fx:id="player1Label" text="Spieler 1">
+                        <Label fx:id="player1Label" styleClass="labels" text="Spieler 1">
                            <font>
                               <Font size="19.0" />
                            </font>
@@ -45,7 +40,7 @@
                   </VBox>
                   <HBox alignment="TOP_CENTER" prefHeight="17.0" prefWidth="59.0">
                      <children>
-                        <Label fx:id="player2Label" text="Spieler 2">
+                        <Label fx:id="player2Label" styleClass="labels" text="Spieler 2">
                            <font>
                               <Font size="19.0" />
                            </font>
@@ -56,7 +51,7 @@
             </VBox>
          </children>
       </StackPane>
-      <StackPane prefHeight="400.0" prefWidth="179.0">
+      <StackPane prefHeight="474.0" prefWidth="185.0" styleClass="secondPane">
          <children>
             <VBox prefHeight="400.0" prefWidth="200.0">
                <children>
@@ -66,7 +61,7 @@
                         <Button fx:id="leaveLobbyButton" layoutX="32.0" layoutY="347.0" mnemonicParsing="false" onAction="#leaveLobbyButtonClicked" prefHeight="40.0" prefWidth="125.0" styleClass="leaveButton" text="Lobby verlassen" />
                         <Line endX="100.0" layoutX="84.0" layoutY="61.0" startX="-85.0" strokeWidth="2.0" />
                         <Line endX="-69.0" endY="252.0" layoutX="69.0" layoutY="148.0" startX="-69.0" startY="-148.0" strokeWidth="2.0" />
-                        <Label fx:id="AccNameDisplayLabel" layoutX="54.0" layoutY="14.0" prefHeight="28.0" prefWidth="81.0" text="Acc Name">
+                        <Label fx:id="AccNameDisplayLabel" layoutX="54.0" layoutY="14.0" prefHeight="28.0" prefWidth="81.0" styleClass="labels" text="Acc Name">
                            <font>
                               <Font size="15.0" />
                            </font>

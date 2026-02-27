@@ -11,9 +11,32 @@
 .leaveButton {
     -fx-border-radius: 22;
     -fx-background-radius: 22;
-    -fx-text-fill: black;
+    -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-border-color: rgba(255, 0, 0, 0.54);
     -fx-border-width: 1px;
     -fx-background-color: rgba(0, 0, 0, 0);
+}
+
+.mainPaine {
+    -fx-background-color: linear-gradient(
+            from 0% 0% to 100% 100%,
+            rgb(58, 96, 115),
+            rgb(34, 52, 68),
+            rgb(22, 34, 42)
+    );
+    -fx-padding: 80 0 80 0;
+}
+
+.labels {
+    -fx-text-fill: white;
+}
+
+.secondPane {
+    -fx-background-color: linear-gradient(
+            from 0% 0% to 100% 100%,
+            rgb(18, 18, 36),
+            rgb(24, 24, 46)
+    );
+    -fx-padding: 80 0 80 0;
 }
