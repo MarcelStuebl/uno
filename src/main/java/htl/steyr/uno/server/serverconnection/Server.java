@@ -61,6 +61,16 @@ public class Server {
 
     public void removeConnection(ServerSocketConnection connection) {
         connections.remove(connection);
+        for (Lobby lobby : lobbies) {
+            if (lobby.getConnections().contains(connection)) {
+                lobby.playerLeft(connection);
+                if (lobby.getConnections().isEmpty()) {
+                    lobbies.remove(lobby);
+                    System.out.println("Lobby " + lobby.getLobbyId() + " removed");
+                }
+                break;
+            }
+        }
     }
 
 
