@@ -168,7 +168,6 @@ public class LoginController implements Initializable {
         stage.setTitle("LobbyErstellen");
         stage.setScene(scene);
         stage.setMaximized(true);
-        stage.setResizable(false);
         stage.show();
         thisStage.close();
     }

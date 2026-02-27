@@ -131,7 +131,6 @@ public class LobbyController implements Initializable {
         stage.setTitle("WarteLobby");
         stage.setScene(scene);
         stage.setMaximized(true);
-        stage.setResizable(false);
         stage.show();
         thisStage.close();
     }
@@ -149,7 +148,6 @@ public class LobbyController implements Initializable {
         stage.setTitle("UNO-AnmeldeBildschirm");
         stage.setScene(scene);
         stage.setMaximized(true);
-        stage.setResizable(false);
         stage.show();
         thisStage.close();
     }
