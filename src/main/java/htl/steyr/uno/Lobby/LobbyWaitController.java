@@ -53,6 +53,13 @@ public class LobbyWaitController implements Initializable {
             });
         });
 
+        if (lobby.getUsers().getFirst().getUsername().equals(client.getConn().getUser().getUsername())) {
+            // This is the host
+            playButton.setVisible(true);
+        } else{
+            playButton.setVisible(false);
+        }
+
         System.out.println("Es geht:\n" + client.getConn().getUser());
         System.out.println("Lobby:\n" + lobby);
     }

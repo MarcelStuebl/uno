@@ -59,6 +59,11 @@ public class Server {
     }
 
 
+    public void removeConnection(ServerSocketConnection connection) {
+        connections.remove(connection);
+    }
+
+
     /**
      * Logs a message to the console with the client's remote socket address as a prefix.
      * This method is used by ServerSocketConnection instances to log messages related to their respective clients.
