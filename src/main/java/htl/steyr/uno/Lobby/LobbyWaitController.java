@@ -67,6 +67,7 @@ public class LobbyWaitController implements Initializable {
 
 
     public void updateLobbyInfo() {
+        System.out.println("Lobby Info Updated: " + lobby);
         String currentUsername = client.getConn().getUser().getUsername();
 
         if (lobby.getUsers().getFirst().getUsername().equals(currentUsername)) {
@@ -130,6 +131,8 @@ public class LobbyWaitController implements Initializable {
      * @throws IOException
      */
     public void leaveLobbyButtonClicked(ActionEvent actionEvent) throws IOException {
+        client.getConn().leaveLobby();
+
         Stage stage = new Stage();
         Stage thisStage = (Stage) leaveLobbyButton.getScene().getWindow();
 

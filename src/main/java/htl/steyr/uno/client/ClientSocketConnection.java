@@ -1,6 +1,7 @@
 package htl.steyr.uno.client;
 
 import htl.steyr.uno.User;
+import htl.steyr.uno.requests.client.LeaveLobbyRequest;
 import htl.steyr.uno.requests.server.*;
 
 import java.io.Closeable;
@@ -191,6 +192,14 @@ public class ClientSocketConnection implements Closeable {
         client.getLoginController().createAccountSuccess(msg);
     }
 
+    public void leaveLobby() {
+        if (lobby != null) {
+            lobby = null;
+            LeaveLobbyRequest msg = new LeaveLobbyRequest(getUser());
+            sendMessage(msg);
+        }
+    }
+
 
     /**
      * Closes the socket connection and stops the receiving thread. This method is called when the client
@@ -208,6 +217,7 @@ public class ClientSocketConnection implements Closeable {
     public User getUser() {
         return user;
     }
+
 
 
 }

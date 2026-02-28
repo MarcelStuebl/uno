@@ -93,6 +93,7 @@ public class ServerSocketConnection {
                         case CreateAccountRequest createAccountRequest -> createAccountRequest(createAccountRequest);
                         case CreateLobbyRequest createLobbyRequest -> createLobbyRequest(createLobbyRequest);
                         case JoinLobbyRequest joinLobbyRequest -> joinLobbyRequest(joinLobbyRequest);
+                        case LeaveLobbyRequest leftLobbyRequest -> leftLobbyRequest(leftLobbyRequest);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -190,6 +191,11 @@ public class ServerSocketConnection {
             sendMessage(msg);
             sendLogMessage(msg);
         }
+    }
+
+
+    private void leftLobbyRequest(LeaveLobbyRequest obj) {
+        server.leaveLobby(this);
     }
 
 
