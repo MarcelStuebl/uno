@@ -67,7 +67,6 @@ public class LobbyWaitController implements Initializable {
 
 
     public void updateLobbyInfo() {
-        System.out.println("Updating lobby info...");
         String currentUsername = client.getConn().getUser().getUsername();
 
         if (lobby.getUsers().getFirst().getUsername().equals(currentUsername)) {
