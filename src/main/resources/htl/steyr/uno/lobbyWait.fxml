@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -19,7 +20,7 @@
                      <children>
                         <AnchorPane prefHeight="33.0" prefWidth="422.0">
                            <children>
-                              <Label fx:id="lobbyCodeLabel" alignment="CENTER" layoutX="36.0" layoutY="11.0" prefHeight="40.0" prefWidth="351.0" styleClass="labels">
+                              <Label fx:id="lobbyCodeLabel" alignment="CENTER" layoutX="36.0" layoutY="11.0" prefHeight="40.0" prefWidth="351.0" styleClass="labels" text="LobbyCode:">
                                  <font>
                                     <Font size="28.0" />
                                  </font>
@@ -47,6 +48,7 @@
                         </Label>
                      </children>
                   </HBox>
+                  <ListView fx:id="playerListView" prefHeight="200.0" prefWidth="200.0" />
                </children>
             </VBox>
          </children>
@@ -61,7 +63,7 @@
                         <Button fx:id="leaveLobbyButton" layoutX="32.0" layoutY="347.0" mnemonicParsing="false" onAction="#leaveLobbyButtonClicked" prefHeight="40.0" prefWidth="125.0" styleClass="leaveButton" text="Lobby verlassen" />
                         <Line endX="100.0" layoutX="84.0" layoutY="61.0" startX="-85.0" strokeWidth="2.0" />
                         <Line endX="-69.0" endY="252.0" layoutX="69.0" layoutY="148.0" startX="-69.0" startY="-148.0" strokeWidth="2.0" />
-                        <Label fx:id="AccNameDisplayLabel" layoutX="54.0" layoutY="14.0" prefHeight="28.0" prefWidth="81.0" styleClass="labels" text="Acc Name">
+                        <Label fx:id="AccNameDisplayLabel" layoutX="13.0" layoutY="14.0" prefHeight="28.0" prefWidth="157.0" styleClass="labels" text="Acc Name">
                            <font>
                               <Font size="15.0" />
                            </font>
