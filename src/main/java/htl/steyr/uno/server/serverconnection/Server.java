@@ -1,5 +1,7 @@
 package htl.steyr.uno.server.serverconnection;
 
+import htl.steyr.uno.server.MailSender;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -36,7 +38,6 @@ public class Server {
      * @throws IOException
      */
     public void start() throws IOException {
-        System.out.println("Server started on port " + port);
         running = true;
         serverSocket = new ServerSocket(port);
 
@@ -56,6 +57,10 @@ public class Server {
             }
         });
         acceptThread.start();
+
+        System.out.println("Server started on port " + port);
+        MailSender ms = new MailSender();
+        ms.sendServerStartetNotification();
     }
 
 
