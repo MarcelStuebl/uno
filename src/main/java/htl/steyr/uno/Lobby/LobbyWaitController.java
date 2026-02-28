@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -25,8 +26,10 @@ public class LobbyWaitController implements Initializable {
     public Label player1Label;
     public Label player2Label;
     public Button playButton;
-    public Button leaveLobbyButton;
     public Label AccNameDisplayLabel;
+    public Button leaveLobbyButton;
+    public ListView<String> playerListView = new ListView<>();
+
 
     private final Client client;
     private LobbyInfoResponse lobby;
@@ -70,18 +73,23 @@ public class LobbyWaitController implements Initializable {
         System.out.println("Lobby Info Updated: " + lobby);
         String currentUsername = client.getConn().getUser().getUsername();
 
+        playerListView.getItems().clear();
+
         if (lobby.getUsers().getFirst().getUsername().equals(currentUsername)) {
             // Current user is the host
             playButton.setVisible(true);
 
             // Display the host username in player1Label
             player1Label.setText(lobby.getUsers().getFirst().getUsername());
+            playerListView.getItems().add(lobby.getUsers().getFirst().getUsername());
 
             // Display the guest username in player2Label if there are 2 players
             if (lobby.getUsers().size() > 1) {
                 player2Label.setText(lobby.getUsers().getLast().getUsername());
+                playerListView.getItems().add(lobby.getUsers().getLast().getUsername());
             } else {
                 player2Label.setText("Wartet auf Spieler...");
+                playerListView.getItems().add("Wartet auf Spieler...");
             }
         } else {
             // Current user is a guest
@@ -89,9 +97,11 @@ public class LobbyWaitController implements Initializable {
 
             // Display the host username in player1Label
             player1Label.setText(lobby.getUsers().getFirst().getUsername());
+            playerListView.getItems().add(lobby.getUsers().getFirst().getUsername());
 
             // Display the guest (current user) username in player2Label
             player2Label.setText(currentUsername);
+            playerListView.getItems().add(currentUsername);
         }
     }
 
