@@ -151,6 +151,7 @@ public class LobbyController implements Initializable {
         stage.setMaximized(true);
         stage.show();
         thisStage.close();
+        onSceneClose();
     }
 
     public Client getClient() {
