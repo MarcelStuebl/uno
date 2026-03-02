@@ -31,15 +31,13 @@ public class CardStack {
 
         pile.push(card);
 
-        // Visual leeren (nur oberste Karte anzeigen)
+        // clear visual image to only show first card
         visual.getChildren().clear();
 
         // Bildpfad erzeugen
         String path = "../Uno_Cards/" + card.getCardColour() + "/" + card.getCardColour() + card.getCardValue() + ".png";
 
-        ImageView iv = new ImageView(
-                new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path)))
-        );
+        ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
 
         iv.setFitWidth(100);
         iv.setFitHeight(150);

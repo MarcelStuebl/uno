@@ -1,5 +1,6 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.scene.control.Button;
@@ -19,10 +20,16 @@ public class Player {
     private final ArrayList<Card> hand = new ArrayList<>();
     private final ArrayList<Enemy> enemies = new ArrayList<>();
 
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies) {
+    //variables not meant for user
+    HBox handBox = new HBox();
+    
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies) throws InvalidHandException {
         this.username = username;
         this.isCurrentTurn = isCurrentTurn;
         this.hand.addAll(hand);
+        if(hand.size() != 7){
+        throw new InvalidHandException("too many or too little Cards");
+        }
         this.enemies.addAll(enemies);
         sortHand();
     }
@@ -98,7 +105,7 @@ public class Player {
 
     public void showPlayerHand(StackPane root, Player player) {
 
-        HBox handBox = new HBox();
+
         handBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
         handBox.setSpacing(-80); // overlap cards
 
@@ -118,9 +125,9 @@ public class Player {
             cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
             // click event to put card down
-            cardBtn.setOnAction(e -> layCard(c));
+            cardBtn.setOnAction(e -> layCard(c, cardBtn));
 
-            // Scale transitions for hover
+            // scale transitions for hover
             ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), cardBtn);
             ScaleTransition stExit = new ScaleTransition(Duration.millis(200), cardBtn);
 
@@ -133,13 +140,14 @@ public class Player {
 
             cardBtn.setOnMouseEntered(e -> {
                 stExit.stop();
-                stEnter.setToX(1.1); // 20% larger
+                stEnter.setToX(1.1); // 10% larger
                 stEnter.setToY(1.1);
                 stEnter.playFromStart();
 
-                // Apply shadow
+                // apply shadow
                 cardBtn.setEffect(shadow);
             });
+
 
             cardBtn.setOnMouseExited(e -> {
                 stEnter.stop();
@@ -160,10 +168,10 @@ public class Player {
         root.getChildren().add(handBox);
     }
 
-    private void layCard(Card c){
+    private void layCard(Card c, Button b){
         System.out.println("Karte gespielt: " + c.getCardColour() + " " + c.getCardValue());
-
-
+        hand.remove(c);
+        handBox.getChildren().remove(b);
     }
 
 }
