@@ -3,6 +3,7 @@ package htl.steyr.uno;
 import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
+import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -162,4 +163,13 @@ public class LobbyController implements Initializable {
         this.client = client;
     }
 
+    private void sendChatMessage(String message) {
+        client.sendChatMessage(message);
+    }
+
+    public void receiveChatMessage(ReceiveChatMessageResponse msg) {
+        String sender = msg.getUser().getUsername();
+        String message = msg.getMessage();
+        System.out.println("Received chat message from " + sender + ": " + message);
+    }
 }

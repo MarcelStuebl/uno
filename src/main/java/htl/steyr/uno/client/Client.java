@@ -3,16 +3,13 @@ package htl.steyr.uno.client;
 import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.LoginController;
-import htl.steyr.uno.requests.client.CreateAccountRequest;
-import htl.steyr.uno.requests.client.CreateLobbyRequest;
-import htl.steyr.uno.requests.client.JoinLobbyRequest;
-import htl.steyr.uno.requests.client.LoginRequest;
+import htl.steyr.uno.requests.client.*;
 
 import java.io.IOException;
 
 public class Client {
 
-    private String host = "server.uno.clouddb.at";
+    private String host = "localhost";
     private int port = 59362;
     private ClientSocketConnection conn;
     private final LoginController loginController;
@@ -37,22 +34,27 @@ public class Client {
 
     public void logIn(String username, String password) {
         LoginRequest msg = new LoginRequest(username, password);
-        conn.sendMessage(msg);
+        getConn().sendMessage(msg);
     }
 
     public void createLobby() {
-        CreateLobbyRequest msg = new CreateLobbyRequest(conn.getUser());
-        conn.sendMessage(msg);
+        CreateLobbyRequest msg = new CreateLobbyRequest(getConn().getUser());
+        getConn().sendMessage(msg);
     }
 
     public void joinLobby(int lobbyId) {
         JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId);
-        conn.sendMessage(msg);
+        getConn().sendMessage(msg);
     }
 
     public void createAccount(String username, String firstName, String lastName, String password) {
         CreateAccountRequest msg = new CreateAccountRequest(username, firstName, lastName, password);
-        conn.sendMessage(msg);
+        getConn().sendMessage(msg);
+    }
+
+    public void sendChatMessage(String message) {
+        SendChatMessageRequest msg = new SendChatMessageRequest(message, getConn().getUser());
+        getConn().sendMessage(msg);
     }
 
     public ClientSocketConnection getConn() {

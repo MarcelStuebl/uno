@@ -5,6 +5,7 @@ import htl.steyr.uno.HelloApplication;
 import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
+import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -124,12 +125,11 @@ public class LobbyWaitController implements Initializable {
 
     public void onSendMassage(ActionEvent actionEvent) {
         String text = gameChatTextField.getText();
-        String user = client.getConn().getUser().getUsername();
 
         if (text != null && !text.isBlank()) {
-            gameChatListView.getItems().add(new ChatMessage(user, text.trim()));
             gameChatTextField.clear();
-            updateLobbyInfo();
+            sendChatMessage(text.trim());
+            System.out.println("Sent chat message: " + text.trim());
         }
     }
 
@@ -185,6 +185,20 @@ public class LobbyWaitController implements Initializable {
     public void setLobby(LobbyInfoResponse lobby) {
         this.lobby = lobby;
         Platform.runLater(this::updateLobbyInfo);
+    }
+
+    private void sendChatMessage(String message) {
+        client.sendChatMessage(message);
+    }
+
+    public void receiveChatMessage(ReceiveChatMessageResponse msg) {
+        String sender = msg.getUser().getUsername();
+        String text = msg.getMessage();
+        System.out.println("Received chat message from " + sender + ": " + text);
+
+        Platform.runLater(() -> {
+            gameChatListView.getItems().add(new ChatMessage(sender, text));
+        });
     }
 
     public record ChatMessage(String sender, String text) { }

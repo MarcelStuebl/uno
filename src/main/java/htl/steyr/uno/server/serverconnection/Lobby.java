@@ -1,6 +1,8 @@
 package htl.steyr.uno.server.serverconnection;
 
+import htl.steyr.uno.requests.client.SendChatMessageRequest;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
+import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +48,13 @@ public class Lobby {
             if (getStatus() != 2) checkStatus();
             msg.setStatus(getStatus());
             for (var c : connections) c.sendMessage(msg);
+        }
+    }
+
+    public void sendChatMessage(SendChatMessageRequest obj) {
+        ReceiveChatMessageResponse response = new ReceiveChatMessageResponse(obj.getMessage(), obj.getUser());
+        synchronized (connections) {
+            for (var c : connections) c.sendMessage(response);
         }
     }
 
@@ -117,6 +126,7 @@ public class Lobby {
     public LobbyInfoResponse getLobbyInfoResponse() {
         return lobbyInfoResponse;
     }
+
 
 }
 

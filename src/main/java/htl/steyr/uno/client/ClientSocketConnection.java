@@ -82,6 +82,7 @@ public class ClientSocketConnection implements Closeable {
                         case LobbyJoinRefusedResponse msg -> lobbyJoinRefused(msg);
                         case CreateLobbySuccessResponse msg -> createLobbySuccess(msg);
                         case CreateAccountSuccessResponse msg -> createAccountSuccess(msg);
+                        case ReceiveChatMessageResponse msg -> receiveChatMessage(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -200,6 +201,13 @@ public class ClientSocketConnection implements Closeable {
         }
     }
 
+    private void receiveChatMessage(ReceiveChatMessageResponse msg) {
+        if (client.getLobbyWaitController() != null) {
+            client.getLobbyWaitController().receiveChatMessage(msg);
+        } else if (client.getLobbyController() != null) {
+            client.getLobbyController().receiveChatMessage(msg);
+        }
+    }
 
     /**
      * Closes the socket connection and stops the receiving thread. This method is called when the client

@@ -89,11 +89,12 @@ public class ServerSocketConnection {
                     sendLogMessage(obj);
 
                     switch (obj) {
-                        case LoginRequest loginRequest -> loginRequest(loginRequest);
-                        case CreateAccountRequest createAccountRequest -> createAccountRequest(createAccountRequest);
-                        case CreateLobbyRequest createLobbyRequest -> createLobbyRequest(createLobbyRequest);
-                        case JoinLobbyRequest joinLobbyRequest -> joinLobbyRequest(joinLobbyRequest);
-                        case LeaveLobbyRequest leftLobbyRequest -> leftLobbyRequest(leftLobbyRequest);
+                        case LoginRequest msg -> loginRequest(msg);
+                        case CreateAccountRequest msg -> createAccountRequest(msg);
+                        case CreateLobbyRequest msg -> createLobbyRequest(msg);
+                        case JoinLobbyRequest msg -> joinLobbyRequest(msg);
+                        case LeaveLobbyRequest msg -> leftLobbyRequest(msg);
+                        case SendChatMessageRequest msg -> sendChatMessageRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -190,6 +191,13 @@ public class ServerSocketConnection {
             LobbyNotFoundResponse msg = new LobbyNotFoundResponse(getUser());
             sendMessage(msg);
             sendLogMessage(msg);
+        }
+    }
+
+    private void sendChatMessageRequest(SendChatMessageRequest obj) {
+        Lobby lobby = server.getLobbies().stream().filter(l -> l.getConnections().contains(this)).findFirst().orElse(null);
+        if (lobby != null) {
+            lobby.sendChatMessage(obj);
         }
     }
 
