@@ -11,7 +11,6 @@
 
 <HBox alignment="CENTER" stylesheets="@style/loginStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="htl.steyr.uno.LoginController">
 
-    <!-- ================= LEFT: Branding ================= -->
     <StackPane fx:id="brandingPane" maxWidth="Infinity" styleClass="centerPane" HBox.hgrow="ALWAYS">
         <VBox alignment="CENTER" spacing="20">
 
@@ -50,9 +49,7 @@
         </VBox>
     </StackPane>
 
-    <!-- ================= RIGHT: Login ================= -->
     <StackPane fx:id="loginPane" alignment="CENTER" maxWidth="Infinity" styleClass="rightPane" HBox.hgrow="ALWAYS">
-      <!-- 2FA Authentication Screen -->
       <VBox fx:id="show2FA" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="24" styleClass="loginCard" visible="false">
          <VBox alignment="CENTER" spacing="6">
             <Label styleClass="lWelcomeBack" text="2-FA Code Authentifizierung" textAlignment="CENTER" wrapText="true" />
@@ -68,6 +65,7 @@
             <Button alignment="CENTER" mnemonicParsing="false" onAction="#onVerify2FA" prefHeight="36.0" prefWidth="200.0" styleClass="loginButton" text="Überprüfen" textAlignment="CENTER" />
             <Button alignment="CENTER" mnemonicParsing="false" onAction="#backToLoginFrom2FA" styleClass="backButton" text="zurück" />
          </VBox>
+         <Label fx:id="errorLabel2FA" styleClass="errorLabel" text="ERROR:" />
       </VBox>
       <VBox fx:id="showCreateAcc" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard">
          <children>
@@ -85,6 +83,7 @@
                   <PasswordField fx:id="welcomeBackPasswd" promptText="Dein Passwort" styleClass="login" />
                </children>
             </VBox>
+            <Button fx:id="forgotPasswordButton" mnemonicParsing="false" onAction="#onForgotPasswordClicked" styleClass="minimalistButton" text="Passwort vergessen" />
             <Button onAction="#onLoginButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Anmelden" />
             <HBox alignment="CENTER" spacing="8">
                <children>
@@ -143,6 +142,65 @@
 
             <Label styleClass="Subtitles" text="© 2026 UNO – HTL Steyr" />
          <Label fx:id="errorLabelCreateAcc" prefHeight="60.0" prefWidth="282.0" styleClass="errorLabel" text="ERROR!!!" textAlignment="CENTER" visible="false" wrapText="true" />
+        </VBox>
+
+        <VBox fx:id="showForgotPassword" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="24" styleClass="loginCard" visible="false">
+            <VBox alignment="CENTER" spacing="6">
+               <Label styleClass="lWelcomeBack" text="Passwort zurücksetzen" textAlignment="CENTER" wrapText="true" />
+               <Label styleClass="Subtitles" text="Email eingeben um Passwort zurückzusetzen" textAlignment="CENTER" />
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="12">
+               <Label styleClass="loginLables" text="E-Mail Adresse" />
+               <TextField fx:id="resetPasswordEmail" promptText="Deine E-Mail" styleClass="login" />
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="12">
+               <Button prefHeight="36.0" prefWidth="200.0" mnemonicParsing="false" onAction="#onResetPasswordClicked" text="Passwort zurücksetzen" textAlignment="CENTER" alignment="CENTER" styleClass="loginButton"/>
+               <Button mnemonicParsing="false" onAction="#backToLoginFromForgotPassword" styleClass="backButton" text="zurück" alignment="CENTER" />
+            </VBox>
+            <Label fx:id="errorLabelForgotPassword" styleClass="errorLabel" text="ERROR:" visible="false" />
+        </VBox>
+
+        <VBox fx:id="showResetPassword2FA" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="24" styleClass="loginCard" visible="false">
+            <VBox alignment="CENTER" spacing="6">
+               <Label styleClass="lWelcomeBack" text="2-FA Verifizierung" textAlignment="CENTER" wrapText="true" />
+               <Label styleClass="Subtitles" text="Gib deinen 6-stelligen Code ein" textAlignment="CENTER" />
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="12">
+               <Label styleClass="loginLables" text="2FA Code" />
+               <TextField fx:id="resetPassword2FACode" promptText="000000" styleClass="login"/>
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="12">
+               <Button prefHeight="36.0" prefWidth="200.0" mnemonicParsing="false" onAction="#onVerifyResetPassword2FA" text="Verifizieren" textAlignment="CENTER" alignment="CENTER" styleClass="loginButton"/>
+               <Button mnemonicParsing="false" onAction="#backToLoginFromReset2FA" styleClass="backButton" text="zurück" alignment="CENTER" />
+            </VBox>
+            <Label fx:id="errorLabelReset2FA" styleClass="errorLabel" text="ERROR:" visible="false" />
+        </VBox>
+
+        <VBox fx:id="showNewPasswordScreen" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="24" styleClass="loginCard" visible="false">
+            <VBox alignment="CENTER" spacing="6">
+               <Label styleClass="lWelcomeBack" text="Neues Passwort" textAlignment="CENTER" wrapText="true" />
+               <Label styleClass="Subtitles" text="Erstelle dein neues Passwort" textAlignment="CENTER" />
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="12">
+               <Label styleClass="loginLables" text="Neues Passwort" />
+               <PasswordField fx:id="newPassword" promptText="Neues Passwort" styleClass="login" />
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="12">
+               <Label styleClass="loginLables" text="Passwort bestätigen" />
+               <PasswordField fx:id="confirmNewPassword" promptText="Passwort bestätigen" styleClass="login" />
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="12">
+               <Button prefHeight="36.0" prefWidth="200.0" mnemonicParsing="false" onAction="#onSetNewPasswordClicked" text="Passwort festlegen" textAlignment="CENTER" alignment="CENTER" styleClass="loginButton"/>
+               <Button mnemonicParsing="false" onAction="#backToLoginFromNewPassword" styleClass="backButton" text="zurück" alignment="CENTER" />
+            </VBox>
+            <Label fx:id="errorLabelNewPassword" styleClass="errorLabel" text="ERROR:" visible="false" />
         </VBox>
     </StackPane>
 
