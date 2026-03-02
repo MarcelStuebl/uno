@@ -26,6 +26,20 @@ public class LoginController implements Initializable {
     @FXML public Button anmeldeButton;
     @FXML public Label errorLabel;
     @FXML public Label errorLabelCreateAcc;
+    @FXML public TextField newAccEmail;
+    @FXML public TextField twoFACode;
+    @FXML public VBox show2FA;
+    @FXML public Label errorLabel2FA;
+    @FXML public VBox showForgotPassword;
+    @FXML public TextField resetPasswordEmail;
+    @FXML public Label errorLabelForgotPassword;
+    @FXML public VBox showResetPassword2FA;
+    @FXML public TextField resetPassword2FACode;
+    @FXML public Label errorLabelReset2FA;
+    @FXML public VBox showNewPasswordScreen;
+    @FXML public PasswordField newPassword;
+    @FXML public PasswordField confirmNewPassword;
+    @FXML public Label errorLabelNewPassword;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
@@ -79,11 +93,30 @@ public class LoginController implements Initializable {
         errorLabelCreateAcc.setVisible(false);
     }
 
+    @FXML
+    private void backToLoginFrom2FA() {
+        show2FA.setVisible(false);
+        showCreateAcc.setVisible(true);
+        twoFACode.clear();
+    }
+
+    @FXML
+    private void onVerify2FA(ActionEvent actionEvent) {
+        String code = twoFACode.getText();
+        if (code.isEmpty()) {
+            // Handle error
+        } else {
+            // TODO: Verify the 2FA code with the server
+            twoFACode.clear();
+        }
+    }
+
     public void onCreateNewAccountButtonClicked(ActionEvent actionEvent) {
         String username = newAccUserName.getText();
         String password = newAccPassword.getText();
         String firstName = newAccFirstName.getText();
         String lastName = newAccLastName.getText();
+        String email = newAccEmail.getText();
 
         if (password.isEmpty()) {
             errorLabelCreateAcc.setText("Password cannot be empty!");
@@ -94,6 +127,9 @@ public class LoginController implements Initializable {
         } else if (lastName.isEmpty()) {
             errorLabelCreateAcc.setText("Last name cannot be empty!");
             errorLabelCreateAcc.setVisible(true);
+        } else if (email.isEmpty()) {
+            errorLabelCreateAcc.setText("Email cannot be empty!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (!(username.matches("[a-z]+"))) {
             errorLabelCreateAcc.setText("Username must only contain lowercase letters!");
             errorLabelCreateAcc.setVisible(true);
@@ -102,6 +138,9 @@ public class LoginController implements Initializable {
             errorLabelCreateAcc.setVisible(true);
         } else if (lastName.matches(".*\\d.*") || lastName.matches(".*[!@#$%^&*()_/].*")) {
             errorLabelCreateAcc.setText("Last name cannot contain numbers or special characters!");
+            errorLabelCreateAcc.setVisible(true);
+        } else if (!(email.contains("@") && email.contains("."))) {
+            errorLabelCreateAcc.setText("Email must be valid!");
             errorLabelCreateAcc.setVisible(true);
         } else {
             client.createAccount(username, lastName, firstName, password);
@@ -146,6 +185,106 @@ public class LoginController implements Initializable {
         });
     }
 
+    @FXML
+    private void onForgotPasswordClicked(ActionEvent actionEvent) {
+        showCreateAcc.setVisible(false);
+        showForgotPassword.setVisible(true);
+        resetPasswordEmail.clear();
+        errorLabelForgotPassword.setVisible(false);
+    }
+
+    @FXML
+    private void backToLoginFromForgotPassword() {
+        showForgotPassword.setVisible(false);
+        showCreateAcc.setVisible(true);
+        resetPasswordEmail.clear();
+    }
+
+    @FXML
+    private void onResetPasswordClicked(ActionEvent actionEvent) {
+        String email = resetPasswordEmail.getText();
+
+        if (email.isEmpty()) {
+            errorLabelForgotPassword.setText("Email cannot be empty!");
+            errorLabelForgotPassword.setVisible(true);
+        } else if (!(email.contains("@") && email.contains("."))) {
+            errorLabelForgotPassword.setText("Email must be valid!");
+            errorLabelForgotPassword.setVisible(true);
+        } else {
+            // TODO: Email-Verifizierung auf dem Server durchführen und 2FA Code versenden
+            showForgotPassword.setVisible(false);
+            showResetPassword2FA.setVisible(true);
+            resetPassword2FACode.clear();
+            errorLabelReset2FA.setVisible(false);
+        }
+    }
+
+    @FXML
+    private void onVerifyResetPassword2FA(ActionEvent actionEvent) {
+        String code = resetPassword2FACode.getText();
+
+        if (code.isEmpty()) {
+            errorLabelReset2FA.setText("Code cannot be empty!");
+            errorLabelReset2FA.setVisible(true);
+        } else if (code.length() != 6 || !code.matches("\\d+")) {
+            errorLabelReset2FA.setText("Code must be 6 digits!");
+            errorLabelReset2FA.setVisible(true);
+        } else {
+            // TODO: 2FA Code auf dem Server überprüfen
+            showResetPassword2FA.setVisible(false);
+            showNewPasswordScreen.setVisible(true);
+            newPassword.clear();
+            confirmNewPassword.clear();
+            errorLabelNewPassword.setVisible(false);
+        }
+    }
+
+    @FXML
+    private void onSetNewPasswordClicked(ActionEvent actionEvent) {
+        String password = newPassword.getText();
+        String confirmPassword = confirmNewPassword.getText();
+
+        if (password.isEmpty()) {
+            errorLabelNewPassword.setText("Password cannot be empty!");
+            errorLabelNewPassword.setVisible(true);
+        } else if (confirmPassword.isEmpty()) {
+            errorLabelNewPassword.setText("Please confirm your password!");
+            errorLabelNewPassword.setVisible(true);
+        } else if (!password.equals(confirmPassword)) {
+            errorLabelNewPassword.setText("Passwords do not match!");
+            errorLabelNewPassword.setVisible(true);
+        } else {
+            // TODO: Neues Passwort auf dem Server speichern
+            errorLabelNewPassword.setText("Passwort erfolgreich geändert!");
+            errorLabelNewPassword.setStyle("-fx-text-fill: #90EE90;");
+            errorLabelNewPassword.setVisible(true);
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2000);
+                    Platform.runLater(this::backToLoginFromNewPassword);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+
+    @FXML
+    private void backToLoginFromReset2FA() {
+        showResetPassword2FA.setVisible(false);
+        showForgotPassword.setVisible(true);
+        resetPassword2FACode.clear();
+    }
+
+    @FXML
+    private void backToLoginFromNewPassword() {
+        showNewPasswordScreen.setVisible(false);
+        showCreateAcc.setVisible(true);
+        newPassword.clear();
+        confirmNewPassword.clear();
+        resetPasswordEmail.clear();
+    }
 
     private void onSceneClose() {
         if (client.getConn() != null) {
