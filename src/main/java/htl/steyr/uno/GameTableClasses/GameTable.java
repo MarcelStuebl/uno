@@ -22,6 +22,7 @@ public class GameTable implements Initializable {
     private final Client client;
     @FXML private StackPane root;
     private Stage stage;
+    CardStack centralStack = new CardStack();
 
     public GameTable(Client client) {
         this.client = client;
@@ -74,9 +75,10 @@ public class GameTable implements Initializable {
         myHand.add(new Card(9, "blue"));
         myHand.add(new Card(2, "green"));
         myHand.add(new Card(8, "yellow"));
-        myHand.add(new Card(1, "red"));
-        myHand.add(new Card(6, "blue"));
-        myHand.add(new Card(4, "green"));
+        myHand.add(new Card(12, "red"));
+        myHand.add(new Card(13, "black"));
+        myHand.add(new Card(14, "black"));
+
 
 
         ArrayList<Enemy> enemies = new ArrayList<>();
@@ -88,8 +90,12 @@ public class GameTable implements Initializable {
         Player player = new Player("Max",true,myHand,enemies);
 
 
+        StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
+        root.getChildren().add(centralStack.getVisual());
 
-        player.showPlayerHand(root, player);
+
+
+        player.showPlayerHand(root, player, centralStack);
 
         player.testPrintHand();
 

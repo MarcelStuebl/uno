@@ -103,35 +103,43 @@ public class Player {
     }
 
 
-    public void showPlayerHand(StackPane root, Player player) {
-
-
+    public void showPlayerHand(StackPane root, Player player, CardStack centralStack) {
+        HBox handBox = new HBox();
         handBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
-        handBox.setSpacing(-80); // overlap cards
+        handBox.setSpacing(-100);
 
         for (Card c : player.getPlayerHand()) {
-
-            Button cardBtn = new Button();
-
-            // picture of the card
             String path = "../Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
             ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
-            iv.setFitWidth(100);
-            iv.setFitHeight(150);
+            iv.setFitWidth(137);
+            iv.setFitHeight(192);
             iv.setPreserveRatio(true);
 
-            cardBtn.setGraphic(iv);
+            StackPane cardPane = new StackPane(iv);
+            cardPane.setPrefSize(137, 192);
+            cardPane.setStyle(
+                    "-fx-border-color: red;" +
+                            "-fx-border-width: 4;" +
+                            "-fx-border-radius: 5;" +
+                            "-fx-background-radius: 5;"
+            );
+
+            Button cardBtn = new Button();
+            cardBtn.setGraphic(cardPane);
             cardBtn.setPadding(javafx.geometry.Insets.EMPTY);
             cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
-            // click event to put card down
-            cardBtn.setOnAction(e -> layCard(c, cardBtn));
+            cardBtn.setOnAction(e -> {
+                centralStack.layCard(c, cardBtn);
+                if (centralStack.getTopCard() == c) {
+                    player.getPlayerHand().remove(c);
+                    handBox.getChildren().remove(cardBtn);
+                }
+            });
 
-            // scale transitions for hover
-            ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), cardBtn);
-            ScaleTransition stExit = new ScaleTransition(Duration.millis(200), cardBtn);
+            ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), cardPane);
+            ScaleTransition stExit = new ScaleTransition(Duration.millis(200), cardPane);
 
-            // DropShadow effect
             DropShadow shadow = new DropShadow();
             shadow.setRadius(15);
             shadow.setOffsetX(0);
@@ -140,23 +148,18 @@ public class Player {
 
             cardBtn.setOnMouseEntered(e -> {
                 stExit.stop();
-                stEnter.setToX(1.1); // 10% larger
+                stEnter.setToX(1.1);
                 stEnter.setToY(1.1);
                 stEnter.playFromStart();
-
-                // apply shadow
-                cardBtn.setEffect(shadow);
+                cardPane.setEffect(shadow);
             });
-
 
             cardBtn.setOnMouseExited(e -> {
                 stEnter.stop();
-                stExit.setToX(1.0); // back to normal size
+                stExit.setToX(1.0);
                 stExit.setToY(1.0);
                 stExit.playFromStart();
-
-                // Remove shadow
-                cardBtn.setEffect(null);
+                cardPane.setEffect(null);
             });
 
             handBox.getChildren().add(cardBtn);
@@ -164,14 +167,7 @@ public class Player {
 
         StackPane.setAlignment(handBox, javafx.geometry.Pos.BOTTOM_CENTER);
         StackPane.setMargin(handBox, new javafx.geometry.Insets(40));
-
         root.getChildren().add(handBox);
-    }
-
-    private void layCard(Card c, Button b){
-        System.out.println("Karte gespielt: " + c.getCardColour() + " " + c.getCardValue());
-        hand.remove(c);
-        handBox.getChildren().remove(b);
     }
 
 }
