@@ -9,65 +9,94 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-
 public class LobbyWaitController implements Initializable {
 
     public Label lobbyCodeLabel;
-    public Label player1Label;
-    public Label player2Label;
     public Button playButton;
     public Label AccNameDisplayLabel;
     public Button leaveLobbyButton;
     public ListView<String> playerListView = new ListView<>();
-
+    public ListView<ChatMessage> gameChatListView = new ListView<>();
+    public TextField gameChatTextField;
 
     private final Client client;
     private LobbyInfoResponse lobby;
 
-    /**
-     * @param client
-     * @param lobby
-     */
     public LobbyWaitController(Client client, LobbyInfoResponse lobby) {
         this.client = client;
         this.lobby = lobby;
     }
 
-    /**
-     * Calls the onSceneClose funktion to close the Client when the Scene is closed
-     * @param url
-     * @param resourceBundle
-     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Platform.runLater(() -> {
-            playButton.getScene().getWindow().setOnCloseRequest(event -> {
-                onSceneClose();
-            });
+            playButton.getScene().getWindow().setOnCloseRequest(event -> onSceneClose());
         });
 
         String lobbyCode = lobby.getLobbyId().toString();
         lobbyCodeLabel.setText("Lobby Code: " + lobbyCode);
 
-        // Display current user's account name
         AccNameDisplayLabel.setText("Account: " + client.getConn().getUser().getUsername());
+
+        final String currentUsername = client.getConn().getUser().getUsername();
+        gameChatListView.setCellFactory(list -> new ListCell<ChatMessage>() {
+            @Override
+            protected void updateItem(ChatMessage item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+
+                boolean mine = currentUsername.equals(item.sender());
+
+                Label nameLabel = new Label(item.sender());
+                nameLabel.setStyle("-fx-text-fill: #c12424; -fx-font-size: 12;");
+
+                Label bubble = new Label(item.text());
+                bubble.setWrapText(true);
+                bubble.setPadding(new Insets(8));
+                bubble.setMaxWidth(320);
+
+                if (mine) {
+                    bubble.setStyle("-fx-background-color: #DCF8C6; -fx-background-radius: 12;");
+                } else {
+                    bubble.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-border-color: #E0E0E0; -fx-border-radius: 12;");
+                }
+
+                javafx.scene.layout.VBox messageBox = new javafx.scene.layout.VBox(2, nameLabel, bubble);
+
+                HBox row = new HBox(messageBox);
+                row.setPadding(new Insets(4, 8, 4, 8));
+                row.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+                setText(null);
+                setGraphic(row);
+            }
+        });
 
         updateLobbyInfo();
 
         System.out.println("Es geht:\n" + client.getConn().getUser());
         System.out.println("Lobby:\n" + lobby);
     }
-
 
     public void updateLobbyInfo() {
         System.out.println("Lobby Info Updated: " + lobby);
@@ -76,49 +105,40 @@ public class LobbyWaitController implements Initializable {
         playerListView.getItems().clear();
 
         if (lobby.getUsers().getFirst().getUsername().equals(currentUsername)) {
-            // Current user is the host
             playButton.setVisible(true);
 
-            // Display the host username in player1Label
-            player1Label.setText(lobby.getUsers().getFirst().getUsername());
             playerListView.getItems().add(lobby.getUsers().getFirst().getUsername());
 
-            // Display the guest username in player2Label if there are 2 players
             if (lobby.getUsers().size() > 1) {
-                player2Label.setText(lobby.getUsers().getLast().getUsername());
                 playerListView.getItems().add(lobby.getUsers().getLast().getUsername());
             } else {
-                player2Label.setText("Wartet auf Spieler...");
                 playerListView.getItems().add("Wartet auf Spieler...");
             }
         } else {
-            // Current user is a guest
             playButton.setVisible(false);
 
-            // Display the host username in player1Label
-            player1Label.setText(lobby.getUsers().getFirst().getUsername());
             playerListView.getItems().add(lobby.getUsers().getFirst().getUsername());
-
-            // Display the guest (current user) username in player2Label
-            player2Label.setText(currentUsername);
             playerListView.getItems().add(currentUsername);
         }
     }
 
-    /**
-     *
-     */
+    public void onSendMassage(ActionEvent actionEvent) {
+        String text = gameChatTextField.getText();
+        String user = client.getConn().getUser().getUsername();
+
+        if (text != null && !text.isBlank()) {
+            gameChatListView.getItems().add(new ChatMessage(user, text.trim()));
+            gameChatTextField.clear();
+            updateLobbyInfo();
+        }
+    }
+
     private void onSceneClose() {
         if (client.getConn() != null) {
             client.getConn().close();
         }
     }
 
-    /**
-     * Changes the Scene from the WaitingLobby to Gametable when the playButton is clicked
-     * @param actionEvent
-     * @throws IOException
-     */
     public void playButtonClicked(ActionEvent actionEvent) throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) playButton.getScene().getWindow();
@@ -135,11 +155,6 @@ public class LobbyWaitController implements Initializable {
         thisStage.close();
     }
 
-    /**
-     * Changes the Scene from the WaitingLobby to the Lobby when the leaveButton is clicked
-     * @param actionEvent
-     * @throws IOException
-     */
     public void leaveLobbyButtonClicked(ActionEvent actionEvent) throws IOException {
         client.getConn().leaveLobby();
 
@@ -172,4 +187,5 @@ public class LobbyWaitController implements Initializable {
         Platform.runLater(this::updateLobbyInfo);
     }
 
+    public record ChatMessage(String sender, String text) { }
 }
