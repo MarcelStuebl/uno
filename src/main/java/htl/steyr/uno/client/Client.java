@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class Client {
 
-    private String host = "xserv.stuebl.eu";
+    private String host = "server.uno.clouddb.at";
     private int port = 59362;
     private ClientSocketConnection conn;
     private final LoginController loginController;
