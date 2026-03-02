@@ -1,10 +1,12 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import htl.steyr.uno.client.Client;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -20,6 +22,7 @@ public class GameTable implements Initializable {
     private final Client client;
     @FXML private StackPane root;
     private Stage stage;
+    CardStack centralStack = new CardStack();
 
     public GameTable(Client client) {
         this.client = client;
@@ -29,7 +32,11 @@ public class GameTable implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Platform.runLater(() -> {
             Stage stage = (Stage) root.getScene().getWindow();
-            open(stage);
+            try {
+                open(stage);
+            } catch (InvalidHandException e) {
+                throw new RuntimeException(e);
+            }
         });
 
     }
@@ -41,15 +48,13 @@ public class GameTable implements Initializable {
     }
 
 
-
-
-    public void open(Stage stage) {
+    public void open(Stage stage) throws InvalidHandException {
         makeTable(stage);
 
     }
 
 
-    private void makeTable(Stage stage) {
+    private void makeTable(Stage stage) throws InvalidHandException {
         StackPane root = null;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));
@@ -70,9 +75,10 @@ public class GameTable implements Initializable {
         myHand.add(new Card(9, "blue"));
         myHand.add(new Card(2, "green"));
         myHand.add(new Card(8, "yellow"));
-        myHand.add(new Card(1, "red"));
-        myHand.add(new Card(6, "blue"));
-        myHand.add(new Card(4, "green"));
+        myHand.add(new Card(12, "red"));
+        myHand.add(new Card(13, "black"));
+        myHand.add(new Card(14, "black"));
+
 
 
         ArrayList<Enemy> enemies = new ArrayList<>();
@@ -83,12 +89,13 @@ public class GameTable implements Initializable {
 
         Player player = new Player("Max",true,myHand,enemies);
 
-        CardStack cardStack = new CardStack();
 
-        StackPane.setAlignment(cardStack.getVisual(), javafx.geometry.Pos.CENTER);
-        root.getChildren().add(cardStack.getVisual());
+        StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
+        root.getChildren().add(centralStack.getVisual());
 
-        player.showPlayerHand(root, player);
+
+
+        player.showPlayerHand(root, player, centralStack);
 
         player.testPrintHand();
 
