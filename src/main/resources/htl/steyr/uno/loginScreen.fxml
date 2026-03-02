@@ -52,6 +52,23 @@
 
     <!-- ================= RIGHT: Login ================= -->
     <StackPane fx:id="loginPane" alignment="CENTER" maxWidth="Infinity" styleClass="rightPane" HBox.hgrow="ALWAYS">
+      <!-- 2FA Authentication Screen -->
+      <VBox fx:id="show2FA" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="24" styleClass="loginCard" visible="false">
+         <VBox alignment="CENTER" spacing="6">
+            <Label styleClass="lWelcomeBack" text="2-FA Code Authentifizierung" textAlignment="CENTER" wrapText="true" />
+            <Label styleClass="Subtitles" text="Gib deinen Sicherheitscode ein" textAlignment="CENTER" />
+         </VBox>
+
+         <VBox alignment="CENTER" spacing="12">
+            <Label styleClass="loginLables" text="2FA Code" />
+            <TextField fx:id="twoFACode" promptText="000000" styleClass="login" />
+         </VBox>
+
+         <VBox alignment="CENTER" spacing="12">
+            <Button alignment="CENTER" mnemonicParsing="false" onAction="#onVerify2FA" prefHeight="36.0" prefWidth="200.0" styleClass="loginButton" text="Überprüfen" textAlignment="CENTER" />
+            <Button alignment="CENTER" mnemonicParsing="false" onAction="#backToLoginFrom2FA" styleClass="backButton" text="zurück" />
+         </VBox>
+      </VBox>
       <VBox fx:id="showCreateAcc" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard">
          <children>
             <Label styleClass="lWelcomeBack" text="Willkommen zurück!" />
@@ -106,6 +123,12 @@
             <VBox spacing="6">
                 <Label styleClass="loginLables" text="Passwort" />
                 <PasswordField fx:id="newAccPassword" promptText="Dein Passwort" styleClass="login" />
+            </VBox>
+            <VBox spacing="6">
+                <children>
+                    <Label styleClass="loginLables" text="E-Mail" />
+                    <TextField fx:id="newAccEmail" promptText="Deine E-Mail" styleClass="login" />
+                </children>
             </VBox>
 
             <Button onAction="#onCreateNewAccountButtonClicked" prefHeight="32.0" prefWidth="240.0" styleClass="loginButton" text="Account erstellen" />

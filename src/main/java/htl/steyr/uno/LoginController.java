@@ -26,6 +26,9 @@ public class LoginController implements Initializable {
     @FXML public Button anmeldeButton;
     @FXML public Label errorLabel;
     @FXML public Label errorLabelCreateAcc;
+    @FXML public TextField newAccEmail;
+    @FXML public TextField twoFACode;
+    @FXML public VBox show2FA;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
@@ -79,11 +82,30 @@ public class LoginController implements Initializable {
         errorLabelCreateAcc.setVisible(false);
     }
 
+    @FXML
+    private void backToLoginFrom2FA() {
+        show2FA.setVisible(false);
+        showCreateAcc.setVisible(true);
+        twoFACode.clear();
+    }
+
+    @FXML
+    private void onVerify2FA(ActionEvent actionEvent) {
+        String code = twoFACode.getText();
+        if (code.isEmpty()) {
+            // Handle error
+        } else {
+            // TODO: Verify the 2FA code with the server
+            twoFACode.clear();
+        }
+    }
+
     public void onCreateNewAccountButtonClicked(ActionEvent actionEvent) {
         String username = newAccUserName.getText();
         String password = newAccPassword.getText();
         String firstName = newAccFirstName.getText();
         String lastName = newAccLastName.getText();
+        String email = newAccEmail.getText();
 
         if (password.isEmpty()) {
             errorLabelCreateAcc.setText("Password cannot be empty!");
@@ -94,6 +116,9 @@ public class LoginController implements Initializable {
         } else if (lastName.isEmpty()) {
             errorLabelCreateAcc.setText("Last name cannot be empty!");
             errorLabelCreateAcc.setVisible(true);
+        } else if (email.isEmpty()) {
+            errorLabelCreateAcc.setText("Email cannot be empty!");
+            errorLabelCreateAcc.setVisible(true);
         } else if (!(username.matches("[a-z]+"))) {
             errorLabelCreateAcc.setText("Username must only contain lowercase letters!");
             errorLabelCreateAcc.setVisible(true);
@@ -102,6 +127,9 @@ public class LoginController implements Initializable {
             errorLabelCreateAcc.setVisible(true);
         } else if (lastName.matches(".*\\d.*") || lastName.matches(".*[!@#$%^&*()_/].*")) {
             errorLabelCreateAcc.setText("Last name cannot contain numbers or special characters!");
+            errorLabelCreateAcc.setVisible(true);
+        } else if (!(email.contains("@") && email.contains("."))) {
+            errorLabelCreateAcc.setText("Email must be valid!");
             errorLabelCreateAcc.setVisible(true);
         } else {
             client.createAccount(username, lastName, firstName, password);
