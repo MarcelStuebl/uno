@@ -13,7 +13,7 @@
 
 <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <StackPane alignment="TOP_CENTER" prefHeight="400.0" prefWidth="422.0" styleClass="mainPaine" HBox.hgrow="ALWAYS">
+      <StackPane prefHeight="400.0" prefWidth="422.0" styleClass="mainPaine" HBox.hgrow="ALWAYS">
          <children>
             <VBox alignment="TOP_CENTER" prefHeight="349.0" prefWidth="337.0">
                <children>
@@ -31,18 +31,26 @@
                         <Line endX="121.5" startX="-298.5" strokeWidth="2.0" />
                      </children>
                   </VBox>
-                  <ListView fx:id="playerListView" prefHeight="111.0" prefWidth="422.0" />
-                  <ListView fx:id="gameChatListView" prefHeight="61.0" prefWidth="422.0" />
-                  <TextField fx:id="gameChatTextField" onAction="#onSendMassage" prefHeight="61.0" prefWidth="422.0" />
+                  <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ListView fx:id="playerListView" prefHeight="163.0" prefWidth="422.0" styleClass="playerListView" />
+                     </children>
+                  </VBox>
+                  <ListView fx:id="gameChatListView" prefHeight="66.0" prefWidth="422.0" styleClass="gameChatListView" />
+                  <AnchorPane prefHeight="62.0" prefWidth="422.0">
+                     <children>
+                        <TextField fx:id="gameChatTextField" layoutX="97.0" layoutY="7.0" onAction="#onSendMassage" prefHeight="35.0" prefWidth="229.0" AnchorPane.leftAnchor="97.0" AnchorPane.rightAnchor="96.0" AnchorPane.topAnchor="7.0" />
+                     </children>
+                  </AnchorPane>
                </children>
             </VBox>
          </children>
       </StackPane>
-      <StackPane prefHeight="474.0" prefWidth="185.0" styleClass="secondPane">
+      <StackPane prefHeight="561.0" prefWidth="0.0" styleClass="secondPane">
          <children>
             <VBox prefHeight="400.0" prefWidth="200.0">
                <children>
-                  <AnchorPane prefHeight="405.0" prefWidth="149.0">
+                  <AnchorPane prefHeight="405.0" prefWidth="159.0">
                      <children>
                         <Button fx:id="playButton" layoutX="59.0" layoutY="113.0" mnemonicParsing="false" onAction="#playButtonClicked" prefHeight="40.0" prefWidth="64.0" styleClass="playButton" text="Spielen" />
                         <Button fx:id="leaveLobbyButton" layoutX="32.0" layoutY="347.0" mnemonicParsing="false" onAction="#leaveLobbyButtonClicked" prefHeight="40.0" prefWidth="125.0" styleClass="leaveButton" text="Lobby verlassen" />
