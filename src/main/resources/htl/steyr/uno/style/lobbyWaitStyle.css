@@ -1,3 +1,23 @@
+.playButton {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+    -fx-background-color: rgba(255, 90, 90, 0.95);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+
+
+}
+
+.leaveButton {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: rgba(255, 0, 0, 0.54);
+    -fx-border-width: 1px;
+    -fx-background-color: rgba(0, 0, 0, 0);
+}
+
 .mainPaine {
     -fx-background-color: linear-gradient(
             from 0% 0% to 100% 100%,
@@ -8,7 +28,11 @@
     -fx-padding: 80 0 80 0;
 }
 
-.secondaryPane {
+.labels {
+    -fx-text-fill: white;
+}
+
+.secondPane {
     -fx-background-color: linear-gradient(
             from 0% 0% to 100% 100%,
             rgb(18, 18, 36),
@@ -17,47 +41,44 @@
     -fx-padding: 80 0 80 0;
 }
 
-.chatPane {
-    -fx-background-color: linear-gradient(
-            from 0% 0% to 100% 100%,
-            rgb(18, 18, 36),
-            rgb(24, 24, 46)
-    );
-}
-
-.lobbyCodeLabel {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-}
-
-.labels {
-    -fx-text-fill: white;
-}
-
-.playButton {
-    -fx-border-radius: 22;
-    -fx-background-radius: 22;
-    -fx-background-color: rgba(255, 90, 90, 0.95);
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-}
-
-.leaveButton {
-    -fx-border-radius: 12;
-    -fx-background-radius: 12;
-    -fx-background-color: rgba(255, 255, 255, 0.1);
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-padding: 8 16 8 16;
-    -fx-font-size: 11px;
+.playerListView {
+    -fx-background-color: #615a5a;
+    -fx-text-fill: red;
 }
 
 .gameChatListView {
+    /* Außen-Hintergrund der ListView */
+    -fx-background-color: rgba(20, 25, 35, 0.35);
+    -fx-background-insets: 0;
+    -fx-background-radius: 12;
+
+    /* WICHTIG: innerer Hintergrund (sonst bleibt oft „solid“/bläulich) */
+    -fx-control-inner-background: rgba(20, 25, 35, 0.25);
+
+    -fx-padding: 6;
+
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
 }
 
-.playerListView {
-}
-
-.splitPane {
+/* Wichtig: ListView hat innen noch eine "Viewport"-Fläche -> auch stylen! */
+.gameChatListView .viewport {
     -fx-background-color: transparent;
+}
+
+.gameChatListView .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.gameChatListView .list-cell:filled:selected,
+.gameChatListView .list-cell:filled:selected:hover,
+.gameChatListView .list-cell:filled:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+}
+
+.gameChatListView:focused {
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: rgba(255, 255, 255, 0.20);
 }
