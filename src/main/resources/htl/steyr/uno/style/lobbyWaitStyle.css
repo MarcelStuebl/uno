@@ -41,3 +41,44 @@
     -fx-padding: 80 0 80 0;
 }
 
+.playerListView {
+    -fx-background-color: #615a5a;
+    -fx-text-fill: red;
+}
+
+.gameChatListView {
+    /* Außen-Hintergrund der ListView */
+    -fx-background-color: rgba(20, 25, 35, 0.35);
+    -fx-background-insets: 0;
+    -fx-background-radius: 12;
+
+    /* WICHTIG: innerer Hintergrund (sonst bleibt oft „solid“/bläulich) */
+    -fx-control-inner-background: rgba(20, 25, 35, 0.25);
+
+    -fx-padding: 6;
+
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+/* Wichtig: ListView hat innen noch eine "Viewport"-Fläche -> auch stylen! */
+.gameChatListView .viewport {
+    -fx-background-color: transparent;
+}
+
+.gameChatListView .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.gameChatListView .list-cell:filled:selected,
+.gameChatListView .list-cell:filled:selected:hover,
+.gameChatListView .list-cell:filled:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+}
+
+.gameChatListView:focused {
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: rgba(255, 255, 255, 0.20);
+}
