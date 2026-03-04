@@ -178,6 +178,7 @@ public class LoginController implements Initializable {
             errorLabel2FA.setVisible(true);
         } else {
             client.verifyNewAccount(username, firstName, lastName, email, password, Integer.parseInt(code));
+            showAccountVerificationScreen.setVisible(false);
         }
     }
 
