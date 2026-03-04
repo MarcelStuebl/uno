@@ -17,8 +17,8 @@ public class DatabaseUser {
      * @throws SQLException if a database access error occurs.
      * @throws UserNotFoundException if no user with the given username is found.
      */
-    private User getUser(String username) throws SQLException {
-        String query = "SELECT id, username, last_name, first_name, games_won, games_lost, created_at, last_login, password_hash, password_salt FROM user WHERE username = ?";
+    private User getUserPerUserName(String username) throws SQLException {
+        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, password_hash, password_salt FROM user WHERE username = ?";
 
         User user = new User();
         try (Connection conn = DatabaseConnection.getConnection();
@@ -31,6 +31,7 @@ public class DatabaseUser {
                             rs.getString("username"),
                             rs.getString("last_name"),
                             rs.getString("first_name"),
+                            rs.getString("email"),
                             rs.getInt("games_won"),
                             rs.getInt("games_lost"),
                             rs.getTimestamp("created_at"),
@@ -53,14 +54,59 @@ public class DatabaseUser {
      * @throws SQLException if a database access error occurs.
      * @throws InvalidPasswordException if the provided password is incorrect.
      */
-    public User getUser(String username, String password) throws SQLException {
-        User user = getUser(username);
+    public User getUserPerUserName(String username, String password) throws SQLException {
+        User user = getUserPerUserName(username);
             if (verifyPassword(password, user.getPasswordHash(), user.getPasswordSalt())) {
                 updateLastLogin(user.getId());
-                return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin());
+                return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getEmail(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin());
             } else {
                 return null;
             }
+    }
+
+
+    public User getUserPerEmail(String email) throws SQLException {
+        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login FROM user WHERE email = ?";
+
+        User user = new User();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    user = new User(
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("last_name"),
+                            rs.getString("first_name"),
+                            rs.getString("email"),
+                            rs.getInt("games_won"),
+                            rs.getInt("games_lost"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("last_login")
+                    );
+                }
+            }
+        }
+        return user;
+    }
+
+
+    public User updatePassword(String username, String newPassword) throws SQLException {
+        String salt = PasswordUtil.generateSalt();
+        String hash = PasswordUtil.hashPassword(newPassword, salt);
+
+        String query = "UPDATE user SET password_hash = ?, password_salt = ? WHERE username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, hash);
+            pstmt.setString(2, salt);
+            pstmt.setString(3, username);
+            pstmt.executeUpdate();
+        }
+
+        return getUserPerUserName(username, newPassword);
     }
 
 
@@ -87,7 +133,7 @@ public class DatabaseUser {
             throw new UserAlreadyExistsException(user.getUsername());
         }
 
-        String query = "INSERT INTO user (username, last_name, first_name, created_at, last_login, password_hash, password_salt) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO user (username, last_name, first_name, email, created_at, last_login, password_hash, password_salt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -95,10 +141,11 @@ public class DatabaseUser {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getLastName());
             pstmt.setString(3, user.getFirstName());
-            pstmt.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+            pstmt.setString(4, user.getEmail());
             pstmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
-            pstmt.setString(6, user.getPasswordHash());
-            pstmt.setString(7, user.getPasswordSalt());
+            pstmt.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+            pstmt.setString(7, user.getPasswordHash());
+            pstmt.setString(8, user.getPasswordSalt());
             pstmt.executeUpdate();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {

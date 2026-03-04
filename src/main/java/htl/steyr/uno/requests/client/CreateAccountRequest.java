@@ -8,6 +8,7 @@ public class CreateAccountRequest implements Serializable {
     private String lastName;
     private String firstName;
     private String password;
+    private String email;
 
 
     /**
@@ -18,11 +19,12 @@ public class CreateAccountRequest implements Serializable {
      * @param firstName the first name of the user
      * @param password  the password for the new account
      */
-    public CreateAccountRequest(String username, String lastName, String firstName, String password) {
+    public CreateAccountRequest(String username, String lastName, String firstName, String password, String email) {
         setUsername(username);
         setLastName(lastName);
         setFirstName(firstName);
         setPassword(password);
+        setEmail(email);
     }
 
 
@@ -32,6 +34,7 @@ public class CreateAccountRequest implements Serializable {
                 "username='" + getUsername() +
                 "', lastName='" + getLastName() +
                 "', firstName='" + getFirstName() +
+                "', email='" + getEmail() +
                 "'}";
     }
 
@@ -62,6 +65,13 @@ public class CreateAccountRequest implements Serializable {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 }

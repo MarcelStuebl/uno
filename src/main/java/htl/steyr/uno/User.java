@@ -11,6 +11,7 @@ public class User implements Serializable {
     private String username;
     private String lastName;
     private String firstName;
+    private String email;
     private int gamesWon;
     private int gamesLost;
     private Timestamp createdAt;
@@ -36,11 +37,12 @@ public class User implements Serializable {
      * @param passwordHash
      * @param passwordSalt
      */
-    public User(int id, String username, String lastName, String firstName, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin, String passwordHash, String passwordSalt) {
+    public User(int id, String username, String lastName, String firstName, String email, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin, String passwordHash, String passwordSalt) {
         setId(id);
         setUsername(username);
         setLastName(lastName);
         setFirstName(firstName);
+        setEmail(email);
         setGamesWon(gamesWon);
         setGamesLost(gamesLost);
         setCreatedAt(createdAt);
@@ -60,16 +62,18 @@ public class User implements Serializable {
      * @param username
      * @param lastName
      * @param firstName
+     * @param email
      * @param gamesWon
      * @param gamesLost
      * @param createdAt
      * @param lastLogin
      */
-    public User(int id, String username, String lastName, String firstName, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin) {
+    public User(int id, String username, String lastName, String firstName, String email, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin) {
         setId(id);
         setUsername(username);
         setLastName(lastName);
         setFirstName(firstName);
+        setEmail(email);
         setGamesWon(gamesWon);
         setGamesLost(gamesLost);
         setCreatedAt(createdAt);
@@ -86,12 +90,14 @@ public class User implements Serializable {
      * @param username
      * @param lastName
      * @param firstName
+     * @param email
      * @param Password
      */
-    public User(String username, String lastName, String firstName, String Password) {
+    public User(String username, String lastName, String firstName, String email, String Password) {
         setUsername(username);
         setLastName(lastName);
         setFirstName(firstName);
+        setEmail(email);
         generatePasswordHashAndSalt(Password);
     }
 
@@ -180,6 +186,13 @@ public class User implements Serializable {
     }
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public int getGamesWon() {

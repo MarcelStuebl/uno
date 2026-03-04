@@ -143,7 +143,7 @@ public class LoginController implements Initializable {
             errorLabelCreateAcc.setText("Email must be valid!");
             errorLabelCreateAcc.setVisible(true);
         } else {
-            client.createAccount(username, lastName, firstName, password);
+            client.createAccount(username, lastName, firstName, email, password);
             errorLabelCreateAcc.setVisible(false);
         }
     }

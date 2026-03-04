@@ -47,8 +47,8 @@ public class Client {
         getConn().sendMessage(msg);
     }
 
-    public void createAccount(String username, String firstName, String lastName, String password) {
-        CreateAccountRequest msg = new CreateAccountRequest(username, firstName, lastName, password);
+    public void createAccount(String username, String firstName, String lastName, String email, String password) {
+        CreateAccountRequest msg = new CreateAccountRequest(username, firstName, lastName, email, password);
         getConn().sendMessage(msg);
     }
 

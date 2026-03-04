@@ -121,7 +121,7 @@ public class ServerSocketConnection {
      */
     private void loginRequest(LoginRequest request) throws SQLException {
         DatabaseUser db = new DatabaseUser();
-        user = db.getUser(request.getUsername(), request.getPassword());
+        user = db.getUserPerUserName(request.getUsername(), request.getPassword());
         Object msg;
         if (user == null) {
             msg = new LoginFailedResponse();
@@ -143,10 +143,10 @@ public class ServerSocketConnection {
      * @throws SQLException
      */
     private void createAccountRequest(CreateAccountRequest request) throws SQLException {
-        User user = new User(request.getUsername(), request.getLastName(), request.getFirstName(), request.getPassword());
+        User user = new User(request.getUsername(), request.getLastName(), request.getFirstName(), request.getEmail(), request.getPassword());
         DatabaseUser db = new DatabaseUser();
         db.addUser(user);
-        User createdUser = db.getUser(request.getUsername(), request.getPassword());
+        User createdUser = db.getUserPerUserName(request.getUsername(), request.getPassword());
         sendMessage(new CreateAccountSuccessResponse(createdUser));
     }
 
