@@ -40,6 +40,9 @@ public class LoginController implements Initializable {
     @FXML public PasswordField newPassword;
     @FXML public PasswordField confirmNewPassword;
     @FXML public Label errorLabelNewPassword;
+    @FXML public VBox showAccountVerificationScreen;
+    @FXML public TextField verifyAccount;
+    @FXML public Label errorLabelVerifyAccount;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
@@ -145,6 +148,9 @@ public class LoginController implements Initializable {
         } else {
             client.createAccount(username, lastName, firstName, password);
             errorLabelCreateAcc.setVisible(false);
+            // @ToDo: Scene mit 2FA Code anzeigen zum Verifizieren des Accounts
+            showAccountVerificationScreen.setVisible(true);
+            showNewAccScreen.setVisible(false);
         }
     }
 
@@ -319,4 +325,7 @@ public class LoginController implements Initializable {
     }
 
 
+    public void onVerifyNewAccount(ActionEvent actionEvent) {
+        // @ToDo: Logik zum Überprüfen des 2FA codes
+    }
 }
