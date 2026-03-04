@@ -28,6 +28,14 @@ public class CreateAccountRequest implements Serializable {
         setEmail(email);
     }
 
+    public CreateAccountRequest(String username, String lastName, String firstName, String email, String password, Integer code) {
+        setUsername(username);
+        setLastName(lastName);
+        setFirstName(firstName);
+        setPassword(password);
+        setEmail(email);
+    }
+
 
     @Override
     public String toString() {

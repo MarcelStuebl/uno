@@ -3,6 +3,7 @@ package htl.steyr.uno.client;
 import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.LoginController;
+import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 
 import java.io.IOException;
@@ -49,6 +50,11 @@ public class Client {
 
     public void createAccount(String username, String firstName, String lastName, String email, String password) {
         CreateAccountRequest msg = new CreateAccountRequest(username, firstName, lastName, email, password);
+        getConn().sendMessage(msg);
+    }
+
+    public void verifyNewAccount(String username, String firstName, String lastName, String email, String password, Integer code) {
+        CreateAccountRequest msg = new CreateAccountRequest(username, firstName, lastName, email, password, code);
         getConn().sendMessage(msg);
     }
 

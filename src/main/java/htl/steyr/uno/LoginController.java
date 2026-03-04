@@ -40,6 +40,7 @@ public class LoginController implements Initializable {
     @FXML public PasswordField confirmNewPassword;
     @FXML public Label errorLabelNewPassword;
     @FXML public VBox showAccountVerificationScreen;
+    @FXML public TextField verifyAccount;
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
@@ -54,6 +55,12 @@ public class LoginController implements Initializable {
     @FXML private TextField welcomeBackUserName;
 
     private Client client;
+
+    private String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String email;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -112,11 +119,11 @@ public class LoginController implements Initializable {
     }
 
     public void onCreateNewAccountButtonClicked(ActionEvent actionEvent) {
-        String username = newAccUserName.getText();
-        String password = newAccPassword.getText();
-        String firstName = newAccFirstName.getText();
-        String lastName = newAccLastName.getText();
-        String email = newAccEmail.getText();
+        username = newAccUserName.getText();
+        password = newAccPassword.getText();
+        firstName = newAccFirstName.getText();
+        lastName = newAccLastName.getText();
+        email = newAccEmail.getText();
 
         if (password.isEmpty()) {
             errorLabelCreateAcc.setText("Password cannot be empty!");
@@ -155,6 +162,19 @@ public class LoginController implements Initializable {
             errorLabelCreateAcc.setVisible(false);
             showAccountVerificationScreen.setVisible(true);
             showNewAccScreen.setVisible(false);
+        }
+    }
+
+    public void onVerifyNewAccount(ActionEvent actionEvent) {
+        String code = verifyAccount.getText();
+        if (code.isEmpty()) {
+            errorLabel2FA.setText("Code cannot be empty!");
+            errorLabel2FA.setVisible(true);
+        } else if (code.length() != 6 || !code.matches("\\d+")) {
+            errorLabel2FA.setText("Code must be 6 digits!");
+            errorLabel2FA.setVisible(true);
+        } else {
+            client.verifyNewAccount(username, firstName, lastName, email, password, Integer.parseInt(code));
         }
     }
 
@@ -327,6 +347,7 @@ public class LoginController implements Initializable {
     public void setClient(Client client) {
         this.client = client;
     }
+
 
 
 }
