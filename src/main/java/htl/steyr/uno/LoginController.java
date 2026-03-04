@@ -1,6 +1,5 @@
 package htl.steyr.uno;
 
-import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.*;
 import javafx.application.Platform;
@@ -46,7 +45,7 @@ public class LoginController implements Initializable {
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
-    @FXML private VBox showCreateAcc;
+    @FXML private VBox showLoginScreen;
     @FXML private StackPane loginPane;
     @FXML private StackPane brandingPane;
     @FXML private PasswordField newAccPassword;
@@ -76,7 +75,7 @@ public class LoginController implements Initializable {
 
     @FXML
     private void onCreateAccountButtonClicked(ActionEvent actionEvent) {
-        showCreateAcc.setVisible(false);
+        showLoginScreen.setVisible(false);
         showNewAccScreen.setVisible(true);
         welcomeBackPasswd.clear();
         welcomeBackUserName.clear();
@@ -87,7 +86,7 @@ public class LoginController implements Initializable {
     @FXML
     private void backToLogin() {
         showNewAccScreen.setVisible(false);
-        showCreateAcc.setVisible(true);
+        showLoginScreen.setVisible(true);
         newAccPassword.clear();
         newAccUserName.clear();
         newAccLastName.clear();
@@ -99,7 +98,7 @@ public class LoginController implements Initializable {
     @FXML
     private void backToLoginFrom2FA() {
         show2FA.setVisible(false);
-        showCreateAcc.setVisible(true);
+        showLoginScreen.setVisible(true);
         twoFACode.clear();
     }
 
@@ -196,7 +195,7 @@ public class LoginController implements Initializable {
 
     @FXML
     private void onForgotPasswordClicked(ActionEvent actionEvent) {
-        showCreateAcc.setVisible(false);
+        showLoginScreen.setVisible(false);
         showForgotPassword.setVisible(true);
         resetPasswordEmail.clear();
         errorLabelForgotPassword.setVisible(false);
@@ -205,7 +204,7 @@ public class LoginController implements Initializable {
     @FXML
     private void backToLoginFromForgotPassword() {
         showForgotPassword.setVisible(false);
-        showCreateAcc.setVisible(true);
+        showLoginScreen.setVisible(true);
         resetPasswordEmail.clear();
     }
 
@@ -289,7 +288,7 @@ public class LoginController implements Initializable {
     @FXML
     private void backToLoginFromNewPassword() {
         showNewPasswordScreen.setVisible(false);
-        showCreateAcc.setVisible(true);
+        showLoginScreen.setVisible(true);
         newPassword.clear();
         confirmNewPassword.clear();
         resetPasswordEmail.clear();
@@ -330,5 +329,10 @@ public class LoginController implements Initializable {
 
     public void onVerifyNewAccount(ActionEvent actionEvent) {
         // @ToDo: Logik zum Überprüfen des 2FA codes
+    }
+
+    public void backToLoginFromAccountVerification(ActionEvent actionEvent) {
+        showAccountVerificationScreen.setVisible(false);
+        showNewAccScreen.setVisible(true);
     }
 }
