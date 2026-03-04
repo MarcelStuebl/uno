@@ -65,6 +65,7 @@ public class DatabaseUser {
     }
 
 
+
     public User getUserPerEmail(String email) throws SQLException {
         String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login FROM user WHERE email = ?";
 

@@ -3,6 +3,7 @@ package htl.steyr.uno.server.serverconnection;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
+import htl.steyr.uno.server.MailSender;
 import htl.steyr.uno.server.database.DatabaseUser;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class ServerSocketConnection {
     private Thread receivethread;
     private boolean running;
     private User user;
+    private PasswordForgotten passwordForgotten;
 
 
     /**
@@ -95,6 +97,9 @@ public class ServerSocketConnection {
                         case JoinLobbyRequest msg -> joinLobbyRequest(msg);
                         case LeaveLobbyRequest msg -> leftLobbyRequest(msg);
                         case SendChatMessageRequest msg -> sendChatMessageRequest(msg);
+                        case ForgotPasswordRequest msg -> forgotPasswordRequest(msg);
+                        case ForgotPasswordSendCodeRequest msg -> forgotPasswordSendCodeRequest(msg);
+                        case ChangePasswordRequest msg -> changePasswordRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -107,6 +112,8 @@ public class ServerSocketConnection {
         });
         receivethread.start();
     }
+
+
 
 
     /**
@@ -198,6 +205,42 @@ public class ServerSocketConnection {
         Lobby lobby = server.getLobbies().stream().filter(l -> l.getConnections().contains(this)).findFirst().orElse(null);
         if (lobby != null) {
             lobby.sendChatMessage(obj);
+        }
+    }
+
+    private void forgotPasswordRequest(ForgotPasswordRequest msg) throws SQLException {
+        // Check if there is an existing password reset request for the provided email and if it is still valid (within 1 minute)
+        if (passwordForgotten == null || passwordForgotten.getRequestTime().getTime() + 60000 < System.currentTimeMillis()) {
+
+            User user = new DatabaseUser().getUserPerEmail(msg.getEmail());
+            if (user == null) {
+                passwordForgotten.setCode((int) (Math.random() * 900000) + 100000); // Generate a random 6-digit code
+                MailSender ms = new MailSender();
+                ms.sendAuthenticationCode(msg.getEmail(), passwordForgotten.getCode().toString());
+            }
+
+            sendMessage(new ForgotPasswordResponse(0));
+        } else {
+            sendMessage(new ForgotPasswordResponse(1));
+        }
+
+    }
+
+    private void forgotPasswordSendCodeRequest(ForgotPasswordSendCodeRequest msg) {
+        if (passwordForgotten != null && passwordForgotten.getCode().equals(msg.getCode())) {
+
+            sendMessage(new ForgotPasswordResponse(0));
+        } else {
+            sendMessage(new ForgotPasswordResponse(2));
+        }
+    }
+
+    private void changePasswordRequest(ChangePasswordRequest msg) throws SQLException {
+        if (passwordForgotten.getCode().equals(msg.getCode())) {
+            DatabaseUser db = new DatabaseUser();
+
+            User user = db.getUserPerEmail(msg.getEmail());
+            db.updatePassword(user.getUsername(), msg.getNewPassword());
         }
     }
 

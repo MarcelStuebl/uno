@@ -83,6 +83,7 @@ public class ClientSocketConnection implements Closeable {
                         case CreateLobbySuccessResponse msg -> createLobbySuccess(msg);
                         case CreateAccountSuccessResponse msg -> createAccountSuccess(msg);
                         case ReceiveChatMessageResponse msg -> receiveChatMessage(msg);
+                        case ForgotPasswordResponse msg -> forgotPasswordResponse(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -206,6 +207,16 @@ public class ClientSocketConnection implements Closeable {
             client.getLobbyWaitController().receiveChatMessage(msg);
         } else if (client.getLobbyController() != null) {
             client.getLobbyController().receiveChatMessage(msg);
+        }
+    }
+
+    private void forgotPasswordResponse(ForgotPasswordResponse msg) {
+        if (msg.getStatus() == 0) {
+            System.out.println("Authentication code sent. Please check your email and enter the code to reset your password.");
+        } else if (msg.getStatus() == 1) {
+            System.out.println("You have already requested a password reset recently. Please wait before trying again.");
+        } else if (msg.getStatus() == 2) {
+            System.out.println("Wrong code. Please try again.");
         }
     }
 
