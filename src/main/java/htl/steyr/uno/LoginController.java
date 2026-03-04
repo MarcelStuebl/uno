@@ -144,6 +144,9 @@ public class LoginController implements Initializable {
             errorLabelCreateAcc.setVisible(true);
         } else {
             client.createAccount(username, lastName, firstName, email, password);
+
+            /// TODO: Show 2FA screen and handle the 2FA code verification.
+
             errorLabelCreateAcc.setVisible(false);
         }
     }

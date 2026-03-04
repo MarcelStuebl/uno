@@ -22,6 +22,7 @@ public class ServerSocketConnection {
     private boolean running;
     private User user;
     private PasswordForgotten passwordForgotten;
+    private Integer createAccountCode;
 
 
     /**
@@ -140,21 +141,23 @@ public class ServerSocketConnection {
     }
 
 
-    /**
-     * The createAccountRequest method handles the account creation process for a client by adding a new user to the database based on the provided information.
-     * It takes a CreateAccountRequest object as a parameter, which contains the username, last name, first name, and password submitted by the client for account creation.
-     * The method creates a new User object using the information from the request and then interacts with the DatabaseUser class to add the new user to the database.
-     * After successfully adding the user, it retrieves the created user information from the database and sends it back to the client as a response.
-     * If any SQLException occurs during this process, it is thrown to be handled by the calling method or higher-level exception handling mechanisms.
-     * @param request
-     * @throws SQLException
-     */
+
     private void createAccountRequest(CreateAccountRequest request) throws SQLException {
-        User user = new User(request.getUsername(), request.getLastName(), request.getFirstName(), request.getEmail(), request.getPassword());
-        DatabaseUser db = new DatabaseUser();
-        db.addUser(user);
-        User createdUser = db.getUserPerUserName(request.getUsername(), request.getPassword());
-        sendMessage(new CreateAccountSuccessResponse(createdUser));
+        if (request.getCode() == null || createAccountCode == null) {
+            Integer code = (int) (Math.random() * 900000) + 100000; // Generate a random 6-digit code
+            MailSender ms = new MailSender();
+            ms.sendAuthenticationCode(request.getEmail(), code.toString());
+        } else {
+            if (!request.getCode().equals(createAccountCode)) {
+                sendMessage(new CreateAccountFailedResponse());
+            } else {
+                User user = new User(request.getUsername(), request.getLastName(), request.getFirstName(), request.getEmail(), request.getPassword());
+                DatabaseUser db = new DatabaseUser();
+                db.addUser(user);
+                User createdUser = db.getUserPerUserName(request.getUsername(), request.getPassword());
+                sendMessage(new CreateAccountSuccessResponse(createdUser));
+            }
+        }
     }
 
 

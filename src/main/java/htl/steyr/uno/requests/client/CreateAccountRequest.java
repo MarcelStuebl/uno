@@ -9,6 +9,7 @@ public class CreateAccountRequest implements Serializable {
     private String firstName;
     private String password;
     private String email;
+    private Integer code;
 
 
     /**
@@ -72,6 +73,13 @@ public class CreateAccountRequest implements Serializable {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+    public void setCode(Integer code) {
+        this.code = code;
     }
 
 }
