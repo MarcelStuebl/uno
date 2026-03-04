@@ -56,9 +56,7 @@ public class MailSender {
             message.setContent(multipart);
             Transport.send(message);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {}
 
     }
 
