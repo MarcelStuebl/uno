@@ -74,13 +74,13 @@
             <VBox spacing="6">
                <children>
                   <Label styleClass="loginLables" text="Benutzername" />
-                  <TextField fx:id="welcomeBackUserName" promptText="Dein Benutzername" styleClass="login" />
+                  <TextField fx:id="welcomeBackUserName" onAction="#onLoginButtonClicked" promptText="Dein Benutzername" styleClass="login" />
                </children>
             </VBox>
             <VBox spacing="6">
                <children>
                   <Label styleClass="loginLables" text="Passwort" />
-                  <PasswordField fx:id="welcomeBackPasswd" promptText="Dein Passwort" styleClass="login" />
+                  <PasswordField fx:id="welcomeBackPasswd" onAction="#onLoginButtonClicked" promptText="Dein Passwort" styleClass="login" />
                </children>
             </VBox>
             <Button fx:id="forgotPasswordButton" mnemonicParsing="false" onAction="#onForgotPasswordClicked" styleClass="minimalistButton" text="Passwort vergessen" />
@@ -156,8 +156,8 @@
             </VBox>
 
             <VBox alignment="CENTER" spacing="12">
-               <Button prefHeight="36.0" prefWidth="200.0" mnemonicParsing="false" onAction="#onResetPasswordClicked" text="Passwort zurücksetzen" textAlignment="CENTER" alignment="CENTER" styleClass="loginButton"/>
-               <Button mnemonicParsing="false" onAction="#backToLoginFromForgotPassword" styleClass="backButton" text="zurück" alignment="CENTER" />
+               <Button alignment="CENTER" mnemonicParsing="false" onAction="#onResetPasswordClicked" prefHeight="36.0" prefWidth="200.0" styleClass="loginButton" text="Passwort zurücksetzen" textAlignment="CENTER" />
+               <Button alignment="CENTER" mnemonicParsing="false" onAction="#backToLoginFromForgotPassword" styleClass="backButton" text="zurück" />
             </VBox>
             <Label fx:id="errorLabelForgotPassword" styleClass="errorLabel" text="ERROR:" visible="false" />
         </VBox>
@@ -170,12 +170,12 @@
 
             <VBox alignment="CENTER" spacing="12">
                <Label styleClass="loginLables" text="2FA Code" />
-               <TextField fx:id="resetPassword2FACode" promptText="000000" styleClass="login"/>
+               <TextField fx:id="resetPassword2FACode" promptText="000000" styleClass="login" />
             </VBox>
 
             <VBox alignment="CENTER" spacing="12">
-               <Button prefHeight="36.0" prefWidth="200.0" mnemonicParsing="false" onAction="#onVerifyResetPassword2FA" text="Verifizieren" textAlignment="CENTER" alignment="CENTER" styleClass="loginButton"/>
-               <Button mnemonicParsing="false" onAction="#backToLoginFromReset2FA" styleClass="backButton" text="zurück" alignment="CENTER" />
+               <Button alignment="CENTER" mnemonicParsing="false" onAction="#onVerifyResetPassword2FA" prefHeight="36.0" prefWidth="200.0" styleClass="loginButton" text="Verifizieren" textAlignment="CENTER" />
+               <Button alignment="CENTER" mnemonicParsing="false" onAction="#backToLoginFromReset2FA" styleClass="backButton" text="zurück" />
             </VBox>
             <Label fx:id="errorLabelReset2FA" styleClass="errorLabel" text="ERROR:" visible="false" />
         </VBox>
@@ -197,8 +197,8 @@
             </VBox>
 
             <VBox alignment="CENTER" spacing="12">
-               <Button prefHeight="36.0" prefWidth="200.0" mnemonicParsing="false" onAction="#onSetNewPasswordClicked" text="Passwort festlegen" textAlignment="CENTER" alignment="CENTER" styleClass="loginButton"/>
-               <Button mnemonicParsing="false" onAction="#backToLoginFromNewPassword" styleClass="backButton" text="zurück" alignment="CENTER" />
+               <Button alignment="CENTER" mnemonicParsing="false" onAction="#onSetNewPasswordClicked" prefHeight="36.0" prefWidth="200.0" styleClass="loginButton" text="Passwort festlegen" textAlignment="CENTER" />
+               <Button alignment="CENTER" mnemonicParsing="false" onAction="#backToLoginFromNewPassword" styleClass="backButton" text="zurück" />
             </VBox>
             <Label fx:id="errorLabelNewPassword" styleClass="errorLabel" text="ERROR:" visible="false" />
         </VBox>
