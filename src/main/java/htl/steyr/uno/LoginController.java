@@ -151,14 +151,17 @@ public class LoginController implements Initializable {
             errorLabelCreateAcc.setVisible(true);
         } else {
             client.createAccount(username, lastName, firstName, email, password);
+            client.getConn().checkIfUserAlreadyExists(username);
         }
     }
 
     public void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
-        if (msg.isUserAlreadyExists()) {
+        if (!msg.isUserAlreadyExists()) {
+            System.out.println("User already exists.");
             errorLabelCreateAcc.setText("Username already exists!");
             errorLabelCreateAcc.setVisible(true);
         } else {
+            System.out.println("User does not exist.");
             errorLabelCreateAcc.setVisible(false);
             showAccountVerificationScreen.setVisible(true);
             showNewAccScreen.setVisible(false);

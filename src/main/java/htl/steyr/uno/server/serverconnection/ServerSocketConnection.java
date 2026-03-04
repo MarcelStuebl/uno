@@ -145,9 +145,10 @@ public class ServerSocketConnection {
 
     private void createAccountRequest(CreateAccountRequest request) throws SQLException {
         if (request.getCode() == null || createAccountCode == null) {
-            Integer code = (int) (Math.random() * 900000) + 100000; // Generate a random 6-digit code
+            createAccountCode = (int) (Math.random() * 900000) + 100000; // Generate a random 6-digit code
             MailSender ms = new MailSender();
-            ms.sendAuthenticationCode(request.getEmail(), code.toString());
+            ms.sendAuthenticationCode(request.getEmail(), createAccountCode.toString());
+            System.out.println("Sent code: " + createAccountCode);
         } else {
             if (!request.getCode().equals(createAccountCode)) {
                 sendMessage(new CreateAccountFailedResponse());

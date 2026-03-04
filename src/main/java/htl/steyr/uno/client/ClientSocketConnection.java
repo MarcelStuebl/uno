@@ -1,6 +1,7 @@
 package htl.steyr.uno.client;
 
 import htl.steyr.uno.User;
+import htl.steyr.uno.requests.client.CheckIfUserAlreadyExistsRequest;
 import htl.steyr.uno.requests.client.LeaveLobbyRequest;
 import htl.steyr.uno.requests.server.*;
 
@@ -223,6 +224,11 @@ public class ClientSocketConnection implements Closeable {
 
     private void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
         client.getLoginController().checkIfUserAlreadyExistsResponse(msg);
+    }
+
+    public void  checkIfUserAlreadyExists(String username) {
+        CheckIfUserAlreadyExistsRequest msg = new CheckIfUserAlreadyExistsRequest(username);
+        sendMessage(msg);
     }
 
     /**

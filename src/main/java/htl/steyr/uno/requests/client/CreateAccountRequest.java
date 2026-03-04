@@ -34,6 +34,7 @@ public class CreateAccountRequest implements Serializable {
         setFirstName(firstName);
         setPassword(password);
         setEmail(email);
+        setCode(code);
     }
 
 
@@ -44,6 +45,7 @@ public class CreateAccountRequest implements Serializable {
                 "', lastName='" + getLastName() +
                 "', firstName='" + getFirstName() +
                 "', email='" + getEmail() +
+                "', code='" + getCode() +
                 "'}";
     }
 

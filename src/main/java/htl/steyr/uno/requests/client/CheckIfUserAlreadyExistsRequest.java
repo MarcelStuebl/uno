@@ -14,7 +14,7 @@ public class CheckIfUserAlreadyExistsRequest implements Serializable {
     public String toString() {
         return "CheckIfUserAlreadyExistsRequest{" +
                 "username='" + getUsername() +
-                '}';
+                "'}";
     }
 
     public String getUsername() {

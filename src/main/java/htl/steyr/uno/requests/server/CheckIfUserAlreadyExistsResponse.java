@@ -1,6 +1,8 @@
 package htl.steyr.uno.requests.server;
 
-public class CheckIfUserAlreadyExistsResponse {
+import java.io.Serializable;
+
+public class CheckIfUserAlreadyExistsResponse implements Serializable {
 
     private String username;
     private boolean userAlreadyExists = true;
