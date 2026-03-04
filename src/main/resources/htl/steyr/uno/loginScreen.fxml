@@ -67,7 +67,7 @@
          </VBox>
          <Label fx:id="errorLabel2FA" styleClass="errorLabel" text="ERROR:" />
       </VBox>
-      <VBox fx:id="showCreateAcc" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard">
+      <VBox fx:id="showLoginScreen" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard">
          <children>
             <Label styleClass="lWelcomeBack" text="Willkommen zurück!" />
             <Label styleClass="Subtitles" text="Melde dich an oder erstelle einen Account" />

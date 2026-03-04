@@ -222,7 +222,7 @@ public class ClientSocketConnection implements Closeable {
     }
 
     private void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
-        client.getLobbyController().checkIfUserAlreadyExistsResponse(msg);
+        client.getLoginController().checkIfUserAlreadyExistsResponse(msg);
     }
 
     /**
