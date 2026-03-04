@@ -17,7 +17,7 @@ public class DatabaseUser {
      * @throws SQLException if a database access error occurs.
      * @throws UserNotFoundException if no user with the given username is found.
      */
-    private User getUserPerUserName(String username) throws SQLException {
+    public User getUserPerUserName(String username) throws SQLException {
         String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, password_hash, password_salt FROM user WHERE username = ?";
 
         User user = new User();

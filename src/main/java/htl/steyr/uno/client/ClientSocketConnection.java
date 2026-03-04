@@ -84,6 +84,7 @@ public class ClientSocketConnection implements Closeable {
                         case CreateAccountSuccessResponse msg -> createAccountSuccess(msg);
                         case ReceiveChatMessageResponse msg -> receiveChatMessage(msg);
                         case ForgotPasswordResponse msg -> forgotPasswordResponse(msg);
+                        case CheckIfUserAlreadyExistsResponse msg -> checkIfUserAlreadyExistsResponse(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -218,6 +219,10 @@ public class ClientSocketConnection implements Closeable {
         } else if (msg.getStatus() == 2) {
             System.out.println("Wrong code. Please try again.");
         }
+    }
+
+    private void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
+        client.getLobbyController().checkIfUserAlreadyExistsResponse(msg);
     }
 
     /**

@@ -101,6 +101,7 @@ public class ServerSocketConnection {
                         case ForgotPasswordRequest msg -> forgotPasswordRequest(msg);
                         case ForgotPasswordSendCodeRequest msg -> forgotPasswordSendCodeRequest(msg);
                         case ChangePasswordRequest msg -> changePasswordRequest(msg);
+                        case CheckIfUserAlreadyExistsRequest msg -> checkIfUserAlreadyExistsRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -245,6 +246,12 @@ public class ServerSocketConnection {
             User user = db.getUserPerEmail(msg.getEmail());
             db.updatePassword(user.getUsername(), msg.getNewPassword());
         }
+    }
+
+    private void checkIfUserAlreadyExistsRequest(CheckIfUserAlreadyExistsRequest msg) throws SQLException {
+        DatabaseUser db = new DatabaseUser();
+        boolean userAlreadyExists = db.getUserPerUserName(msg.getUsername()) != null;
+        sendMessage(new CheckIfUserAlreadyExistsResponse(msg.getUsername(), userAlreadyExists));
     }
 
 
