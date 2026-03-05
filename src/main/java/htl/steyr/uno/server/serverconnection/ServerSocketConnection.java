@@ -251,8 +251,23 @@ public class ServerSocketConnection {
 
     private void checkIfUserAlreadyExistsRequest(CheckIfUserAlreadyExistsRequest msg) throws SQLException {
         DatabaseUser db = new DatabaseUser();
-        boolean userAlreadyExists = db.getUserPerUserName(msg.getUsername()) != null;
-        sendMessage(new CheckIfUserAlreadyExistsResponse(msg.getUsername(), userAlreadyExists));
+        String username = msg.getUsername();
+        String email = msg.getEmail();
+
+        boolean userAlreadyExists = false;
+        boolean emailAlreadyExists = false;
+
+        if (username != null && !username.trim().isEmpty()) {
+            userAlreadyExists = db.getUserPerUserName(username).getUsername() != null;
+        }
+
+        if (email != null && !email.trim().isEmpty()) {
+            emailAlreadyExists = db.getUserPerEmail(email).getUsername() != null;
+        }
+
+        sendMessage(new CheckIfUserAlreadyExistsResponse(username, email, userAlreadyExists, emailAlreadyExists));
+        System.out.println("Checked if user already exists: " + username + ", " + email
+                + " - User already exists: " + userAlreadyExists + ", Email already exists: " + emailAlreadyExists);
     }
 
 

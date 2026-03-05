@@ -84,6 +84,7 @@ public class LoginController implements Initializable {
         showNewAccScreen.setVisible(true);
         welcomeBackPasswd.clear();
         welcomeBackUserName.clear();
+        newAccEmail.clear();
         errorLabel.setVisible(false);
         errorLabelCreateAcc.setVisible(false);
     }
@@ -150,21 +151,31 @@ public class LoginController implements Initializable {
             errorLabelCreateAcc.setText("Email must be valid!");
             errorLabelCreateAcc.setVisible(true);
         } else {
-            client.createAccount(username, lastName, firstName, email, password);
-            client.getConn().checkIfUserAlreadyExists(username);
+            client.getConn().checkIfUserAlreadyExists(username, email);
         }
     }
 
     public void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
-        if (!msg.isUserAlreadyExists()) {
+        if (msg.isUserAlreadyExists()) {
             System.out.println("User already exists.");
-            errorLabelCreateAcc.setText("Username already exists!");
-            errorLabelCreateAcc.setVisible(true);
+            Platform.runLater(() -> {
+                errorLabelCreateAcc.setText("Username already exists!");
+                errorLabelCreateAcc.setVisible(true);
+            });
+        } else if (msg.isEmailAlreadyExists()) {
+            System.out.println("Email already exists.");
+            Platform.runLater(() -> {
+                errorLabelCreateAcc.setText("Email already exists!");
+                errorLabelCreateAcc.setVisible(true);
+            });
         } else {
             System.out.println("User does not exist.");
-            errorLabelCreateAcc.setVisible(false);
-            showAccountVerificationScreen.setVisible(true);
-            showNewAccScreen.setVisible(false);
+            client.createAccount(username, lastName, firstName, email, password);
+            Platform.runLater(() -> {
+                errorLabelCreateAcc.setVisible(false);
+                showAccountVerificationScreen.setVisible(true);
+                showNewAccScreen.setVisible(false);
+            });
         }
     }
 
@@ -306,9 +317,11 @@ public class LoginController implements Initializable {
 
     @FXML
     private void backToLoginFromReset2FA() {
+        showAccountVerificationScreen.setVisible(false);
         showResetPassword2FA.setVisible(false);
-        showForgotPassword.setVisible(true);
+        showForgotPassword.setVisible(false);
         resetPassword2FACode.clear();
+        showNewAccScreen.setVisible(true);
     }
 
     @FXML

@@ -226,8 +226,8 @@ public class ClientSocketConnection implements Closeable {
         client.getLoginController().checkIfUserAlreadyExistsResponse(msg);
     }
 
-    public void  checkIfUserAlreadyExists(String username) {
-        CheckIfUserAlreadyExistsRequest msg = new CheckIfUserAlreadyExistsRequest(username);
+    public void  checkIfUserAlreadyExists(String username, String email) {
+        CheckIfUserAlreadyExistsRequest msg = new CheckIfUserAlreadyExistsRequest(username, email);
         sendMessage(msg);
     }
 
