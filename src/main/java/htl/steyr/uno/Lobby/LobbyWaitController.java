@@ -72,8 +72,9 @@ public class LobbyWaitController implements Initializable {
                     return;
                 }
 
-                boolean mine = currentUsername.equals(item.sender());
+                boolean myMessage = currentUsername.equals(item.sender());
 
+                //Label or displaying the Autor oft the Message
                 Label nameLabel = new Label(item.sender());
                 nameLabel.setStyle("-fx-text-fill: #c12424; -fx-font-size: 12;");
 
@@ -82,7 +83,7 @@ public class LobbyWaitController implements Initializable {
                 bubble.setPadding(new Insets(8));
                 bubble.setMaxWidth(320);
 
-                if (mine) {
+                if (myMessage) {
                     bubble.setStyle("-fx-background-color: #91ec4e; -fx-background-radius: 12;");
                 } else {
                     bubble.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 12; " +
@@ -93,7 +94,7 @@ public class LobbyWaitController implements Initializable {
 
                 HBox row = new HBox(messageBox);
                 row.setPadding(new Insets(4, 8, 4, 8));
-                row.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+                row.setAlignment(myMessage ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
                 setText(null);
                 setGraphic(row);

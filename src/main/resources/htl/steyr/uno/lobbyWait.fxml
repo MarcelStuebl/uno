@@ -44,9 +44,9 @@
                     <items>
 
                         <!-- Spieler-Liste (nimmt automatisch Platz) -->
-                        <VBox>
+                        <VBox prefHeight="111.0" prefWidth="0.0">
                             <children>
-                                <ListView fx:id="playerListView" styleClass="playerListView" VBox.vgrow="ALWAYS" />
+                                <ListView fx:id="playerListView" prefHeight="100.0" prefWidth="306.0" styleClass="playerListView" />
                             </children>
                             <padding>
                                 <Insets bottom="0" left="0" right="0" top="0" />
@@ -56,11 +56,11 @@
                         <!-- Chat-Bereich (ausklappbar über SplitPane-Divider) -->
                         <VBox spacing="8.0">
                             <children>
-                                <ListView fx:id="gameChatListView" prefHeight="13.0" prefWidth="280.0" styleClass="gameChatListView" VBox.vgrow="ALWAYS" />
+                                <ListView fx:id="gameChatListView" prefHeight="13.0" prefWidth="299.0" styleClass="gameChatListView" />
 
                                 <AnchorPane styleClass="chatPane">
                                     <children>
-                                        <TextField fx:id="gameChatTextField" layoutX="79.0" onAction="#onSendMassage" prefHeight="25.0" prefWidth="242.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="79.0" AnchorPane.topAnchor="0.0" />
+                                        <TextField fx:id="gameChatTextField" layoutX="79.0" onAction="#onSendMassage" prefHeight="25.0" prefWidth="242.0" styleClass="gameChatTextField" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="79.0" AnchorPane.topAnchor="0.0" />
                                     </children>
                                 </AnchorPane>
                             </children>
