@@ -2,7 +2,6 @@ package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import javafx.animation.ScaleTransition;
-import javafx.animation.TranslateTransition;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
@@ -103,7 +102,7 @@ public class Player {
     }
 
 
-    public void showPlayerHand(StackPane root, Player player, CardStack centralStack) {
+    public void displayPlayerHand(StackPane root, Player player, CardStack middleCardStack) {
         HBox handBox = new HBox();
         handBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
         handBox.setSpacing(-100);
@@ -118,7 +117,7 @@ public class Player {
             StackPane cardPane = new StackPane(iv);
             cardPane.setPrefSize(137, 192);
             cardPane.setStyle(
-                    "-fx-border-color: red;" +
+                    "-fx-border-color: white;" +
                             "-fx-border-width: 4;" +
                             "-fx-border-radius: 5;" +
                             "-fx-background-radius: 5;"
@@ -130,8 +129,8 @@ public class Player {
             cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
             cardBtn.setOnAction(e -> {
-                centralStack.layCard(c, cardBtn);
-                if (centralStack.getTopCard() == c) {
+                middleCardStack.layCard(c, cardBtn);
+                if (middleCardStack.getTopCard() == c) {
                     player.getPlayerHand().remove(c);
                     handBox.getChildren().remove(cardBtn);
                 }
@@ -169,5 +168,7 @@ public class Player {
         StackPane.setMargin(handBox, new javafx.geometry.Insets(40));
         root.getChildren().add(handBox);
     }
+
+
 
 }

@@ -1,6 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
 import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,7 +17,7 @@ import java.util.Objects;
  * Ungültige Karten wackeln auf dem Button der Hand.
  */
 public class CardStack {
-
+    ScaleTransition st;
     private Card topCard;
     private final StackPane visual;
 
@@ -29,28 +30,26 @@ public class CardStack {
         return visual;
     }
 
-    /**
-     * Legt eine Karte auf den Stack.
-     * Speichert die Karte intern und zeigt sie im StackPane an.
-     * Wird nur bei gültigen Zügen aufgerufen.
-     */
+    //player lays a card on the stack
+    //stack will update, display a small animation and check if it can be layed down or not
+    //logic for laying down cards will happen in the stack
     public void addToStack(Card c) {
         if (c == null) return;
 
-        // Karte speichern
+        // save card
         this.topCard = c;
 
-        // visuelles Update
+        // update visually
         visual.getChildren().clear();
 
         String path = "../Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
         ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
-        iv.setFitWidth(100);
-        iv.setFitHeight(150);
+        iv.setFitWidth(137);
+        iv.setFitHeight(192);
         iv.setPreserveRatio(true);
         visual.getChildren().add(iv);
 
-        // kleine Pop-Animation
+        // small pop animation
         ScaleTransition st = new ScaleTransition(Duration.millis(200), visual);
         st.setFromX(0.8);
         st.setFromY(0.8);
@@ -69,20 +68,21 @@ public class CardStack {
 
         Card top = getTopCard();
 
-        // always lay black card
-        if (c.getCardColour().equals("black")) {
-            addToStack(c);
-            System.out.println("used black card");
-            return;
-        }
-
         // if no card, just lay card
         if (top == null) {
             addToStack(c);
             return;
         }
 
-        // Prüfen: Farbe oder Wert matchen
+        // always lay black card
+        if (c.getCardColour().equals("black")) {
+            addToStack(c);
+            return;
+        }
+
+
+
+        // check if colour of value matches
         boolean colorMatch = c.getCardColour().equals(top.getCardColour());
         boolean valueMatch = c.getCardValue() == top.getCardValue();
 
@@ -95,8 +95,8 @@ public class CardStack {
                 case 10 -> System.out.println("Skip");
                 case 11 -> System.out.println("Reverse");
                 case 12 -> System.out.println("+2");
-                case 13 -> System.out.println("Farbwahl");
-                case 14 -> System.out.println("+4");
+                case 13 -> System.out.println("pick Colour");
+                case 14 -> System.out.println("+4 and pick Colour");
             }
 
         } else {
@@ -104,17 +104,14 @@ public class CardStack {
         }
     }
 
-    /**
-     * Macht den Button in der Hand wackeln bei ungültigem Zug
-     * @param cardBtn Button der Karte
-     */
+   // makes the button that is currently clicked shake if it is layable
     private void shakeHandButton(Button cardBtn) {
-        ScaleTransition st = new ScaleTransition(Duration.millis(100), cardBtn);
-        st.setFromX(1.0); st.setFromY(1.0);
-        st.setToX(1.1); st.setToY(1.1);
-        st.setAutoReverse(true);
-        st.setCycleCount(4); // 2x hin und her wackeln
-        st.play();
+        TranslateTransition tt = new TranslateTransition(Duration.millis(50), cardBtn);
+        tt.setFromX(0f);
+        tt.setByX(10f);
+        tt.setCycleCount(4);
+        tt.setAutoReverse(true);
+        tt.playFromStart();
     }
 
 }

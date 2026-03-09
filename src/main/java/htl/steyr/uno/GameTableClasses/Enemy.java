@@ -1,5 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
+import javafx.scene.layout.HBox;
+
 public class Enemy {
 
     private String username;
@@ -42,6 +44,8 @@ public class Enemy {
     public void decrementCardCount(int count) {
         this.cardCount -= count;
     }
+
+
 
 
 }

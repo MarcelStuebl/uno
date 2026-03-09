@@ -6,7 +6,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -95,7 +94,7 @@ public class GameTable implements Initializable {
 
 
 
-        player.showPlayerHand(root, player, centralStack);
+        player.displayPlayerHand(root, player, centralStack);
 
         player.testPrintHand();
 
@@ -106,25 +105,24 @@ public class GameTable implements Initializable {
 
     private void addCloseButton(StackPane root, Stage stage) {
 
-        Button closeBtn = new Button("X"); // Symmetrisches X
-        closeBtn.setPrefSize(40, 40);      // klein
+        Button closeBtn = new Button("X"); // X to make it look like a Close Button
+        closeBtn.setPrefSize(40, 40);    //make it smaller
         closeBtn.setPadding(javafx.geometry.Insets.EMPTY);
         closeBtn.setAlignment(javafx.geometry.Pos.CENTER);
 
-        // Einfach rot/weiß für Sichtbarkeit
+        // red/white style for easy visability
         closeBtn.setStyle(
                 "-fx-background-color: #d32f2f;" +
                         "-fx-text-fill: white;" +
                         "-fx-font-size: 18;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 20;"  // rund
+                        "-fx-background-radius: 20;"  //make it appear round
         );
 
         closeBtn.setOnAction(e -> stage.close());
         onSceneClose();
 
-
-        // Oben rechts im StackPane
+        //align top right on the stackpane
         StackPane.setAlignment(closeBtn, javafx.geometry.Pos.TOP_RIGHT);
         StackPane.setMargin(closeBtn, new javafx.geometry.Insets(10));
 
