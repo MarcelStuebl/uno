@@ -180,7 +180,7 @@ public class LoginController implements Initializable {
             client.verifyNewAccount(username, firstName, lastName, email, password, Integer.parseInt(code));
             showAccountVerificationScreen.setVisible(false);
         }
-    }
+    }   
 
     public void onLoginButtonClicked(ActionEvent actionEvent) throws IOException {
         String username = welcomeBackUserName.getText();
