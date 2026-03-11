@@ -307,28 +307,35 @@ public class LoginController implements Initializable {
 
     public void forgotPasswordResponse(ForgotPasswordResponse msg) {
         if (msg.getStatus() == 0) {
-            System.out.println("Authentication code sent. Please check your email and enter the code to reset your password.");
-
             showForgotPassword.setVisible(false);
             showResetPassword2FA.setVisible(true);
             resetPassword2FACode.clear();
             errorLabelReset2FA.setVisible(false);
 
-            // @TODO: Show the screen to enter the authentication code for password reset
         } else if (msg.getStatus() == 1) {
             System.out.println("You have already requested a password reset recently. Please wait before trying again.");
-            // @TODO: Show error message.
 
+
+            // @TODO: Show error message.
         } else if (msg.getStatus() == 2) {
             System.out.println("Wrong code. Please try again.");
 
+
             // @TODO: Show error message.
         } else if (msg.getStatus() == 3) {
-            System.out.println("Code correct. Please enter your new password.");
-
-            // @TODO: Show the screen to enter a new password
+            Platform.runLater(() -> {
+                showResetPassword2FA.setVisible(false);
+                showNewPasswordScreen.setVisible(true);
+                newPassword.clear();
+                confirmNewPassword.clear();
+                errorLabelNewPassword.setVisible(false);
+            });
         } else if (msg.getStatus() == 4) {
-            System.out.println("Password reset successful. You can now log in with your new password.");
+            Platform.runLater(() -> {
+                errorLabelNewPassword.setText("Passwort erfolgreich geändert!");
+                errorLabelNewPassword.setStyle("-fx-text-fill: #90EE90;");
+                errorLabelNewPassword.setVisible(true);
+            });
 
             new Thread(() -> {
                 try {
@@ -338,23 +345,15 @@ public class LoginController implements Initializable {
                     e.printStackTrace();
                 }
             }).start();
-
-            // @TODO: Show success message and redirect to login screen after a short delay
         } else if (msg.getStatus() == 5) {
             System.out.println("Something went wrong. Please try again later.");
 
             // @TODO: Show error message.
         } else if (msg.getStatus() == 6) {
-            System.out.println("No account associated with this email address.");
-
             Platform.runLater(() -> {
-
                 errorLabelForgotPassword.setText("Email address not found!");
                 errorLabelForgotPassword.setVisible(true);
-
             });
-
-            // @TODO: Show error message.
         }
 
     }
@@ -370,12 +369,6 @@ public class LoginController implements Initializable {
             errorLabelReset2FA.setText("Code must be 6 digits!");
             errorLabelReset2FA.setVisible(true);
         } else {
-            showResetPassword2FA.setVisible(false);
-            showNewPasswordScreen.setVisible(true);
-            newPassword.clear();
-            confirmNewPassword.clear();
-            errorLabelNewPassword.setVisible(false);
-
             client.getConn().verifyPasswordResetCode(Integer.parseInt(code));
         }
     }
@@ -395,13 +388,7 @@ public class LoginController implements Initializable {
             errorLabelNewPassword.setText("Passwords do not match!");
             errorLabelNewPassword.setVisible(true);
         } else {
-            errorLabelNewPassword.setText("Passwort erfolgreich geändert!");
-            errorLabelNewPassword.setStyle("-fx-text-fill: #90EE90;");
-            errorLabelNewPassword.setVisible(true);
-
             client.getConn().setNewPassword(email, Integer.parseInt(code), password);
-
-
         }
     }
 
