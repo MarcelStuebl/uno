@@ -1,6 +1,8 @@
 package htl.steyr.uno.requests.client;
 
-public class ChangePasswordRequest {
+import java.io.Serializable;
+
+public class ChangePasswordRequest implements Serializable {
 
     private String email;
     private Integer code;

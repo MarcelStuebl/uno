@@ -1,8 +1,7 @@
 package htl.steyr.uno.client;
 
 import htl.steyr.uno.User;
-import htl.steyr.uno.requests.client.CheckIfUserAlreadyExistsRequest;
-import htl.steyr.uno.requests.client.LeaveLobbyRequest;
+import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
 
 import java.io.Closeable;
@@ -213,13 +212,22 @@ public class ClientSocketConnection implements Closeable {
     }
 
     private void forgotPasswordResponse(ForgotPasswordResponse msg) {
-        if (msg.getStatus() == 0) {
-            System.out.println("Authentication code sent. Please check your email and enter the code to reset your password.");
-        } else if (msg.getStatus() == 1) {
-            System.out.println("You have already requested a password reset recently. Please wait before trying again.");
-        } else if (msg.getStatus() == 2) {
-            System.out.println("Wrong code. Please try again.");
-        }
+        client.getLoginController().forgotPasswordResponse(msg);
+    }
+
+    public void requestPasswordReset(String email) {
+        ForgotPasswordRequest msg = new ForgotPasswordRequest(email);
+        sendMessage(msg);
+    }
+
+    public void verifyPasswordResetCode(int code) {
+        ForgotPasswordSendCodeRequest msg = new ForgotPasswordSendCodeRequest(code);
+        sendMessage(msg);
+    }
+
+    public void setNewPassword(String email, int code, String password) {
+        ChangePasswordRequest msg = new ChangePasswordRequest(email, code, password);
+        sendMessage(msg);
     }
 
     private void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
@@ -247,7 +255,6 @@ public class ClientSocketConnection implements Closeable {
     public User getUser() {
         return user;
     }
-
 
 
 }
