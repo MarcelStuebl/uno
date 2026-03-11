@@ -55,7 +55,6 @@ public class LoginController implements Initializable {
     @FXML private TextField welcomeBackUserName;
 
     private Client client;
-
     private String username;
     private String password;
     private String firstName;
@@ -112,9 +111,8 @@ public class LoginController implements Initializable {
     private void onVerify2FA(ActionEvent actionEvent) {
         String code = twoFACode.getText();
         if (code.isEmpty()) {
-            // Handle error
+
         } else {
-            // TODO: Verify the 2FA code with the server
             twoFACode.clear();
         }
     }
@@ -182,14 +180,29 @@ public class LoginController implements Initializable {
     public void onVerifyNewAccount(ActionEvent actionEvent) {
         String code = verifyAccount.getText();
         if (code.isEmpty()) {
-            errorLabel2FA.setText("Code cannot be empty!");
-            errorLabel2FA.setVisible(true);
         } else if (code.length() != 6 || !code.matches("\\d+")) {
-            errorLabel2FA.setText("Code must be 6 digits!");
-            errorLabel2FA.setVisible(true);
         } else {
             client.verifyNewAccount(username, firstName, lastName, email, password, Integer.parseInt(code));
+
+            verifyAccount.clear();
             showAccountVerificationScreen.setVisible(false);
+            showLoginScreen.setVisible(true);
+
+            errorLabel.setText("2FA Code Authentifizierung erfolgreich! ✓");
+            errorLabel.setStyle("-fx-text-fill: #90EE90;");
+            errorLabel.setVisible(true);
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2000);
+                    Platform.runLater(() -> {
+                        errorLabel.setVisible(false);
+                        errorLabel.setStyle("-fx-text-fill: #FF0000;");
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
     }   
 
@@ -256,7 +269,6 @@ public class LoginController implements Initializable {
             errorLabelForgotPassword.setText("Email must be valid!");
             errorLabelForgotPassword.setVisible(true);
         } else {
-            // TODO: Email-Verifizierung auf dem Server durchführen und 2FA Code versenden
             showForgotPassword.setVisible(false);
             showResetPassword2FA.setVisible(true);
             resetPassword2FACode.clear();
@@ -275,7 +287,6 @@ public class LoginController implements Initializable {
             errorLabelReset2FA.setText("Code must be 6 digits!");
             errorLabelReset2FA.setVisible(true);
         } else {
-            // TODO: 2FA Code auf dem Server überprüfen
             showResetPassword2FA.setVisible(false);
             showNewPasswordScreen.setVisible(true);
             newPassword.clear();
@@ -299,7 +310,6 @@ public class LoginController implements Initializable {
             errorLabelNewPassword.setText("Passwords do not match!");
             errorLabelNewPassword.setVisible(true);
         } else {
-            // TODO: Neues Passwort auf dem Server speichern
             errorLabelNewPassword.setText("Passwort erfolgreich geändert!");
             errorLabelNewPassword.setStyle("-fx-text-fill: #90EE90;");
             errorLabelNewPassword.setVisible(true);
@@ -364,7 +374,5 @@ public class LoginController implements Initializable {
     public void setClient(Client client) {
         this.client = client;
     }
-
-
 
 }

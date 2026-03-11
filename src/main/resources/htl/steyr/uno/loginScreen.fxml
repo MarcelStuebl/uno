@@ -67,7 +67,7 @@
          </VBox>
          <Label fx:id="errorLabel2FA" styleClass="errorLabel" text="ERROR:" />
       </VBox>
-      <VBox fx:id="showLoginScreen" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard">
+      <VBox fx:id="showLoginScreen" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard" visible="false">
          <children>
             <Label styleClass="lWelcomeBack" text="Willkommen zurück!" />
             <Label styleClass="Subtitles" text="Melde dich an oder erstelle einen Account" />
@@ -98,7 +98,7 @@
          </children>
       </VBox>
 
-        <VBox fx:id="showNewAccScreen" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard" visible="false">
+        <VBox fx:id="showNewAccScreen" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard">
 
             <Label styleClass="lWelcomeBack" text="Neues Konto erstellen!" />
          <VBox spacing="6">
@@ -137,11 +137,10 @@
                 <Label styleClass="Subtitles" text="oder" />
                 <Separator />
             </HBox>
-         <Label styleClass="Subtitles" text="Du hast bereits einen Account?" />
          <Button fx:id="showLogin" onAction="#backToLogin" prefHeight="32.0" prefWidth="240.0" styleClass="CreateAccButton" text="Anmelden" />
 
             <Label styleClass="Subtitles" text="© 2026 UNO – HTL Steyr" />
-         <Label fx:id="errorLabelCreateAcc" prefHeight="60.0" prefWidth="282.0" styleClass="errorLabel" text="ERROR!!!" textAlignment="CENTER" visible="false" wrapText="true" />
+         <Label fx:id="errorLabelCreateAcc" alignment="CENTER" prefHeight="22.0" prefWidth="282.0" styleClass="errorLabel" text="ERROR!!!" textAlignment="CENTER" visible="false" wrapText="true" />
         </VBox>
 
         <VBox fx:id="showForgotPassword" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="24" styleClass="loginCard" visible="false">
@@ -170,7 +169,7 @@
 
             <VBox alignment="CENTER" spacing="12">
                <Label styleClass="loginLables" text="2FA Code" />
-               <TextField fx:id="resetPassword2FACode" promptText="000000" styleClass="login" />
+               <TextField fx:id="resetPassword2FACode" alignment="CENTER" promptText="000000" styleClass="login" />
             </VBox>
 
             <VBox alignment="CENTER" spacing="12">
