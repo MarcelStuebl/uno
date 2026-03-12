@@ -47,13 +47,7 @@ public class GameTable implements Initializable {
     }
 
 
-    public void open(Stage stage) throws InvalidHandException {
-        makeTable(stage);
-
-    }
-
-
-    private void makeTable(Stage stage) throws InvalidHandException {
+    private void open(Stage stage) throws InvalidHandException {
         StackPane root = null;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));
@@ -93,21 +87,15 @@ public class GameTable implements Initializable {
         root.getChildren().add(centralStack.getVisual());
 
 
-
         player.displayPlayerHand(root, player, centralStack);
-        int i=1;
-        for(Enemy enemy : enemies){
-            enemy.displayEnemyHand(root,enemy,i);
-            i++;
-        }
+
 
 
         addCloseButton(root, stage);  //for readabiity
 
 
     }
-
-    private void addCloseButton(StackPane root, Stage stage) {
+    public void addCloseButton(StackPane root, Stage stage) {
 
         Button closeBtn = new Button("X"); // X to make it look like a Close Button
         closeBtn.setPrefSize(40, 40);    //make it smaller
@@ -132,7 +120,4 @@ public class GameTable implements Initializable {
 
         root.getChildren().add(closeBtn);
     }
-
-
-
 }
