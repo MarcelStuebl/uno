@@ -81,9 +81,9 @@ public class GameTable implements Initializable {
 
 
         ArrayList<Enemy> enemies = new ArrayList<>();
-        enemies.add(new Enemy("Anna", false, 5));
-        enemies.add(new Enemy("Lukas", false, 7));
-        enemies.add(new Enemy("Sophie", false, 3));
+        enemies.add(new Enemy("Anna", false, 5,1));
+        enemies.add(new Enemy("Lukas", false, 7,4));
+        enemies.add(new Enemy("Sophie", false, 3,4));
 
 
         Player player = new Player("Max",true,myHand,enemies);
@@ -95,8 +95,12 @@ public class GameTable implements Initializable {
 
 
         player.displayPlayerHand(root, player, centralStack);
+        int i=1;
+        for(Enemy enemy : enemies){
+            enemy.displayEnemyHand(root,enemy,i);
+            i++;
+        }
 
-        player.testPrintHand();
 
         addCloseButton(root, stage);  //for readabiity
 

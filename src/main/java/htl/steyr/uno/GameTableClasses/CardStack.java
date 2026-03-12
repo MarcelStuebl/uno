@@ -19,11 +19,16 @@ import java.util.Objects;
 public class CardStack {
     ScaleTransition st;
     private Card topCard;
-    private final StackPane visual;
+    private StackPane visual;
 
     public CardStack() {
         this.visual = new StackPane();
-        this.visual.setPrefSize(120, 180); // Standardgröße für Karten
+        this.visual.setPrefSize(137, 192);
+        this.visual.setMaxSize(137, 192);
+        this.visual.setStyle("-fx-border-color: green;" +
+                "-fx-border-width: 6;" +
+                "-fx-border-radius: 5;" +
+                "-fx-background-radius: 5;");
     }
 
     public StackPane getVisual() {
@@ -48,6 +53,8 @@ public class CardStack {
         iv.setFitHeight(192);
         iv.setPreserveRatio(true);
         visual.getChildren().add(iv);
+
+
 
         // small pop animation
         ScaleTransition st = new ScaleTransition(Duration.millis(200), visual);

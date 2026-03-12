@@ -2,11 +2,16 @@ package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import javafx.animation.ScaleTransition;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
@@ -64,6 +69,7 @@ public class Player {
     public Enemy getEnemy(int index) {
         return this.enemies.get(index);
     }
+
     private void sortHand() {
         this.hand.sort((c1, c2) -> {
 
@@ -89,17 +95,7 @@ public class Player {
         }
     }
 
-    public void testPrintHand() {
-        System.out.println("Hand von " + username + ":");
 
-        for (Card card : hand) {
-            System.out.println(
-                    card.getCardColour() + " " + card.getCardValue()
-            );
-        }
-
-        System.out.println("----------------------");
-    }
 
 
     public void displayPlayerHand(StackPane root, Player player, CardStack middleCardStack) {
@@ -117,10 +113,10 @@ public class Player {
             StackPane cardPane = new StackPane(iv);
             cardPane.setPrefSize(137, 192);
             cardPane.setStyle(
-                    "-fx-border-color: white;" +
-                            "-fx-border-width: 4;" +
-                            "-fx-border-radius: 5;" +
-                            "-fx-background-radius: 5;"
+                    "-fx-border-color: green;" +
+                            "-fx-border-width: 6;" +
+                            "-fx-border-radius: 6;" +
+                            "-fx-background-radius: 6;"
             );
 
             Button cardBtn = new Button();
@@ -168,6 +164,7 @@ public class Player {
         StackPane.setMargin(handBox, new javafx.geometry.Insets(40));
         root.getChildren().add(handBox);
     }
+
 
 
 
