@@ -22,45 +22,76 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
-    @FXML public Button anmeldeButton;
-    @FXML public Label errorLabel;
-    @FXML public Label errorLabelCreateAcc;
-    @FXML public TextField newAccEmail;
-    @FXML public TextField twoFACode;
-    @FXML public VBox show2FA;
-    @FXML public Label errorLabel2FA;
-    @FXML public VBox showForgotPassword;
-    @FXML public TextField resetPasswordEmail;
-    @FXML public Label errorLabelForgotPassword;
-    @FXML public VBox showResetPassword2FA;
-    @FXML public TextField resetPassword2FACode;
-    @FXML public Label errorLabelReset2FA;
-    @FXML public VBox showNewPasswordScreen;
-    @FXML public PasswordField newPassword;
-    @FXML public PasswordField confirmNewPassword;
-    @FXML public Label errorLabelNewPassword;
-    @FXML public VBox showAccountVerificationScreen;
-    @FXML public TextField verifyAccount;
-    @FXML private Button showLogin;
-    @FXML private VBox showNewAccScreen;
-    @FXML private Button createAcc;
-    @FXML private VBox showLoginScreen;
-    @FXML private StackPane loginPane;
-    @FXML private StackPane brandingPane;
-    @FXML private PasswordField newAccPassword;
-    @FXML private TextField newAccUserName;
-    @FXML private TextField newAccLastName;
-    @FXML private TextField newAccFirstName;
-    @FXML private PasswordField welcomeBackPasswd;
-    @FXML private TextField welcomeBackUserName;
+    @FXML
+    public Button anmeldeButton;
+    @FXML
+    public Label errorLabel;
+    @FXML
+    public Label errorLabelCreateAcc;
+    @FXML
+    public TextField newAccEmail;
+    @FXML
+    public TextField twoFACode;
+    @FXML
+    public VBox show2FA;
+    @FXML
+    public Label errorLabel2FA;
+    @FXML
+    public VBox showForgotPassword;
+    @FXML
+    public TextField resetPasswordEmail;
+    @FXML
+    public Label errorLabelForgotPassword;
+    @FXML
+    public VBox showResetPassword2FA;
+    @FXML
+    public TextField resetPassword2FACode;
+    @FXML
+    public Label errorLabelReset2FA;
+    @FXML
+    public VBox showNewPasswordScreen;
+    @FXML
+    public PasswordField newPassword;
+    @FXML
+    public PasswordField confirmNewPassword;
+    @FXML
+    public Label errorLabelNewPassword;
+    @FXML
+    public VBox showAccountVerificationScreen;
+    @FXML
+    public TextField verifyAccount;
+    @FXML
+    private Button showLogin;
+    @FXML
+    private VBox showNewAccScreen;
+    @FXML
+    private Button createAcc;
+    @FXML
+    private VBox showLoginScreen;
+    @FXML
+    private StackPane loginPane;
+    @FXML
+    private StackPane brandingPane;
+    @FXML
+    private PasswordField newAccPassword;
+    @FXML
+    private TextField newAccUserName;
+    @FXML
+    private TextField newAccLastName;
+    @FXML
+    private TextField newAccFirstName;
+    @FXML
+    private PasswordField welcomeBackPasswd;
+    @FXML
+    private TextField welcomeBackUserName;
 
     private Client client;
-
     private String username;
     private String password;
     private String firstName;
     private String lastName;
     private String email;
+    private String code;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -112,9 +143,8 @@ public class LoginController implements Initializable {
     private void onVerify2FA(ActionEvent actionEvent) {
         String code = twoFACode.getText();
         if (code.isEmpty()) {
-            // Handle error
+
         } else {
-            // TODO: Verify the 2FA code with the server
             twoFACode.clear();
         }
     }
@@ -182,16 +212,31 @@ public class LoginController implements Initializable {
     public void onVerifyNewAccount(ActionEvent actionEvent) {
         String code = verifyAccount.getText();
         if (code.isEmpty()) {
-            errorLabel2FA.setText("Code cannot be empty!");
-            errorLabel2FA.setVisible(true);
         } else if (code.length() != 6 || !code.matches("\\d+")) {
-            errorLabel2FA.setText("Code must be 6 digits!");
-            errorLabel2FA.setVisible(true);
         } else {
             client.verifyNewAccount(username, firstName, lastName, email, password, Integer.parseInt(code));
+
+            verifyAccount.clear();
             showAccountVerificationScreen.setVisible(false);
+            showLoginScreen.setVisible(true);
+
+            errorLabel.setText("2FA Code Authentifizierung erfolgreich! ✓");
+            errorLabel.setStyle("-fx-text-fill: #90EE90;");
+            errorLabel.setVisible(true);
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2000);
+                    Platform.runLater(() -> {
+                        errorLabel.setVisible(false);
+                        errorLabel.setStyle("-fx-text-fill: #FF0000;");
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
-    }   
+    }
 
     public void onLoginButtonClicked(ActionEvent actionEvent) throws IOException {
         String username = welcomeBackUserName.getText();
@@ -224,7 +269,7 @@ public class LoginController implements Initializable {
     }
 
     public void logInFailed(LoginFailedResponse msg) {
-        Platform.runLater(() ->{
+        Platform.runLater(() -> {
             errorLabel.setText("Username or Password wrong!");
             errorLabel.setVisible(true);
         });
@@ -247,7 +292,7 @@ public class LoginController implements Initializable {
 
     @FXML
     private void onResetPasswordClicked(ActionEvent actionEvent) {
-        String email = resetPasswordEmail.getText();
+        email = resetPasswordEmail.getText();
 
         if (email.isEmpty()) {
             errorLabelForgotPassword.setText("Email cannot be empty!");
@@ -256,17 +301,66 @@ public class LoginController implements Initializable {
             errorLabelForgotPassword.setText("Email must be valid!");
             errorLabelForgotPassword.setVisible(true);
         } else {
-            // TODO: Email-Verifizierung auf dem Server durchführen und 2FA Code versenden
+            client.getConn().requestPasswordReset(email);
+        }
+    }
+
+    public void forgotPasswordResponse(ForgotPasswordResponse msg) {
+        if (msg.getStatus() == 0) {
             showForgotPassword.setVisible(false);
             showResetPassword2FA.setVisible(true);
             resetPassword2FACode.clear();
             errorLabelReset2FA.setVisible(false);
+
+        } else if (msg.getStatus() == 1) {
+            System.out.println("You have already requested a password reset recently. Please wait before trying again.");
+
+
+            // @TODO: Show error message.
+        } else if (msg.getStatus() == 2) {
+            System.out.println("Wrong code. Please try again.");
+
+
+            // @TODO: Show error message.
+        } else if (msg.getStatus() == 3) {
+            Platform.runLater(() -> {
+                showResetPassword2FA.setVisible(false);
+                showNewPasswordScreen.setVisible(true);
+                newPassword.clear();
+                confirmNewPassword.clear();
+                errorLabelNewPassword.setVisible(false);
+            });
+        } else if (msg.getStatus() == 4) {
+            Platform.runLater(() -> {
+                errorLabelNewPassword.setText("Passwort erfolgreich geändert!");
+                errorLabelNewPassword.setStyle("-fx-text-fill: #90EE90;");
+                errorLabelNewPassword.setVisible(true);
+            });
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2000);
+                    Platform.runLater(this::backToLoginFromNewPassword);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        } else if (msg.getStatus() == 5) {
+            System.out.println("Something went wrong. Please try again later.");
+
+            // @TODO: Show error message.
+        } else if (msg.getStatus() == 6) {
+            Platform.runLater(() -> {
+                errorLabelForgotPassword.setText("Email address not found!");
+                errorLabelForgotPassword.setVisible(true);
+            });
         }
+
     }
 
     @FXML
     private void onVerifyResetPassword2FA(ActionEvent actionEvent) {
-        String code = resetPassword2FACode.getText();
+        code = resetPassword2FACode.getText();
 
         if (code.isEmpty()) {
             errorLabelReset2FA.setText("Code cannot be empty!");
@@ -275,12 +369,7 @@ public class LoginController implements Initializable {
             errorLabelReset2FA.setText("Code must be 6 digits!");
             errorLabelReset2FA.setVisible(true);
         } else {
-            // TODO: 2FA Code auf dem Server überprüfen
-            showResetPassword2FA.setVisible(false);
-            showNewPasswordScreen.setVisible(true);
-            newPassword.clear();
-            confirmNewPassword.clear();
-            errorLabelNewPassword.setVisible(false);
+            client.getConn().verifyPasswordResetCode(Integer.parseInt(code));
         }
     }
 
@@ -299,19 +388,7 @@ public class LoginController implements Initializable {
             errorLabelNewPassword.setText("Passwords do not match!");
             errorLabelNewPassword.setVisible(true);
         } else {
-            // TODO: Neues Passwort auf dem Server speichern
-            errorLabelNewPassword.setText("Passwort erfolgreich geändert!");
-            errorLabelNewPassword.setStyle("-fx-text-fill: #90EE90;");
-            errorLabelNewPassword.setVisible(true);
-
-            new Thread(() -> {
-                try {
-                    Thread.sleep(2000);
-                    Platform.runLater(this::backToLoginFromNewPassword);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+            client.getConn().setNewPassword(email, Integer.parseInt(code), password);
         }
     }
 
@@ -361,10 +438,9 @@ public class LoginController implements Initializable {
     public Client getClient() {
         return client;
     }
+
     public void setClient(Client client) {
         this.client = client;
     }
-
-
 
 }

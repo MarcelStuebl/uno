@@ -12,6 +12,10 @@ public class ForgotPasswordResponse implements Serializable {
      * - 0: Success - You can send an authentication code. - User can be sent to enter the authentication code.
      * - 1: You have already requested a password reset recently. Please wait before trying again.
      * - 2: Wrong code.
+     * - 3: Code correct, enter new password.
+     * - 4: Password reset successful.
+     * - 5: Something went wrong. Please try again later.
+     * - 6: No account associated with this email address.
      *
      * @param status the status code representing the result of the forgot password request
      */

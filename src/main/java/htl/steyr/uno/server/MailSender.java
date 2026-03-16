@@ -166,7 +166,7 @@ public class MailSender {
                       <tr>
                         <td style="padding: 20px 40px 32px; text-align:center;">
                           <p style="margin:0; font-size:12px; color:#ccc;">
-                            © 2025 UNO HTL Steyr · Automatisch generierte E-Mail
+                            © 2026 UNO HTL Steyr · Automatisch generierte E-Mail
                           </p>
                           <p style="margin:4px 0 0; font-size:12px; color:#ccc;">
                             Bitte nicht auf diese E-Mail antworten.
