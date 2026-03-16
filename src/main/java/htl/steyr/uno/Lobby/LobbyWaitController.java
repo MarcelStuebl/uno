@@ -101,7 +101,7 @@ public class LobbyWaitController implements Initializable {
             }
         });
 
-        // Chat-ListView initial "eingeklappt" (nicht sichtbar und nimmt keinen Platz weg)
+        // Chat-ListView initial eingeklappt (nicht sichtbar und nimmt keinen Platz weg)
         gameChatListView.setPrefHeight(0);
         gameChatListView.setMinHeight(0);
         gameChatListView.setVisible(false);
@@ -178,6 +178,13 @@ public class LobbyWaitController implements Initializable {
             gameChatTextField.clear();
             sendChatMessage(text.trim());
             System.out.println("Sent chat message: " + text.trim());
+
+            if (text.startsWith("@")){
+                gameChatTextField.clear();
+                sendPrivateMessage(text.trim());
+                System.out.println("Sent private message: " + text.trim());
+            }
+
         }
     }
 
@@ -237,6 +244,10 @@ public class LobbyWaitController implements Initializable {
 
     private void sendChatMessage(String message) {
         client.sendChatMessage(message);
+    }
+
+    private void sendPrivateMessage(String message){
+        //client.sendPrivateMesssage(message);
     }
 
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {
