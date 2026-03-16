@@ -19,12 +19,10 @@ public class GameLogic {
         }
     }
 
-    public void chooseColour(boolean isPlusFour){
-
-    }
-
-    public void plusTwo(Card card){
-
+    public void drawFourCards(Player player){
+        for(int i = 0; i < 4; i++){
+            player.addCardToHand(WithdrawalStack.drawCard()); //static method
+        }
     }
 
 
