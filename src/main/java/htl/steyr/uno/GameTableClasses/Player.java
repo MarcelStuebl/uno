@@ -19,8 +19,6 @@ public class Player {
     private final ArrayList<Card> hand = new ArrayList<>();
     private final ArrayList<Enemy> enemies = new ArrayList<>();
 
-    //variables not meant for user
-    HBox handBox = new HBox();
     
     public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies) throws InvalidHandException {
         this.username = username;

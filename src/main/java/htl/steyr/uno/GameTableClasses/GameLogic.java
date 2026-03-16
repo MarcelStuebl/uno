@@ -20,10 +20,21 @@ public class GameLogic {
     }
 
     public void drawFourCards(Player player){
-        for(int i = 0; i < 4; i++){
-            player.addCardToHand(WithdrawalStack.drawCard()); //static method
+       //logic for drawing four cards (card can only be
+        chooseColour();
+    }
+
+    public void blockNextPlayer(Player player){
+        for(Enemy enemy : player.getEnemies()){
+            //ask server whose turn it currently is. then tell seerver to block the next player in line
+
         }
     }
+
+    public void chooseColour(){
+        //logic for picking what Colour the player can / cant use on their next turn
+    }
+
 
 
 }

@@ -90,7 +90,6 @@ public class GameTable implements Initializable {
         player.displayPlayerHand(root, player, centralStack);
 
 
-
         addCloseButton(root, stage);  //for readabiity
 
 
