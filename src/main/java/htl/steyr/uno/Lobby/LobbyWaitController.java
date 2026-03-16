@@ -72,8 +72,9 @@ public class LobbyWaitController implements Initializable {
                     return;
                 }
 
-                boolean mine = currentUsername.equals(item.sender());
+                boolean myMessage = currentUsername.equals(item.sender());
 
+                //Label or displaying the Autor oft the Message
                 Label nameLabel = new Label(item.sender());
                 nameLabel.setStyle("-fx-text-fill: #c12424; -fx-font-size: 12;");
 
@@ -82,7 +83,7 @@ public class LobbyWaitController implements Initializable {
                 bubble.setPadding(new Insets(8));
                 bubble.setMaxWidth(320);
 
-                if (mine) {
+                if (myMessage) {
                     bubble.setStyle("-fx-background-color: #91ec4e; -fx-background-radius: 12;");
                 } else {
                     bubble.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 12; " +
@@ -93,14 +94,14 @@ public class LobbyWaitController implements Initializable {
 
                 HBox row = new HBox(messageBox);
                 row.setPadding(new Insets(4, 8, 4, 8));
-                row.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+                row.setAlignment(myMessage ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
                 setText(null);
                 setGraphic(row);
             }
         });
 
-        // Chat-ListView initial "eingeklappt" (nicht sichtbar und nimmt keinen Platz weg)
+        // Chat-ListView initial eingeklappt (nicht sichtbar und nimmt keinen Platz weg)
         gameChatListView.setPrefHeight(0);
         gameChatListView.setMinHeight(0);
         gameChatListView.setVisible(false);
@@ -177,6 +178,13 @@ public class LobbyWaitController implements Initializable {
             gameChatTextField.clear();
             sendChatMessage(text.trim());
             System.out.println("Sent chat message: " + text.trim());
+
+            if (text.startsWith("@")){
+                gameChatTextField.clear();
+                sendPrivateMessage(text.trim());
+                System.out.println("Sent private message: " + text.trim());
+            }
+
         }
     }
 
@@ -236,6 +244,10 @@ public class LobbyWaitController implements Initializable {
 
     private void sendChatMessage(String message) {
         client.sendChatMessage(message);
+    }
+
+    private void sendPrivateMessage(String message){
+        //client.sendPrivateMesssage(message);
     }
 
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {

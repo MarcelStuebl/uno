@@ -13,108 +13,129 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<HBox prefHeight="400.0" prefWidth="600.0" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<HBox prefHeight="879.0" prefWidth="1021.0" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
 
     <children>
+        <HBox prefHeight="879.0" prefWidth="823.0" HBox.hgrow="ALWAYS">
+            <children>
 
-        <!-- LINKER BEREICH: Hauptinhalt (skaliert mit) -->
-        <BorderPane styleClass="mainPaine" HBox.hgrow="ALWAYS">
+                <!-- LINKER BEREICH: Hauptinhalt (skaliert mit) -->
+                <BorderPane prefHeight="879.0" prefWidth="821.0" styleClass="mainPaine" HBox.hgrow="ALWAYS">
 
-            <top>
-                <VBox alignment="TOP_CENTER">
-                    <children>
-                        <AnchorPane>
+                    <top>
+                        <VBox alignment="TOP_CENTER">
                             <children>
-                                <Label fx:id="lobbyCodeLabel" alignment="CENTER" styleClass="lobbyCodeLabel" text="LobbyCode:" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="8.0">
-                                    <font>
-                                        <Font size="30.0" />
-                                    </font>
-                                </Label>
-                            </children>
-                        </AnchorPane>
-
-                        <Line endX="200.0" startX="-200.0" strokeWidth="2.0" />
-                    </children>
-                </VBox>
-            </top>
-
-            <!-- Center: SplitPane, damit der Chat „ausgeklappt“ werden kann (Divider ziehen) -->
-            <center>
-                <SplitPane dividerPositions="0.65" orientation="VERTICAL" styleClass="splitPane">
-                    <items>
-
-                        <!-- Spieler-Liste (nimmt automatisch Platz) -->
-                        <VBox>
-                            <children>
-                                <ListView fx:id="playerListView" styleClass="playerListView" VBox.vgrow="ALWAYS" />
-                            </children>
-                            <padding>
-                                <Insets bottom="0" left="0" right="0" top="0" />
-                            </padding>
-                        </VBox>
-
-                        <!-- Chat-Bereich (ausklappbar über SplitPane-Divider) -->
-                        <VBox spacing="8.0">
-                            <children>
-                                <ListView fx:id="gameChatListView" prefHeight="13.0" prefWidth="280.0" styleClass="gameChatListView" VBox.vgrow="ALWAYS" />
-
-                                <AnchorPane styleClass="chatPane">
+                                <AnchorPane>
                                     <children>
-                                        <TextField fx:id="gameChatTextField" layoutX="79.0" onAction="#onSendMassage" prefHeight="25.0" prefWidth="242.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="79.0" AnchorPane.topAnchor="0.0" />
+                                        <Label fx:id="lobbyCodeLabel" alignment="CENTER" styleClass="lobbyCodeLabel" text="LobbyCode:" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="8.0">
+                                            <font>
+                                                <Font size="30.0" />
+                                            </font>
+                                        </Label>
                                     </children>
                                 </AnchorPane>
+
+                                <Line endX="200.0" startX="-200.0" strokeWidth="2.0" />
+                            </children>
+                        </VBox>
+                    </top>
+
+                    <!-- Center: SplitPane, damit der Chat „ausgeklappt“ werden kann (Divider ziehen) -->
+                    <center>
+                        <SplitPane orientation="VERTICAL" styleClass="splitPane">
+                            <items>
+
+                                <!-- Spieler-Liste (nimmt automatisch Platz) -->
+                                <VBox prefHeight="654.0" prefWidth="868.0">
+                                    <children>
+                                        <ListView fx:id="playerListView" opacity="0.78" prefHeight="627.0" prefWidth="520.0" styleClass="playerListView" VBox.vgrow="ALWAYS" />
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="0" left="0" right="0" top="0" />
+                                    </padding>
+                                </VBox>
+
+                            </items>
+                        </SplitPane>
+                    </center>
+
+                    <padding>
+                        <Insets bottom="12" left="12" right="12" top="12" />
+                    </padding>
+                    <right>
+
+                        <!-- Chat-Bereich (ausklappbar über SplitPane-Divider) -->
+                        <VBox alignment="BOTTOM_CENTER" prefHeight="415.0" prefWidth="261.0" spacing="8.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <ListView fx:id="gameChatListView" cacheShape="false" centerShape="false" prefHeight="350.0" prefWidth="261.0" scaleShape="false" styleClass="gameChatListView" VBox.vgrow="ALWAYS" />
+                                <HBox alignment="BOTTOM_CENTER">
+                                    <children>
+
+                                        <AnchorPane prefHeight="31.0" prefWidth="372.0" styleClass="chatPane">
+                                            <children>
+                                                <TextField fx:id="gameChatTextField" layoutX="10.0" layoutY="3.0" onAction="#onSendMassage" opacity="0.78" prefHeight="25.0" prefWidth="242.0" styleClass="gameChatTextField" />
+                                            </children>
+                                        </AnchorPane>
+                                    </children>
+                                </HBox>
                             </children>
                             <padding>
                                 <Insets bottom="12" left="0" right="0" top="0" />
                             </padding>
                         </VBox>
-
-                    </items>
-                </SplitPane>
-            </center>
-
-            <padding>
-                <Insets bottom="12" left="12" right="12" top="12" />
-            </padding>
-        </BorderPane>
-
-        <!-- RECHTER BEREICH: Seitenleiste (fixer, aber sauber skalierbar) -->
-        <VBox minWidth="180.0" prefWidth="200.0" styleClass="secondaryPane">
-            <children>
-
-                <Label fx:id="AccNameDisplayLabel" maxWidth="1.7976931348623157E308" styleClass="labels" text="Acc Name">
-                    <font>
-                        <Font size="18.0" />
-                    </font>
-                    <VBox.margin>
-                        <Insets bottom="8" left="12" right="12" top="12" />
-                    </VBox.margin>
-                </Label>
-
-                <Line endX="120.0" startX="-120.0" strokeWidth="2.0">
-                    <VBox.margin>
-                        <Insets bottom="12" left="12" right="12" top="0" />
-                    </VBox.margin>
-                </Line>
-
-                <VBox spacing="12.0" VBox.vgrow="ALWAYS">
-                    <children>
-
-                        <Button fx:id="playButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#playButtonClicked" styleClass="playButton" text="Spielen" />
-
-                        <!-- Füller, damit "Lobby verlassen" unten bleibt -->
-                        <VBox VBox.vgrow="ALWAYS" />
-
-                        <Button fx:id="leaveLobbyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#leaveLobbyButtonClicked" styleClass="leaveButton" text="Lobby verlassen" />
-                    </children>
-
-                    <padding>
-                        <Insets bottom="12" left="12" right="12" top="12" />
-                    </padding>
-                </VBox>
-
+                    </right>
+               <left>
+                  <HBox prefHeight="656.0" prefWidth="38.0" BorderPane.alignment="CENTER" />
+               </left>
+                </BorderPane>
             </children>
-        </VBox>
+        </HBox>
+        <HBox alignment="TOP_RIGHT" prefHeight="879.0" prefWidth="128.0" HBox.hgrow="SOMETIMES">
+            <children>
+                <BorderPane prefHeight="879.0" prefWidth="426.0">
+                    <right>
+
+                        <!-- RECHTER BEREICH: Seitenleiste (fixer, aber sauber skalierbar) -->
+                        <VBox minWidth="180.0" prefWidth="200.0" styleClass="secondaryPane" BorderPane.alignment="CENTER">
+                            <children>
+
+                                <Label fx:id="AccNameDisplayLabel" maxWidth="1.7976931348623157E308" styleClass="labels" text="Acc Name">
+                                    <font>
+                                        <Font size="18.0" />
+                                    </font>
+                                    <VBox.margin>
+                                        <Insets bottom="8" left="12" right="12" top="12" />
+                                    </VBox.margin>
+                                </Label>
+
+                                <Line endX="120.0" startX="-120.0" strokeWidth="2.0">
+                                    <VBox.margin>
+                                        <Insets bottom="12" left="12" right="12" top="0" />
+                                    </VBox.margin>
+                                </Line>
+
+                                <VBox spacing="12.0" VBox.vgrow="ALWAYS">
+                                    <children>
+
+                                        <Button fx:id="playButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#playButtonClicked" styleClass="playButton" text="Spielen" />
+
+                                        <!-- Füller, damit "Lobby verlassen" unten bleibt -->
+                                        <VBox VBox.vgrow="ALWAYS" />
+
+                                        <Button fx:id="leaveLobbyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#leaveLobbyButtonClicked" styleClass="leaveButton" text="Lobby verlassen" />
+                                    </children>
+
+                                    <padding>
+                                        <Insets bottom="12" left="12" right="12" top="12" />
+                                    </padding>
+                                </VBox>
+
+                            </children>
+                        </VBox>
+                    </right>
+                </BorderPane>
+            </children>
+        </HBox>
 
     </children>
 </HBox>

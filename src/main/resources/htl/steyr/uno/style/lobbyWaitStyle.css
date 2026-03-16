@@ -53,11 +53,20 @@
 }
 
 .gameChatListView {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
 }
 
 .playerListView {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
 }
 
 .splitPane {
     -fx-background-color: transparent;
+}
+
+.gameChatTextField {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
 }
