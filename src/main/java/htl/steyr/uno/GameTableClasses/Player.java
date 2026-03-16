@@ -19,8 +19,6 @@ public class Player {
     private final ArrayList<Card> hand = new ArrayList<>();
     private final ArrayList<Enemy> enemies = new ArrayList<>();
 
-    //variables not meant for user
-    HBox handBox = new HBox();
     
     public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies) throws InvalidHandException {
         this.username = username;
@@ -64,6 +62,7 @@ public class Player {
     public Enemy getEnemy(int index) {
         return this.enemies.get(index);
     }
+
     private void sortHand() {
         this.hand.sort((c1, c2) -> {
 
@@ -89,17 +88,7 @@ public class Player {
         }
     }
 
-    public void testPrintHand() {
-        System.out.println("Hand von " + username + ":");
 
-        for (Card card : hand) {
-            System.out.println(
-                    card.getCardColour() + " " + card.getCardValue()
-            );
-        }
-
-        System.out.println("----------------------");
-    }
 
 
     public void displayPlayerHand(StackPane root, Player player, CardStack middleCardStack) {
@@ -117,10 +106,10 @@ public class Player {
             StackPane cardPane = new StackPane(iv);
             cardPane.setPrefSize(137, 192);
             cardPane.setStyle(
-                    "-fx-border-color: white;" +
-                            "-fx-border-width: 4;" +
-                            "-fx-border-radius: 5;" +
-                            "-fx-background-radius: 5;"
+                    "-fx-border-color: green;" +
+                            "-fx-border-width: 6;" +
+                            "-fx-border-radius: 6;" +
+                            "-fx-background-radius: 6;"
             );
 
             Button cardBtn = new Button();
@@ -168,6 +157,9 @@ public class Player {
         StackPane.setMargin(handBox, new javafx.geometry.Insets(40));
         root.getChildren().add(handBox);
     }
+
+
+
 
 
 
