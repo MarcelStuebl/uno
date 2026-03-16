@@ -6,7 +6,12 @@ import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,6 +25,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,6 +41,8 @@ public class LobbyWaitController implements Initializable {
     public ListView<ChatMessage> gameChatListView = new ListView<>();
     public TextField gameChatTextField;
 
+    private final BooleanProperty chatExpanded = new SimpleBooleanProperty(false);
+
     private final Client client;
     private LobbyInfoResponse lobby;
 
@@ -45,9 +53,7 @@ public class LobbyWaitController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Platform.runLater(() -> {
-            playButton.getScene().getWindow().setOnCloseRequest(event -> onSceneClose());
-        });
+        Platform.runLater(() -> playButton.getScene().getWindow().setOnCloseRequest(event -> onSceneClose()));
 
         String lobbyCode = lobby.getLobbyId().toString();
         lobbyCodeLabel.setText("Lobby Code: " + lobbyCode);
@@ -66,8 +72,9 @@ public class LobbyWaitController implements Initializable {
                     return;
                 }
 
-                boolean mine = currentUsername.equals(item.sender());
+                boolean myMessage = currentUsername.equals(item.sender());
 
+                //Label or displaying the Autor oft the Message
                 Label nameLabel = new Label(item.sender());
                 nameLabel.setStyle("-fx-text-fill: #c12424; -fx-font-size: 12;");
 
@@ -76,22 +83,63 @@ public class LobbyWaitController implements Initializable {
                 bubble.setPadding(new Insets(8));
                 bubble.setMaxWidth(320);
 
-                if (mine) {
-                    bubble.setStyle("-fx-background-color: #DCF8C6; -fx-background-radius: 12;");
+                if (myMessage) {
+                    bubble.setStyle("-fx-background-color: #91ec4e; -fx-background-radius: 12;");
                 } else {
-                    bubble.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-border-color: #E0E0E0; -fx-border-radius: 12;");
+                    bubble.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 12; " +
+                            "-fx-border-color: #E0E0E0; -fx-border-radius: 12; -fx-background-radius: 12;");
                 }
 
                 javafx.scene.layout.VBox messageBox = new javafx.scene.layout.VBox(2, nameLabel, bubble);
 
                 HBox row = new HBox(messageBox);
                 row.setPadding(new Insets(4, 8, 4, 8));
-                row.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+                row.setAlignment(myMessage ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
                 setText(null);
                 setGraphic(row);
             }
         });
+
+        // Chat-ListView initial eingeklappt (nicht sichtbar und nimmt keinen Platz weg)
+        gameChatListView.setPrefHeight(0);
+        gameChatListView.setMinHeight(0);
+        gameChatListView.setVisible(false);
+        gameChatListView.setManaged(false);
+
+        Timeline expand = new Timeline(
+                new KeyFrame(Duration.millis(200),
+                        new KeyValue(gameChatListView.prefHeightProperty(), 300))
+        );
+
+        Timeline collapse = new Timeline(
+                new KeyFrame(Duration.millis(200),
+                        new KeyValue(gameChatListView.prefHeightProperty(), 0))
+        );
+
+        chatExpanded.addListener((obs, oldVal, open) -> {
+            expand.stop();
+            collapse.stop();
+
+            if (open) {
+                gameChatListView.setManaged(true);
+                gameChatListView.setVisible(true);
+                expand.playFromStart();
+            } else {
+                collapse.setOnFinished(ev -> {
+                    gameChatListView.setVisible(false);
+                    gameChatListView.setManaged(false);
+                });
+                collapse.playFromStart();
+            }
+        });
+
+        gameChatTextField.focusedProperty().addListener((obs, oldV, focused) -> {
+            if (!focused) chatExpanded.set(false);
+        });
+
+        // beim Klick aufs TextField auf-/zuklappen
+        gameChatTextField.setOnMouseClicked(e -> chatExpanded.set(!chatExpanded.get()));
 
         updateLobbyInfo();
 
@@ -130,6 +178,13 @@ public class LobbyWaitController implements Initializable {
             gameChatTextField.clear();
             sendChatMessage(text.trim());
             System.out.println("Sent chat message: " + text.trim());
+
+            if (text.startsWith("@")){
+                gameChatTextField.clear();
+                sendPrivateMessage(text.trim());
+                System.out.println("Sent private message: " + text.trim());
+            }
+
         }
     }
 
@@ -191,15 +246,18 @@ public class LobbyWaitController implements Initializable {
         client.sendChatMessage(message);
     }
 
+    private void sendPrivateMessage(String message){
+        //client.sendPrivateMesssage(message);
+    }
+
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {
         String sender = msg.getUser().getUsername();
         String text = msg.getMessage();
         System.out.println("Received chat message from " + sender + ": " + text);
 
-        Platform.runLater(() -> {
-            gameChatListView.getItems().add(new ChatMessage(sender, text));
-        });
+        Platform.runLater(() -> gameChatListView.getItems().add(new ChatMessage(sender, text)));
     }
 
-    public record ChatMessage(String sender, String text) { }
+    public record ChatMessage(String sender, String text) {
+    }
 }

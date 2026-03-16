@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 public class ServerSocketConnection {
 
@@ -148,7 +149,6 @@ public class ServerSocketConnection {
             createAccountCode = (int) (Math.random() * 900000) + 100000; // Generate a random 6-digit code
             MailSender ms = new MailSender();
             ms.sendAuthenticationCode(request.getEmail(), createAccountCode.toString());
-            System.out.println("Sent code: " + createAccountCode);
         } else {
             if (!request.getCode().equals(createAccountCode)) {
                 sendMessage(new CreateAccountFailedResponse());
@@ -218,13 +218,16 @@ public class ServerSocketConnection {
         if (passwordForgotten == null || passwordForgotten.getRequestTime().getTime() + 60000 < System.currentTimeMillis()) {
 
             User user = new DatabaseUser().getUserPerEmail(msg.getEmail());
-            if (user == null) {
-                passwordForgotten.setCode((int) (Math.random() * 900000) + 100000); // Generate a random 6-digit code
+            if (user.getUsername() != null) {
+                Integer code = Integer.parseInt(String.format("%06d", new java.util.Random().nextInt(1000000)));
+                passwordForgotten = new PasswordForgotten(code, new Timestamp(System.currentTimeMillis()));
                 MailSender ms = new MailSender();
                 ms.sendAuthenticationCode(msg.getEmail(), passwordForgotten.getCode().toString());
+                sendMessage(new ForgotPasswordResponse(0));
+            } else {
+                sendMessage(new ForgotPasswordResponse(6));
             }
 
-            sendMessage(new ForgotPasswordResponse(0));
         } else {
             sendMessage(new ForgotPasswordResponse(1));
         }
@@ -233,8 +236,8 @@ public class ServerSocketConnection {
 
     private void forgotPasswordSendCodeRequest(ForgotPasswordSendCodeRequest msg) {
         if (passwordForgotten != null && passwordForgotten.getCode().equals(msg.getCode())) {
-
-            sendMessage(new ForgotPasswordResponse(0));
+            // Code is correct, allow the user to enter a new password
+            sendMessage(new ForgotPasswordResponse(3));
         } else {
             sendMessage(new ForgotPasswordResponse(2));
         }
@@ -246,6 +249,12 @@ public class ServerSocketConnection {
 
             User user = db.getUserPerEmail(msg.getEmail());
             db.updatePassword(user.getUsername(), msg.getNewPassword());
+
+            ForgotPasswordResponse response = new ForgotPasswordResponse(4);
+            sendMessage(response);
+        } else {
+            ForgotPasswordResponse response = new ForgotPasswordResponse(5);
+            sendMessage(response);
         }
     }
 
@@ -266,8 +275,6 @@ public class ServerSocketConnection {
         }
 
         sendMessage(new CheckIfUserAlreadyExistsResponse(username, email, userAlreadyExists, emailAlreadyExists));
-        System.out.println("Checked if user already exists: " + username + ", " + email
-                + " - User already exists: " + userAlreadyExists + ", Email already exists: " + emailAlreadyExists);
     }
 
 

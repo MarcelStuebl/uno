@@ -1,23 +1,3 @@
-.playButton {
-    -fx-border-radius: 22;
-    -fx-background-radius: 22;
-    -fx-background-color: rgba(255, 90, 90, 0.95);
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-
-
-}
-
-.leaveButton {
-    -fx-border-radius: 22;
-    -fx-background-radius: 22;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-border-color: rgba(255, 0, 0, 0.54);
-    -fx-border-width: 1px;
-    -fx-background-color: rgba(0, 0, 0, 0);
-}
-
 .mainPaine {
     -fx-background-color: linear-gradient(
             from 0% 0% to 100% 100%,
@@ -28,11 +8,7 @@
     -fx-padding: 80 0 80 0;
 }
 
-.labels {
-    -fx-text-fill: white;
-}
-
-.secondPane {
+.secondaryPane {
     -fx-background-color: linear-gradient(
             from 0% 0% to 100% 100%,
             rgb(18, 18, 36),
@@ -41,3 +17,56 @@
     -fx-padding: 80 0 80 0;
 }
 
+.chatPane {
+    -fx-background-color: linear-gradient(
+            from 0% 0% to 100% 100%,
+            rgb(18, 18, 36),
+            rgb(24, 24, 46)
+    );
+}
+
+.lobbyCodeLabel {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.labels {
+    -fx-text-fill: white;
+}
+
+.playButton {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+    -fx-background-color: rgba(255, 90, 90, 0.95);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.leaveButton {
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-font-size: 11px;
+}
+
+.gameChatListView {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+}
+
+.playerListView {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+}
+
+.splitPane {
+    -fx-background-color: transparent;
+}
+
+.gameChatTextField {
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+}
