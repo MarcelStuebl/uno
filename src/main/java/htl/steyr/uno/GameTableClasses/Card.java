@@ -1,5 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
+
 public class Card {
     //CardValue 0 bis 9 stands for the Number on the Card
     /**
@@ -15,17 +17,17 @@ public class Card {
     //the colour black stands for choose-colour cards
     private final String CardColour;
 
-    public Card(int value, String colour) {
+    public Card(int value, String colour) throws InvalidCardException{
 
         if (colour == null) {
-            throw new IllegalArgumentException("Colour cannot be null.");
+           throw new InvalidCardException("Colour cannot be null");
         }
 
         colour = colour.toLowerCase();
 
         //check if CardValue is correct
         if (value < 0 || value > 14) {
-            throw new IllegalArgumentException("Invalid card value: " + value);
+            throw new InvalidCardException("Value must be between 0 and 14");
         }
 
         //  check if colour is correct
@@ -35,13 +37,14 @@ public class Card {
                 !colour.equals("red") &&
                 !colour.equals("black")) {
 
-            throw new IllegalArgumentException("Invalid card colour: " + colour);
+           throw new InvalidCardException("Invalid colour");
         }
 
         // check Black Cards. Colour.equals & value == 13 or Colour.equals & value == 14 has to be true
         //in order for it to count
+
         if (colour.equals("black") != (value == 13 || value == 14)) {
-            throw new IllegalArgumentException("Black cards must be 13 or 14, and 13/14 must be black.");
+           throw new InvalidCardException("black cards must have value 13 or 14");
         }
 
         this.CardValue = value;

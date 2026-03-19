@@ -6,35 +6,32 @@ import java.util.ArrayList;
 
 public class GameLogic {
 
-    public void endGame(Player player, Stage stage) {
-        int counter = 0;
-        ArrayList<Enemy> enemies = player.getEnemies();
-        if (player.getPlayerHand().size() == 0) {
-            counter++;
-        }
-        for (Enemy enemy : enemies) {
-            if (enemy.getCardCount() == 0) {
-            }
-            stage.close();
-        }
+    public static void endGame(Player player, Stage stage) {
+     stage.close();
+     //no idea what happens after the game ends but heres gonna be the code for it
+
+
+
     }
 
-    public void drawFourCards(Player player){
-       //logic for drawing four cards (card can only be
+    public static void drawFourCards(Player player){
+       //logic for drawing four cards (card can only be +4 AND colour chooseable)
+
+
+
+
         chooseColour();
     }
 
-    public void blockNextPlayer(Player player){
-        for(Enemy enemy : player.getEnemies()){
-            //ask server whose turn it currently is. then tell seerver to block the next player in line
-
+    public static void blockNextPlayer(Player player){
+            //ask server whose turn it currently is. then tell server to block the next player in line
         }
-    }
 
-    public void chooseColour(){
+    public static void chooseColour(){
         //logic for picking what Colour the player can / cant use on their next turn
-    }
+        //should be programmed so that it can be used for drawFourCards aswell
 
+    }
 
 
 }

@@ -1,6 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
+import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
 import javafx.animation.ScaleTransition;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
@@ -20,12 +21,16 @@ public class Player {
     private final ArrayList<Enemy> enemies = new ArrayList<>();
 
     
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies) throws InvalidHandException {
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies) throws InvalidHandException, InvalidPlayerException {
         this.username = username;
         this.isCurrentTurn = isCurrentTurn;
-        this.hand.addAll(hand);
         if(hand.size() != 7){
-        throw new InvalidHandException("too many or too little Cards");
+            throw new InvalidHandException("too many or too little Cards");
+        }
+        this.hand.addAll(hand);
+
+        if(enemies.size() >= 7){
+            throw new InvalidPlayerException("too many or too little Enemies");
         }
         this.enemies.addAll(enemies);
         sortHand();
@@ -118,7 +123,7 @@ public class Player {
             cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
             cardBtn.setOnAction(e -> {
-                middleCardStack.layCard(c, cardBtn);
+                middleCardStack.layCard(c, cardBtn, player);
                 if (middleCardStack.getTopCard() == c) {
                     player.getPlayerHand().remove(c);
                     handBox.getChildren().remove(cardBtn);

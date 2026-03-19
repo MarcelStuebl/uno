@@ -1,6 +1,8 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
+import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
 import htl.steyr.uno.client.Client;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -20,7 +22,6 @@ public class GameTable implements Initializable {
 
     private final Client client;
     @FXML private StackPane root;
-    private Stage stage;
     CardStack centralStack = new CardStack();
 
     public GameTable(Client client) {
@@ -33,7 +34,7 @@ public class GameTable implements Initializable {
             Stage stage = (Stage) root.getScene().getWindow();
             try {
                 open(stage);
-            } catch (InvalidHandException e) {
+            } catch (InvalidHandException | InvalidCardException | InvalidPlayerException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -47,7 +48,7 @@ public class GameTable implements Initializable {
     }
 
 
-    private void open(Stage stage) throws InvalidHandException {
+    private void open(Stage stage) throws InvalidHandException, InvalidCardException, InvalidPlayerException {
         StackPane root = null;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));

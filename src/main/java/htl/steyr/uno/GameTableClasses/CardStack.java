@@ -70,7 +70,7 @@ public class CardStack {
     }
 
 
-    public void layCard(Card c, Button handButton) {
+    public void layCard(Card c, Button handButton, Player p) {
         if (c == null) return;
 
         Card top = getTopCard();
@@ -88,12 +88,11 @@ public class CardStack {
         }
 
 
-
         // check if colour of value matches
         boolean colorMatch = c.getCardColour().equals(top.getCardColour());
         boolean valueMatch = c.getCardValue() == top.getCardValue();
 
-        if (colorMatch || valueMatch) {
+        if ((colorMatch || valueMatch) || p.isCurrentTurn()) {
             // card valid, lay card
             addToStack(c);
 
