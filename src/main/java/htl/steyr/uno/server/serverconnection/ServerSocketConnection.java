@@ -12,9 +12,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.security.SecureRandom;
 
 public class ServerSocketConnection {
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private final Server server;
     private final Socket socket;
     private final ObjectInputStream in;
@@ -146,7 +148,7 @@ public class ServerSocketConnection {
 
     private void createAccountRequest(CreateAccountRequest request) throws SQLException {
         if (request.getCode() == null || createAccountCode == null) {
-            createAccountCode = (int) (Math.random() * 900000) + 100000; // Generate a random 6-digit code
+            createAccountCode = SECURE_RANDOM.nextInt(900000) + 100000; // Generate a random 6-digit code
             MailSender ms = new MailSender();
             ms.sendAuthenticationCode(request.getEmail(), createAccountCode.toString());
         } else {
