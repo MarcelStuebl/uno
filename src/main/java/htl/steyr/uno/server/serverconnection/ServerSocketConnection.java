@@ -283,9 +283,7 @@ public class ServerSocketConnection {
 
     private void startGameRequest(StartGameRequest msg) {
         Lobby lobby = server.getLobbyByConnection(this);
-
         System.out.println(lobby);
-
         lobby.startGame();
     }
 

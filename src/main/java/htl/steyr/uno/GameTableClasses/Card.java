@@ -52,6 +52,11 @@ public class Card {
 
     }
 
+    @Override
+    public String toString() {
+        return getCardColour() + getCardValue() + "";
+    }
+
 
     public int getCardValue() {
         return this.CardValue;

@@ -19,6 +19,7 @@ public class Lobby {
     private Integer status = 0; // 0 = waiting for players, 1 = full, 2 = in game
     private final LobbyInfoResponse lobbyInfoResponse = new LobbyInfoResponse(lobbyId, status);
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
+    private GameLogic gameLogic = new GameLogic(this);
 
 
     /**
@@ -140,6 +141,9 @@ public class Lobby {
         return lobbyInfoResponse;
     }
 
+    public GameLogic getGameLogic() {
+        return gameLogic;
+    }
 
 }
 
