@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -84,6 +85,8 @@ public class LoginController implements Initializable {
     private PasswordField welcomeBackPasswd;
     @FXML
     private TextField welcomeBackUserName;
+    @FXML
+    private HBox rootContainer;
 
     private Client client;
     private String username;
@@ -102,6 +105,7 @@ public class LoginController implements Initializable {
         clientThread.start();
 
         Platform.runLater(() -> {
+            rootContainer.requestFocus();
             loginPane.getScene().getWindow().setOnCloseRequest(event -> {
                 onSceneClose();
             });
@@ -120,6 +124,12 @@ public class LoginController implements Initializable {
         errorLabelCreateAcc.setVisible(false);
     }
 
+    private void resetLoginErrorLabel() {
+        errorLabel.setVisible(false);
+        errorLabel.setText("ERROR!!!");
+        errorLabel.setStyle("-fx-text-fill: #ff5a5a;");
+    }
+
     @FXML
     private void backToLogin() {
         showNewAccScreen.setVisible(false);
@@ -128,7 +138,7 @@ public class LoginController implements Initializable {
         newAccUserName.clear();
         newAccLastName.clear();
         newAccFirstName.clear();
-        errorLabel.setVisible(false);
+        resetLoginErrorLabel();
         errorLabelCreateAcc.setVisible(false);
     }
 
@@ -137,6 +147,7 @@ public class LoginController implements Initializable {
         show2FA.setVisible(false);
         showLoginScreen.setVisible(true);
         twoFACode.clear();
+        resetLoginErrorLabel();
     }
 
     @FXML
@@ -288,6 +299,7 @@ public class LoginController implements Initializable {
         showForgotPassword.setVisible(false);
         showLoginScreen.setVisible(true);
         resetPasswordEmail.clear();
+        resetLoginErrorLabel();
     }
 
     @FXML
@@ -303,6 +315,10 @@ public class LoginController implements Initializable {
         } else {
             client.getConn().requestPasswordReset(email);
         }
+
+        //@ToDo: Wenn email zu schnell hintereinander eingegeben wird, soll label zeigen "Try again later"
+        // zu verwendendes label: errorLabelForgotPassword.setText("To fast! Try again Later");
+
     }
 
     public void forgotPasswordResponse(ForgotPasswordResponse msg) {
@@ -313,10 +329,10 @@ public class LoginController implements Initializable {
             errorLabelReset2FA.setVisible(false);
 
         } else if (msg.getStatus() == 1) {
-            System.out.println("You have already requested a password reset recently. Please wait before trying again.");
-
-
-            // @TODO: Show error message.
+            Platform.runLater(() -> {
+                errorLabelForgotPassword.setText("To fast! Try again later.");
+                errorLabelForgotPassword.setVisible(true);
+            });
         } else if (msg.getStatus() == 2) {
             System.out.println("Wrong code. Please try again.");
 
@@ -398,7 +414,8 @@ public class LoginController implements Initializable {
         showResetPassword2FA.setVisible(false);
         showForgotPassword.setVisible(false);
         resetPassword2FACode.clear();
-        showNewAccScreen.setVisible(true);
+        showLoginScreen.setVisible(true);
+        resetLoginErrorLabel();
     }
 
     @FXML
@@ -408,6 +425,7 @@ public class LoginController implements Initializable {
         newPassword.clear();
         confirmNewPassword.clear();
         resetPasswordEmail.clear();
+        resetLoginErrorLabel();
     }
 
     private void onSceneClose() {
@@ -427,6 +445,7 @@ public class LoginController implements Initializable {
         controller.getClient().setLobbyController(controller);
 
         Scene scene = new Scene(loader.load());
+        UiStyleUtil.applyGlobalFocusStyle(scene);
 
         stage.setTitle("LobbyErstellen");
         stage.setScene(scene);
@@ -444,3 +463,4 @@ public class LoginController implements Initializable {
     }
 
 }
+

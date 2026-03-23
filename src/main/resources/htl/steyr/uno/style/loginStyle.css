@@ -91,6 +91,14 @@
     -fx-padding: 10 12 10 12;
 }
 
+.login:focused {
+    -fx-border-color: #4da3ff;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-radius: 12;
+    -fx-background-insets: 0;
+    -fx-effect: dropshadow(gaussian, rgba(77, 163, 255, 0.35), 10, 0.25, 0, 0);
+}
+
 /* Buttons */
 .loginButton {
     -fx-border-radius: 22;
@@ -98,6 +106,14 @@
     -fx-background-color: rgba(255, 90, 90, 0.95);
     -fx-text-fill: white;
     -fx-font-weight: bold;
+}
+
+.loginButton:focused {
+    -fx-border-color: #4da3ff;
+    -fx-border-width: 2;
+    -fx-border-radius: 22;
+    -fx-background-insets: 0;
+    -fx-effect: dropshadow(gaussian, rgba(77, 163, 255, 0.4), 12, 0.3, 0, 0);
 }
 
 .backButton {
@@ -110,6 +126,14 @@
     -fx-font-size: 11px;
 }
 
+.backButton:focused,
+.minimalistButton:focused,
+.CreateAccButton:focused {
+    -fx-border-color: #4da3ff;
+    -fx-border-width: 0 0 2 0;
+    -fx-effect: dropshadow(gaussian, rgba(77, 163, 255, 0.35), 10, 0.25, 0, 0);
+}
+
 .minimalistButton {
     -fx-background-color: transparent;
     -fx-text-fill: #b5b9c8;
@@ -118,6 +142,7 @@
     -fx-border-width: 0;
 }
 
+/* Create Account Button */
 .CreateAccButton {
     -fx-border-radius: 22;
     -fx-background-radius: 22;
@@ -128,6 +153,7 @@
     -fx-background-color: rgba(0, 0, 0, 0);
 }
 
+/* Error label */
 .errorLabel {
     -fx-text-fill: #ff5a5a;
     -fx-font-weight: bold;

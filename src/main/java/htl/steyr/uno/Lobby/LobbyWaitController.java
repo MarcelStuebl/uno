@@ -3,6 +3,7 @@ package htl.steyr.uno.Lobby;
 import htl.steyr.uno.GameTableClasses.GameTable;
 import htl.steyr.uno.HelloApplication;
 import htl.steyr.uno.LobbyController;
+import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
@@ -204,6 +205,7 @@ public class LobbyWaitController implements Initializable {
         loader.setController(controller);
 
         Scene scene = new Scene(loader.load());
+        UiStyleUtil.applyGlobalFocusStyle(scene);
 
         stage.setScene(scene);
         stage.show();
@@ -224,6 +226,7 @@ public class LobbyWaitController implements Initializable {
         client.setLobbyWaitController(null);
 
         Scene scene = new Scene(loader.load());
+        UiStyleUtil.applyGlobalFocusStyle(scene);
 
         stage.setTitle("WarteLobby");
         stage.setScene(scene);

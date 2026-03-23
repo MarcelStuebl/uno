@@ -1,6 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
+import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -53,7 +54,9 @@ public class GameTable implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));
             root = loader.load();
 
-            stage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            UiStyleUtil.applyGlobalFocusStyle(scene);
+            stage.setScene(scene);
             stage.setTitle("UNO - Game Table");
             stage.setMaximized(true);
             stage.setResizable(true);
