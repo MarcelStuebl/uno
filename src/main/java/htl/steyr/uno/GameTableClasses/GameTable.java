@@ -91,13 +91,21 @@ public class GameTable implements Initializable {
 
 
         StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
-        root.getChildren().add(centralStack.getVisual());
+        pane.getChildren().add(centralStack.getVisual());
 
 
-        player.displayPlayerHand(root, player, centralStack);
+        player.displayPlayerHand(pane, player, centralStack);
+
+        Platform.runLater(() -> {
+            double centerX = root.getWidth() / 2;
+            double centerY = root.getHeight() / 2;
+
+            player.displayEnemies(root, centerX, centerY, 250);
+        });
 
 
-        addCloseButton(root, stage);  //for readabiity
+
+        addCloseButton(pane, stage);  //for readabiity
 
 
     }
