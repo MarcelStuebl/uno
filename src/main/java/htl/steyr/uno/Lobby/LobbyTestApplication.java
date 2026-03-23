@@ -1,6 +1,7 @@
 package htl.steyr.uno.Lobby;
 
 import htl.steyr.uno.HelloApplication;
+import htl.steyr.uno.UiStyleUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,6 +15,7 @@ public class LobbyTestApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("../../../../../resources/htl/steyr/uno/lobby.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        UiStyleUtil.applyGlobalFocusStyle(scene);
         stage.setTitle("Lobby");
         stage.setScene(scene);
         //stage.setFullScreen(true);

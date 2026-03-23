@@ -129,6 +129,7 @@ public class LobbyController implements Initializable {
         client.setLobbyWaitController(controller);
 
         Scene scene = new Scene(loader.load());
+        UiStyleUtil.applyGlobalFocusStyle(scene);
 
         stage.setTitle("WarteLobby");
         stage.setScene(scene);
@@ -147,6 +148,7 @@ public class LobbyController implements Initializable {
         Stage thisStage = (Stage) createPartyButton.getScene().getWindow();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("loginScreen.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        UiStyleUtil.applyGlobalFocusStyle(scene);
         stage.setTitle("UNO-AnmeldeBildschirm");
         stage.setScene(scene);
         stage.setMaximized(true);

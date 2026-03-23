@@ -11,20 +11,22 @@
 
 /* Tisch in der Mitte */
 .table {
-    -fx-background-color: radial-gradient(
-            center 50% 50%, radius 100%,
-            #1e8449 0%,
-            #196f3d 60%,
-            #145a32 100%
-    );
+    /* Mehrschichtiger, moderner Filz-Look mit subtiler Lichtkante */
+    -fx-background-color:
+            linear-gradient(to bottom, rgba(255,255,255,0.16), rgba(255,255,255,0.03)),
+            linear-gradient(to bottom right, #2f8f4f 0%, #267947 45%, #1d643b 100%),
+            radial-gradient(center 35% 28%, radius 80%, rgba(255,255,255,0.10), rgba(255,255,255,0.00) 60%),
+            radial-gradient(center 50% 55%, radius 115%, #1b6039 0%, #12492c 72%, #0d341f 100%);
+    -fx-background-insets: 0, 8, 20, 32;
+    -fx-background-radius: 520, 500, 480, 455;
 
-    -fx-background-radius: 500;
-    -fx-border-radius: 500;
+    /* Aussenring + dunklere Kante fuer mehr Materialtiefe */
+    -fx-border-color: rgba(255,255,255,0.24), rgba(0,0,0,0.34);
+    -fx-border-width: 2, 10;
+    -fx-border-insets: 4, 0;
+    -fx-border-radius: 500, 520;
 
-    -fx-border-color: rgba(255,255,255,0.15);
-    -fx-border-width: 6;
-
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 60, 0.4, 0, 20);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.62), 65, 0.36, 0, 22);
 
     /* Tischgröße */
     -fx-pref-width: 600px;
