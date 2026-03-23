@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -16,9 +17,9 @@ import java.util.Objects;
 
 public class Player {
     private final String username;
-    private final boolean isCurrentTurn;
-    private final ArrayList<Card> hand = new ArrayList<>();
-    private final ArrayList<Enemy> enemies = new ArrayList<>();
+    private boolean isCurrentTurn;
+    private  ArrayList<Card> hand = new ArrayList<>();
+    private  ArrayList<Enemy> enemies = new ArrayList<>();
 
     
     public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies) throws InvalidHandException, InvalidPlayerException {
@@ -29,7 +30,7 @@ public class Player {
         }
         this.hand.addAll(hand);
 
-        if(enemies.size() >= 7){
+        if(enemies.size() > 7){
             throw new InvalidPlayerException("too many or too little Enemies");
         }
         this.enemies.addAll(enemies);
@@ -58,6 +59,9 @@ public class Player {
 
     public boolean isCurrentTurn() {
         return isCurrentTurn;
+    }
+    public void setCurrentTurn(boolean isTurn) {
+        isCurrentTurn = isTurn;
     }
 
     public ArrayList<Enemy> getEnemies() {
@@ -163,7 +167,33 @@ public class Player {
         root.getChildren().add(handBox);
     }
 
+    public void displayEnemies(StackPane root, double centerX, double centerY, double radius) {
 
+        int count = enemies.size();
+
+        double angleStep = 360.0 / count;
+
+        // leicht verschoben damit keiner genau unten sitzt
+        double startAngle = -90 + (angleStep / 2);
+
+        for (int i = 0; i < count; i++) {
+
+            Enemy enemy = enemies.get(i);
+
+            double angleDeg = startAngle + i * angleStep;
+            double angleRad = Math.toRadians(angleDeg);
+
+            double x = centerX + radius * Math.cos(angleRad);
+            double y = centerY + radius * Math.sin(angleRad);
+
+            Pane hand = Enemy.createEnemyHand(enemy, angleRad);
+
+            hand.setLayoutX(x - 50);
+            hand.setLayoutY(y - 50);
+
+            root.getChildren().add(hand);
+        }
+    }
 
 
 

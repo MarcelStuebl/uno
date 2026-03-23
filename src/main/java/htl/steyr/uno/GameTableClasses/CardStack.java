@@ -75,42 +75,46 @@ public class CardStack {
 
         Card top = getTopCard();
 
-        // if no card, just lay card
+        // if it isnt your turn, you cant make a move
+        if (!p.isCurrentTurn()) {
+            shakeHandButton(handButton);
+            return;
+        }
+
+        //if stack is empty, just lay down a card
         if (top == null) {
             addToStack(c);
+            p.setCurrentTurn(false);
             return;
         }
 
-        // always lay black card
-        if (c.getCardColour().equals("black")) {
-            addToStack(c);
-            return;
-        }
-
-
-        // check if colour of value matches
         boolean colorMatch = c.getCardColour().equals(top.getCardColour());
         boolean valueMatch = c.getCardValue() == top.getCardValue();
+        boolean isBlack = c.getCardColour().equals("black");
 
-        if ((colorMatch || valueMatch) || p.isCurrentTurn()) {
-            // card valid, lay card
+        // only lay cards if the rules are correct
+        if (isBlack || colorMatch || valueMatch) {
             addToStack(c);
 
-            // special card testPrint
+            // heres gonna be the logic for telling the server that a special card has been laid
             switch (c.getCardValue()) {
                 case 10 -> System.out.println("Skip");
                 case 11 -> System.out.println("Reverse");
                 case 12 -> System.out.println("+2");
-                case 13 -> System.out.println("pick Colour");
-                case 14 -> System.out.println("+4 and pick Colour");
+                case 13 -> System.out.println("Pick Colour");
+                case 14 -> System.out.println("+4 and Pick Colour");
             }
 
+            // end turn
+            p.setCurrentTurn(false);
+
         } else {
+            // if player tried to lay down a card which is not playable, shake the card that he has clicked
             shakeHandButton(handButton);
         }
     }
 
-   // makes the button that is currently clicked shake if it is layable
+   // logic for the card being shaken
     private void shakeHandButton(Button cardBtn) {
         TranslateTransition tt = new TranslateTransition(Duration.millis(50), cardBtn);
         tt.setFromX(0f);

@@ -49,12 +49,12 @@ public class GameTable implements Initializable {
 
 
     private void open(Stage stage) throws InvalidHandException, InvalidCardException, InvalidPlayerException {
-        StackPane root = null;
+        StackPane pane = null;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));
-            root = loader.load();
+            pane = loader.load();
 
-            stage.setScene(new Scene(root));
+            stage.setScene(new Scene(pane));
             stage.setTitle("UNO - Game Table");
             stage.setMaximized(true);
             stage.setResizable(true);
@@ -85,13 +85,21 @@ public class GameTable implements Initializable {
 
 
         StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
-        root.getChildren().add(centralStack.getVisual());
+        pane.getChildren().add(centralStack.getVisual());
 
 
-        player.displayPlayerHand(root, player, centralStack);
+        player.displayPlayerHand(pane, player, centralStack);
+
+        Platform.runLater(() -> {
+            double centerX = root.getWidth() / 2;
+            double centerY = root.getHeight() / 2;
+
+            player.displayEnemies(root, centerX, centerY, 250);
+        });
 
 
-        addCloseButton(root, stage);  //for readabiity
+
+        addCloseButton(pane, stage);  //for readabiity
 
 
     }
