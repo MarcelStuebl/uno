@@ -1,5 +1,6 @@
 package htl.steyr.uno.server.serverconnection;
 
+import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
@@ -105,6 +106,7 @@ public class ServerSocketConnection {
                         case ForgotPasswordSendCodeRequest msg -> forgotPasswordSendCodeRequest(msg);
                         case ChangePasswordRequest msg -> changePasswordRequest(msg);
                         case CheckIfUserAlreadyExistsRequest msg -> checkIfUserAlreadyExistsRequest(msg);
+                        case StartGameRequest msg -> startGameRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -277,6 +279,14 @@ public class ServerSocketConnection {
         }
 
         sendMessage(new CheckIfUserAlreadyExistsResponse(username, email, userAlreadyExists, emailAlreadyExists));
+    }
+
+    private void startGameRequest(StartGameRequest msg) {
+        Lobby lobby = server.getLobbyByConnection(this);
+
+        if (lobby != null) {
+            lobby.startGame();
+        }
     }
 
 

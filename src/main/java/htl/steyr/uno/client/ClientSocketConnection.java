@@ -85,6 +85,7 @@ public class ClientSocketConnection implements Closeable {
                         case ReceiveChatMessageResponse msg -> receiveChatMessage(msg);
                         case ForgotPasswordResponse msg -> forgotPasswordResponse(msg);
                         case CheckIfUserAlreadyExistsResponse msg -> checkIfUserAlreadyExistsResponse(msg);
+                        case StartGameResponse msg -> startGameResponse(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -234,9 +235,18 @@ public class ClientSocketConnection implements Closeable {
         client.getLoginController().checkIfUserAlreadyExistsResponse(msg);
     }
 
-    public void  checkIfUserAlreadyExists(String username, String email) {
+    public void checkIfUserAlreadyExists(String username, String email) {
         CheckIfUserAlreadyExistsRequest msg = new CheckIfUserAlreadyExistsRequest(username, email);
         sendMessage(msg);
+    }
+
+    public void startGame() {
+        StartGameRequest msg = new StartGameRequest(getUser());
+        sendMessage(msg);
+    }
+
+    public void startGameResponse(StartGameResponse msg) throws IOException {
+        client.getLobbyWaitController().startGameResponse(msg);
     }
 
     /**

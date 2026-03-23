@@ -3,7 +3,9 @@ package htl.steyr.uno.server.serverconnection;
 import htl.steyr.uno.requests.client.SendChatMessageRequest;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
+import htl.steyr.uno.requests.server.StartGameResponse;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +17,7 @@ public class Lobby {
     private final Server server;
     private Integer lobbyId;
     private Integer status = 0; // 0 = waiting for players, 1 = full, 2 = in game
-    private final LobbyInfoResponse lobbyInfoResponse = new LobbyInfoResponse();
+    private final LobbyInfoResponse lobbyInfoResponse = new LobbyInfoResponse(lobbyId, status);
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
 
 
@@ -25,6 +27,7 @@ public class Lobby {
      * If a duplicate ID is generated, the process is repeated until a unique ID is found.
      * The lobby is initialized with a status of 0 (waiting for players) and the lobby information is updated accordingly.
      * The new lobby is then added to the server's list of lobbies.
+     *
      * @param server
      */
     public Lobby(Server server) {
@@ -40,14 +43,16 @@ public class Lobby {
     }
 
     public void updateJoined() {
-        LobbyInfoResponse msg = new LobbyInfoResponse();
-        msg.setLobbyId(lobbyId);
+        checkLobbyInfoResponse();
+        for (var c : connections) c.sendMessage(lobbyInfoResponse);
+    }
 
+    private void checkLobbyInfoResponse() {
+        lobbyInfoResponse.setStatus(status);
         synchronized (connections) {
-            for (var c : connections) msg.addUser(c.getUser());
+            for (var c : connections) lobbyInfoResponse.addUser(c.getUser());
             if (getStatus() != 2) checkStatus();
-            msg.setStatus(getStatus());
-            for (var c : connections) c.sendMessage(msg);
+            lobbyInfoResponse.setStatus(getStatus());
         }
     }
 
@@ -63,7 +68,6 @@ public class Lobby {
         connections.remove(connection);
         updateJoined();
     }
-
 
 
     private void checkStatus() {
@@ -88,13 +92,22 @@ public class Lobby {
     }
 
 
-
     @Override
     public String toString() {
         return "Lobby{" +
                 "lobbyId=" + lobbyId +
                 ", connections=" + connections.size() +
                 '}';
+    }
+
+
+    public void startGame() {
+        setStatus(2);
+        checkLobbyInfoResponse();
+        for (ServerSocketConnection c : connections) {
+            c.sendMessage(new StartGameResponse(lobbyInfoResponse));
+        }
+        updateJoined();
     }
 
 

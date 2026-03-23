@@ -17,6 +17,11 @@ public class LobbyInfoResponse implements Serializable {
      */
     public LobbyInfoResponse() {}
 
+    public LobbyInfoResponse(Integer lobbyId, Integer status) {
+        setLobbyId(lobbyId);
+        setStatus(status);
+    }
+
 
     @Override
     public String toString() {

@@ -6,6 +6,7 @@ import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
+import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -195,12 +196,16 @@ public class LobbyWaitController implements Initializable {
     }
 
     public void playButtonClicked(ActionEvent actionEvent) throws IOException {
+        client.getConn().startGame();
+    }
+
+    public void startGameResponse(StartGameResponse msg) throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) playButton.getScene().getWindow();
 
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("gameTable.fxml"));
 
-        GameTable controller = new GameTable(client);
+        GameTable controller = new GameTable(client, msg);
         loader.setController(controller);
 
         Scene scene = new Scene(loader.load());

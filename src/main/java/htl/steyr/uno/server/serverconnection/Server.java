@@ -1,5 +1,7 @@
 package htl.steyr.uno.server.serverconnection;
 
+import htl.steyr.uno.LobbyController;
+import htl.steyr.uno.requests.client.StartGameRequest;
 import htl.steyr.uno.server.MailSender;
 
 import java.io.IOException;
@@ -108,6 +110,16 @@ public class Server {
 
     public List<Lobby> getLobbies() {
         return lobbies;
+    }
+
+
+    public Lobby getLobbyByConnection(ServerSocketConnection connection) {
+        for (Lobby lobby : lobbies) {
+            if (lobby.getConnections().contains(connection)) {
+                return lobby;
+            }
+        }
+        return null;
     }
 
 

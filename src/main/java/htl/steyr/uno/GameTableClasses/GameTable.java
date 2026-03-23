@@ -4,6 +4,7 @@ import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,9 +24,11 @@ public class GameTable implements Initializable {
     private final Client client;
     @FXML private StackPane root;
     CardStack centralStack = new CardStack();
+    private StartGameResponse startGameResponse;
 
-    public GameTable(Client client) {
+    public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
+        this.startGameResponse = msg;
     }
 
     @Override
