@@ -164,7 +164,16 @@ public class Player {
     }
 
 
-
+    public void addCard(Card card) {
+        this.hand.add(card);
+        sortHand();
+    }
+    public void removeCard(Card card) {
+        this.hand.remove(card);
+    }
+    public ArrayList<Card> getHand() {
+        return this.hand;
+    }
 
 
 
