@@ -284,9 +284,9 @@ public class ServerSocketConnection {
     private void startGameRequest(StartGameRequest msg) {
         Lobby lobby = server.getLobbyByConnection(this);
 
-        if (lobby != null) {
-            lobby.startGame();
-        }
+        System.out.println(lobby);
+
+        lobby.startGame();
     }
 
 

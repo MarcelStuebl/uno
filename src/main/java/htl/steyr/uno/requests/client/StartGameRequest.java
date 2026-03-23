@@ -15,8 +15,8 @@ public class StartGameRequest implements Serializable {
     @Override
     public String toString() {
         return "StartGameRequest{" +
-                "user=" + user +
-                '}';
+                "user='" + getUser().getUsername() +
+                "'}";
     }
 
     public User getUser() {

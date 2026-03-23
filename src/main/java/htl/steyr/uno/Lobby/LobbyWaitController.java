@@ -199,7 +199,7 @@ public class LobbyWaitController implements Initializable {
         client.getConn().startGame();
     }
 
-    public void startGameResponse(StartGameResponse msg) throws IOException {
+    private void startGame(StartGameResponse msg) throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) playButton.getScene().getWindow();
 
@@ -213,6 +213,16 @@ public class LobbyWaitController implements Initializable {
         stage.setScene(scene);
         stage.show();
         thisStage.close();
+    }
+
+    public void startGameResponse(StartGameResponse msg) throws IOException {
+        Platform.runLater(() -> {
+            try {
+                startGame(msg);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public void leaveLobbyButtonClicked(ActionEvent actionEvent) throws IOException {

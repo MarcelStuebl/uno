@@ -2,7 +2,9 @@ package htl.steyr.uno.requests.server;
 
 import htl.steyr.uno.User;
 
-public class StartGameResponse {
+import java.io.Serializable;
+
+public class StartGameResponse implements Serializable {
 
 
     private LobbyInfoResponse lobbyInfoResponse;
@@ -14,8 +16,8 @@ public class StartGameResponse {
     @Override
     public String toString() {
         return "StartGameRequest{" +
-                "user=" + getLobbyInfoResponse().getUsers().getFirst().getUsername() +
-                '}';
+                "user='" + getLobbyInfoResponse().getUsers().getFirst().getUsername() +
+                "'}";
     }
 
     public LobbyInfoResponse getLobbyInfoResponse() {
