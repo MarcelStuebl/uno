@@ -15,17 +15,23 @@ public class Enemy implements Serializable {
     private boolean isCurrentTurn;
     private int handSize;
     private Integer playerIndex;
+    private boolean isPassive = false;
 
 
-    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex) {
+    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex, boolean isPassive) {
         this.username = username;
         this.isCurrentTurn = isCurrentTurn;
         this.handSize = cardCount;
         this.playerIndex = playerIndex;
+        this.isPassive = isPassive;
     }
 
     public Enemy(Player player) {
-        new Enemy(player.getUsername(), player.isCurrentTurn(), player.getHand().size(), player.getPlayerIndex());
+        this(player.getUsername(), player.isCurrentTurn(), player.getHand().size(), player.getPlayerIndex(), player.isPassive());
+    }
+
+    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex) {
+        this(username, isCurrentTurn, cardCount, playerIndex, false);
     }
 
     public String getUsername() {

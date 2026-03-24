@@ -22,22 +22,28 @@ public class Player implements Serializable {
     private final ArrayList<Enemy> enemies = new ArrayList<>();
     private final Integer playerIndex;
     private boolean isReady = false;
+    private boolean isPassive = false;
 
-    
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex) throws InvalidHandException, InvalidPlayerException {
+
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, boolean isPassive) throws InvalidHandException, InvalidPlayerException {
         this.username = username;
         this.isCurrentTurn = isCurrentTurn;
-        if(hand.size() != 7){
+        if (hand.size() != 7) {
             throw new InvalidHandException("too many or too little Cards");
         }
         this.hand.addAll(hand);
 
-        if(enemies.size() >= 7){
+        if (enemies.size() >= 7) {
             throw new InvalidPlayerException("too many or too little Enemies");
         }
         this.enemies.addAll(enemies);
         this.playerIndex = playerIndex;
+        this.isPassive = isPassive;
         sortHand();
+    }
+
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex) throws InvalidHandException, InvalidPlayerException {
+        this(username, isCurrentTurn, hand, enemies, playerIndex, false);
     }
 
 
@@ -53,9 +59,11 @@ public class Player implements Serializable {
         this.hand.clear();
         this.hand.addAll(arr);
     }
+
     public void addCardToHand(Card card) {
         this.hand.add(card);
     }
+
     public void removeCardFromHand(Card card) {
         this.hand.remove(card);
     }
@@ -88,16 +96,20 @@ public class Player implements Serializable {
 
     private int getColorOrder(String color) {
         switch (color) {
-            case "red": return 0;
-            case "green": return 1;
-            case "yellow": return 2;
-            case "blue": return 3;
-            case "black": return 4;
-            default: return 5;
+            case "red":
+                return 0;
+            case "green":
+                return 1;
+            case "yellow":
+                return 2;
+            case "blue":
+                return 3;
+            case "black":
+                return 4;
+            default:
+                return 5;
         }
     }
-
-
 
 
     public void displayPlayerHand(StackPane root, Player player, CardStack middleCardStack) {
@@ -184,8 +196,16 @@ public class Player implements Serializable {
     public boolean isReady() {
         return isReady;
     }
+
     public void setReady(boolean ready) {
         isReady = ready;
     }
 
+    public boolean isPassive() {
+        return isPassive;
+    }
+
+    public void setPassive(boolean passive) {
+        isPassive = passive;
+    }
 }
