@@ -1,21 +1,14 @@
 package htl.steyr.uno.server.serverconnection;
 
-import htl.steyr.uno.GameTableClasses.Card;
-import htl.steyr.uno.GameTableClasses.Enemy;
-import htl.steyr.uno.GameTableClasses.Player;
-import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
-import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
-import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
+import htl.steyr.uno.GameTableClasses.*;
+import htl.steyr.uno.GameTableClasses.exceptions.*;
 import htl.steyr.uno.User;
-import htl.steyr.uno.requests.client.CardPlayedRequest;
-import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
-import htl.steyr.uno.requests.client.RequestCardRequest;
-import htl.steyr.uno.requests.server.CardAddResponse;
-import htl.steyr.uno.requests.server.CardPlayedResponse;
-import htl.steyr.uno.requests.server.PlayerGetResponse;
+import htl.steyr.uno.requests.client.*;
+import htl.steyr.uno.requests.server.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GameLogic {
 
@@ -23,6 +16,7 @@ public class GameLogic {
     private ArrayList<Player> players = new ArrayList<>();
     private Integer currentPlayerIndex = 0;
     private boolean directionClockwise = true;
+    private final Random random = new Random();
 
 
     public GameLogic(Lobby lobby) {
@@ -38,17 +32,28 @@ public class GameLogic {
      * The methods in this class should interact with the Lobby and Player classes to manage the game state and communicate with the clients as needed.
      */
     public void createGame(List<User> users) {
+        players.clear();
+        currentPlayerIndex = 0;
+        directionClockwise = true;
+
         int playerIndex = 0;
         for (User user : users) {
+            if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
+                continue;
+            }
+
+            ArrayList<Card> hand = new ArrayList<>();
+            for (int i = 0; i < 7; i++) {
+                hand.add(generateCard());
+            }
+
             Player player;
             try {
-                player = new Player(user.getUsername(), false, new ArrayList<>(), new ArrayList<>(), playerIndex);
+                player = new Player(user.getUsername(), false, hand, new ArrayList<>(), playerIndex);
             } catch (InvalidHandException | InvalidPlayerException e) {
                 throw new RuntimeException(e);
             }
-            for (int i = 0; i < 7; i++) {
-                player.addCardToHand(generateCard());
-            }
+
             players.add(player);
             playerIndex++;
         }
@@ -92,10 +97,21 @@ public class GameLogic {
      * This method should send a PlayerGetResponse to each player with their initial hand of cards and any relevant game information.
      */
     public void startGame(){
+        if (lobby == null || lobby.getConnections() == null || players.isEmpty()) {
+            return;
+        }
+
         for (Player player : players) {
+            if (player == null || player.getUsername() == null) {
+                continue;
+            }
             for (ServerSocketConnection c : lobby.getConnections()) {
+                if (c == null || c.getUser() == null || c.getUser().getUsername() == null) {
+                    continue;
+                }
                 if (c.getUser().getUsername().equals(player.getUsername())) {
                     c.sendMessage(new PlayerGetResponse(player));
+                    break;
                 }
             }
         }
@@ -109,19 +125,22 @@ public class GameLogic {
      * @return A randomly generated Card object for use in the game.
      */
     private Card generateCard() {
-        int value = (int) (Math.random() * 15);
+        int value = random.nextInt(15); // 0–14
         String colour;
-        switch ((int) (Math.random() * 4)) {
-            case 0 -> colour = "yellow";
-            case 1 -> colour = "green";
-            case 2 -> colour = "blue";
-            case 3 -> colour = "red";
-            default -> throw new IllegalStateException("Unexpected value: " + (int) (Math.random() * 4));
+
+        if (value == 13 || value == 14) {
+            // Spezialkarten sind immer schwarz
+            colour = "black";
+        } else {
+            // Normale Farben
+            String[] colors = {"yellow", "green", "blue", "red"};
+            colour = colors[random.nextInt(colors.length)];
         }
+
         try {
             return new Card(value, colour);
         } catch (InvalidCardException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error generating valid card", e);
         }
     }
 
@@ -165,9 +184,17 @@ public class GameLogic {
     }
 
     private void updatePlayer(Player player) {
+        if (player == null || player.getUsername() == null || lobby == null || lobby.getConnections() == null) {
+            return;
+        }
+
         for (ServerSocketConnection c : lobby.getConnections()) {
+            if (c == null || c.getUser() == null || c.getUser().getUsername() == null) {
+                continue;
+            }
             if (c.getUser().getUsername().equals(player.getUsername())) {
                 c.sendMessage(new PlayerGetResponse(player));
+                break;
             }
         }
     }
@@ -175,10 +202,18 @@ public class GameLogic {
 
 
     private void addCardsToPlayer(Player player, Card card) {
+        if (player == null || player.getUsername() == null || card == null || lobby == null || lobby.getConnections() == null) {
+            return;
+        }
+
         player.addCardToHand(card);
         for (ServerSocketConnection c : lobby.getConnections()) {
+            if (c == null || c.getUser() == null || c.getUser().getUsername() == null) {
+                continue;
+            }
             if (c.getUser().getUsername().equals(player.getUsername())) {
                 c.sendMessage(new CardAddResponse(card));
+                break;
             }
         }
     }

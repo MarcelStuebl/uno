@@ -55,7 +55,11 @@ public class LobbyWaitController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Platform.runLater(() -> playButton.getScene().getWindow().setOnCloseRequest(event -> onSceneClose()));
+        Platform.runLater(() -> {
+            if (playButton.getScene() != null && playButton.getScene().getWindow() != null) {
+                playButton.getScene().getWindow().setOnCloseRequest(event -> onSceneClose());
+            }
+        });
 
         String lobbyCode = lobby.getLobbyId().toString();
         lobbyCodeLabel.setText("Lobby Code: " + lobbyCode);

@@ -2,7 +2,9 @@ package htl.steyr.uno.requests.client;
 
 import htl.steyr.uno.GameTableClasses.Player;
 
-public class ReadyInGameTableRequest {
+import java.io.Serializable;
+
+public class ReadyInGameTableRequest implements Serializable {
 
     private Player player;
 
