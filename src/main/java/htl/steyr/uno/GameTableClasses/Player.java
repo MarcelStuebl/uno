@@ -76,8 +76,13 @@ public class Player implements Serializable {
         return this.enemies;
     }
 
-    public Enemy getEnemy(int index) {
-        return this.enemies.get(index);
+    public Enemy getEnemyByUsername(String username) {
+        for (Enemy e : this.enemies) {
+            if (e.getUsername().equals(username)) {
+                return e;
+            }
+        }
+        return null;
     }
 
     private void sortHand() {

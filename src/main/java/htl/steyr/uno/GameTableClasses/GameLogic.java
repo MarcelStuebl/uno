@@ -66,21 +66,22 @@ public class GameLogic {
      * @param msg The CardPlayedResponse message containing information about the card that was played and the player who played it.
      */
     public void cardPlayedResponse(CardPlayedResponse msg) {
-        Card card = msg.getCard();
         Enemy enemy = msg.getEnemy();
 
         if (!enemy.getUsername().equals(getGameTable().getPlayer().getUsername())) {
             for (Enemy e : getGameTable().getPlayer().getEnemies()) {
                 if (e.getUsername().equals(enemy.getUsername())) {
-                    e.decrementCardCount(1);
+                    getGameTable().getPlayer().getEnemyByUsername(enemy.getUsername()).setEnemy(enemy);
                     break;
                 }
             }
+        } else {
+            getGameTable().getPlayer().setPassive(enemy.isPassive());
         }
 
+        Card card = msg.getCard();
         Integer nextPlayerIndex = msg.getNextPlayerIndex();
         // @TODO: Update the UI to reflect the card that was played and any changes to the game state (e.g., next player's turn)
-
     }
 
 
@@ -88,10 +89,10 @@ public class GameLogic {
      * Handles the logic for when a player requests to draw a card from the central stack.
      * This method should send a RequestCardRequest to the server with the number of cards the player wants to draw.
      *
-     * @param ammount The number of cards the player is requesting to draw.
+     * @param amount The number of cards the player is requesting to draw.
      */
-    public void requestCard(int ammount) {
-        getGameTable().getClient().getConn().sendMessage(new RequestCardRequest(gameTable.getPlayer(), ammount));
+    public void requestCard(int amount) {
+        getGameTable().getClient().getConn().sendMessage(new RequestCardRequest(gameTable.getPlayer(), amount));
     }
 
 

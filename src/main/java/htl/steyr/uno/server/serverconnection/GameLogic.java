@@ -155,11 +155,21 @@ public class GameLogic {
 
         currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
 
+        checkForWinner(player);
+
         CardPlayedResponse response = new CardPlayedResponse(card, player, currentPlayerIndex);
         for (ServerSocketConnection c : lobby.getConnections()) {
             c.sendMessage(response);
         }
 
+    }
+
+    private void updatePlayer(Player player) {
+        for (ServerSocketConnection c : lobby.getConnections()) {
+            if (c.getUser().getUsername().equals(player.getUsername())) {
+                c.sendMessage(new PlayerGetResponse(player));
+            }
+        }
     }
 
 
@@ -185,6 +195,12 @@ public class GameLogic {
     }
 
 
+    private void checkForWinner(Player player) {
+        if (player.getHand().isEmpty()) {
+            player.setPassive(true);
+            updatePlayer(player);
+        }
+    }
 
 
 

@@ -61,6 +61,22 @@ public class Enemy implements Serializable {
         this.handSize -= count;
     }
 
+    public Integer getPlayerIndex() {
+        return playerIndex;
+    }
+
+    public boolean isPassive() {
+        return isPassive;
+    }
+
+    public void setEnemy(Enemy enemy) {
+        this.username = enemy.getUsername();
+        this.isCurrentTurn = enemy.isCurrentTurn();
+        this.handSize = enemy.getHandSize();
+        this.playerIndex = enemy.getPlayerIndex();
+        this.isPassive = enemy.isPassive();
+    }
+
 
 
 
