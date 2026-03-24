@@ -269,6 +269,22 @@ public class LoginController implements Initializable {
         Platform.runLater(this::backToLogin);
     }
 
+    public void createAccountFailedResponse(CreateAccountFailedResponse msg) {
+        if (msg.getStatus() == 1) {
+            Platform.runLater(() -> {
+                errorLabelCreateAcc.setText("Username already exists!");
+                errorLabelCreateAcc.setVisible(true);
+            });
+        } else if (msg.getStatus() == 2) {
+            Platform.runLater(() -> {
+                errorLabelCreateAcc.setText("Verification code is incorrect!");
+                errorLabelCreateAcc.setVisible(true);
+            });
+        }
+
+        // @TODO: Check if this is right
+    }
+
     public void logInSuccess(User user) {
         Platform.runLater(() -> {
             try {

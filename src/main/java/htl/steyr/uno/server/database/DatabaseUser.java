@@ -2,9 +2,7 @@ package htl.steyr.uno.server.database;
 
 import htl.steyr.uno.server.PasswordUtil;
 import htl.steyr.uno.User;
-import htl.steyr.uno.server.exceptions.user.InvalidPasswordException;
-import htl.steyr.uno.server.exceptions.user.UserAlreadyExistsException;
-import htl.steyr.uno.server.exceptions.user.UserNotFoundException;
+import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
 
 import java.sql.*;
 
@@ -15,7 +13,6 @@ public class DatabaseUser {
      * @param username The username of the user to retrieve.
      * @return A User object representing the user.
      * @throws SQLException if a database access error occurs.
-     * @throws UserNotFoundException if no user with the given username is found.
      */
     public User getUserPerUserName(String username) throws SQLException {
         String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, password_hash, password_salt FROM user WHERE username = ?";
@@ -52,7 +49,6 @@ public class DatabaseUser {
      * @param password The password to verify against the stored hash and salt.
      * @return A User object representing the user if the password is correct.
      * @throws SQLException if a database access error occurs.
-     * @throws InvalidPasswordException if the provided password is incorrect.
      */
     public User getUserPerUserName(String username, String password) throws SQLException {
         User user = getUserPerUserName(username);
@@ -65,7 +61,12 @@ public class DatabaseUser {
     }
 
 
-
+    /**
+     * Retrieves a user by their email from the database.
+     * @param email The email of the user to retrieve.
+     * @return A User object representing the user.
+     * @throws SQLException if a database access error occurs.
+     */
     public User getUserPerEmail(String email) throws SQLException {
         String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login FROM user WHERE email = ?";
 
@@ -93,6 +94,13 @@ public class DatabaseUser {
     }
 
 
+    /**
+     * Updates the password for a user in the database.
+     * @param username The username of the user whose password is to be updated.
+     * @param newPassword The new password to be set for the user.
+     * @return A User object representing the updated user.
+     * @throws SQLException if a database access error occurs.
+     */
     public User updatePassword(String username, String newPassword) throws SQLException {
         String salt = PasswordUtil.generateSalt();
         String hash = PasswordUtil.hashPassword(newPassword, salt);
@@ -128,8 +136,9 @@ public class DatabaseUser {
      * Adds a new user to the database.
      * @param user The User object to be added.
      * @throws SQLException if a database access error occurs.
+     * @throws UserAlreadyExistsException if a user with the same username already exists in the database.
      */
-    public void addUser(User user) throws SQLException {
+    public void addUser(User user) throws SQLException, UserAlreadyExistsException {
         if (userExists(user)) {
             throw new UserAlreadyExistsException(user.getUsername());
         }

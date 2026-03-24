@@ -1,11 +1,11 @@
 package htl.steyr.uno.server.serverconnection;
 
-import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
 import htl.steyr.uno.server.MailSender;
 import htl.steyr.uno.server.database.DatabaseUser;
+import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -154,14 +154,23 @@ public class ServerSocketConnection {
             MailSender ms = new MailSender();
             ms.sendAuthenticationCode(request.getEmail(), createAccountCode.toString());
         } else {
-            if (!request.getCode().equals(createAccountCode)) {
-                sendMessage(new CreateAccountFailedResponse());
+            User user = new User(request.getUsername(), request.getLastName(), request.getFirstName(), request.getEmail(), request.getPassword());
+            DatabaseUser db1 = new DatabaseUser();
+            if (db1.userExists(user)) {
+                sendMessage(new CreateAccountFailedResponse(1));
             } else {
-                User user = new User(request.getUsername(), request.getLastName(), request.getFirstName(), request.getEmail(), request.getPassword());
-                DatabaseUser db = new DatabaseUser();
-                db.addUser(user);
-                User createdUser = db.getUserPerUserName(request.getUsername(), request.getPassword());
-                sendMessage(new CreateAccountSuccessResponse(createdUser));
+                if (!request.getCode().equals(createAccountCode)) {
+                    sendMessage(new CreateAccountFailedResponse(2));
+                } else {
+                    DatabaseUser db = new DatabaseUser();
+                    try {
+                        db.addUser(user);
+                    } catch (UserAlreadyExistsException e) {
+                        sendMessage(new CreateAccountFailedResponse(1));
+                    }
+                    User createdUser = db.getUserPerUserName(request.getUsername(), request.getPassword());
+                    sendMessage(new CreateAccountSuccessResponse(createdUser));
+                }
             }
         }
     }

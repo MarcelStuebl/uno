@@ -86,6 +86,7 @@ public class ClientSocketConnection implements Closeable {
                         case ForgotPasswordResponse msg -> forgotPasswordResponse(msg);
                         case CheckIfUserAlreadyExistsResponse msg -> checkIfUserAlreadyExistsResponse(msg);
                         case StartGameResponse msg -> startGameResponse(msg);
+                        case CreateAccountFailedResponse msg -> createAccountFailedResponse(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -191,9 +192,12 @@ public class ClientSocketConnection implements Closeable {
         System.out.println("Joined lobby successfully.");
     }
 
-
     private void createAccountSuccess(CreateAccountSuccessResponse msg) {
         client.getLoginController().createAccountSuccess(msg);
+    }
+
+    private void createAccountFailedResponse(CreateAccountFailedResponse msg) {
+        client.getLoginController().createAccountFailedResponse(msg);
     }
 
     public void leaveLobby() {
