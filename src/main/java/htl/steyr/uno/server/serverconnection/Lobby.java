@@ -51,6 +51,7 @@ public class Lobby {
     private void checkLobbyInfoResponse() {
         lobbyInfoResponse.setStatus(status);
         synchronized (connections) {
+            lobbyInfoResponse.clearUsers();
             for (var c : connections) lobbyInfoResponse.addUser(c.getUser());
             if (getStatus() != 2) checkStatus();
             lobbyInfoResponse.setStatus(getStatus());
@@ -147,7 +148,4 @@ public class Lobby {
     }
 
 }
-
-
-
 

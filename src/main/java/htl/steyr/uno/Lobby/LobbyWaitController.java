@@ -148,13 +148,9 @@ public class LobbyWaitController implements Initializable {
         gameChatTextField.setOnMouseClicked(e -> chatExpanded.set(!chatExpanded.get()));
 
         updateLobbyInfo();
-
-        System.out.println("Es geht:\n" + client.getConn().getUser());
-        System.out.println("Lobby:\n" + lobby);
     }
 
     public void updateLobbyInfo() {
-        System.out.println("Lobby Info Updated: " + lobby);
         String currentUsername = client.getConn().getUser().getUsername();
 
         playerListView.getItems().clear();

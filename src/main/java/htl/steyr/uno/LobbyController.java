@@ -79,7 +79,6 @@ public class LobbyController implements Initializable {
      */
     @FXML
     private void onCreatePartyButtonClicked(ActionEvent actionEvent) {
-        System.out.println(client.getConn().getUser());
         client.createLobby();
     }
 
