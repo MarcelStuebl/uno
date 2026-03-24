@@ -4,17 +4,17 @@ import htl.steyr.uno.GameTableClasses.Card;
 
 import java.io.Serializable;
 
-public class AddCardResponse implements Serializable {
+public class CardRemoveResponse implements Serializable {
 
     private Card card;
 
-    public AddCardResponse(Card card) {
+    public CardRemoveResponse(Card card) {
         setCard(card);
     }
 
     @Override
     public String toString(){
-        return "AddCardResponse{" +
+        return "RemoveCardResponse{" +
                 "card='" + card +
                 "'}";
     }

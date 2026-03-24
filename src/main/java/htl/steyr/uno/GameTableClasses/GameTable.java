@@ -26,10 +26,12 @@ public class GameTable implements Initializable {
     @FXML private StackPane root;
     CardStack centralStack = new CardStack();
     private StartGameResponse startGameResponse;
+    private final GameLogic gameLogic;
 
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
         this.startGameResponse = msg;
+        gameLogic = new GameLogic(this);
     }
 
     @Override
@@ -46,6 +48,7 @@ public class GameTable implements Initializable {
     }
 
     private void onSceneClose() {
+        client.setGameTable(null);
         if (client.getConn() != null) {
             client.getConn().close();
         }
@@ -126,4 +129,11 @@ public class GameTable implements Initializable {
 
         root.getChildren().add(closeBtn);
     }
+
+
+    public GameLogic getGameLogic() {
+        return gameLogic;
+    }
+
+
 }

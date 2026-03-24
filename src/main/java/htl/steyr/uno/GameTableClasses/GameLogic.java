@@ -1,40 +1,55 @@
 package htl.steyr.uno.GameTableClasses;
 
-import javafx.stage.Stage;
-
-import java.util.ArrayList;
+import htl.steyr.uno.requests.server.CardAddResponse;
+import htl.steyr.uno.requests.server.CardRemoveResponse;
 
 public class GameLogic {
 
-    public static void endGame(Player player, Stage stage) {
-     stage.close();
-     //no idea what happens after the game ends but heres gonna be the code for it
+    private GameTable gameTable;
 
-
-
+    /**
+     * The GameLogic class is responsible for handling the core game mechanics and rules.
+     * It processes incoming messages related to card additions and removals, and updates the game state accordingly.
+     * This class interacts with the GameTable to reflect changes in the game state visually and logically.
+     */
+    public GameLogic(GameTable gameTable) {
+        setGameTable(gameTable);
     }
 
-    public static void drawFourCards(Player player){
-       //logic for drawing four cards (card can only be +4 AND colour chooseable)
 
-
-
-
-        chooseColour();
+    /**
+     * Handles the logic for when a card is added to the central stack.
+     * This method should update the game state and UI to reflect the new card on the stack.
+     *
+     * @param msg The CardAddResponse message containing information about the card that was added.
+     */
+    public void cardAddResponse(CardAddResponse msg) {
+        // @TODO: Implement logic for when a card is added to the central stack
     }
 
-    public static void blockNextPlayer(Player player){
-            //ask server whose turn it currently is. then tell server to block the next player in line
-        }
 
-    public static void chooseColour(){
-        //logic for picking what Colour the player can / cant use on their next turn
-        //should be programmed so that it can be used for drawFourCards aswell
-
+    /**
+     * Handles the logic for when a card is removed from the central stack.
+     * This method should update the game state and UI to reflect the removed card from the stack.
+     *
+     * @param msg The CardRemoveResponse message containing information about the card that was removed.
+     */
+    public void cardRemoveResponse(CardRemoveResponse msg) {
+        // @TODO: Implement logic for when a card is removed from the central stack
     }
 
+
+
+
+
+
+
+
+    public GameTable getGameTable() {
+        return gameTable;
+    }
+    public void setGameTable(GameTable gameTable) {
+        this.gameTable = gameTable;
+    }
 
 }
-
-
-

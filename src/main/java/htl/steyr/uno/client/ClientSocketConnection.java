@@ -87,6 +87,8 @@ public class ClientSocketConnection implements Closeable {
                         case CheckIfUserAlreadyExistsResponse msg -> checkIfUserAlreadyExistsResponse(msg);
                         case StartGameResponse msg -> startGameResponse(msg);
                         case CreateAccountFailedResponse msg -> createAccountFailedResponse(msg);
+                        case CardAddResponse msg -> cardAddResponse(msg);
+                        case CardRemoveResponse msg -> cardRemoveResponse(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -249,8 +251,16 @@ public class ClientSocketConnection implements Closeable {
         sendMessage(msg);
     }
 
-    public void startGameResponse(StartGameResponse msg) throws IOException {
+    private void startGameResponse(StartGameResponse msg) throws IOException {
         client.getLobbyWaitController().startGameResponse(msg);
+    }
+
+    private void cardAddResponse(CardAddResponse msg) {
+        client.getGameTable().getGameLogic().cardAddResponse(msg);
+    }
+
+    private void cardRemoveResponse(CardRemoveResponse msg) {
+        client.getGameTable().getGameLogic().cardRemoveResponse(msg);
     }
 
     /**

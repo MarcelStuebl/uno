@@ -5,8 +5,8 @@ import htl.steyr.uno.GameTableClasses.Player;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
-import htl.steyr.uno.requests.server.AddCardResponse;
-import htl.steyr.uno.requests.server.RemoveCardResponse;
+import htl.steyr.uno.requests.server.CardAddResponse;
+import htl.steyr.uno.requests.server.CardRemoveResponse;
 
 import java.util.ArrayList;
 
@@ -56,7 +56,7 @@ public class GameLogic {
         player.addCardToHand(card);
         for (ServerSocketConnection c : lobby.getConnections()) {
             if (c.getUser().getUsername().equals(player.getUsername())) {
-                c.sendMessage(new AddCardResponse(card));
+                c.sendMessage(new CardAddResponse(card));
             }
         }
     }
@@ -65,7 +65,7 @@ public class GameLogic {
         player.removeCardFromHand(card);
         for (ServerSocketConnection c : lobby.getConnections()) {
             if (c.getUser().getUsername().equals(player.getUsername())) {
-                c.sendMessage(new RemoveCardResponse(card));
+                c.sendMessage(new CardRemoveResponse(card));
             }
         }
     }
