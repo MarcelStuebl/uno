@@ -21,6 +21,7 @@ public class Player implements Serializable {
     private final ArrayList<Card> hand = new ArrayList<>();
     private final ArrayList<Enemy> enemies = new ArrayList<>();
     private final Integer playerIndex;
+    private boolean isReady = false;
 
     
     public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex) throws InvalidHandException, InvalidPlayerException {
@@ -178,6 +179,13 @@ public class Player implements Serializable {
 
     public Integer getPlayerIndex() {
         return playerIndex;
+    }
+
+    public boolean isReady() {
+        return isReady;
+    }
+    public void setReady(boolean ready) {
+        isReady = ready;
     }
 
 }

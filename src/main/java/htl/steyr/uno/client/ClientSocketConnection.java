@@ -74,15 +74,13 @@ public class ClientSocketConnection implements Closeable {
                      * etc. If an unknown message type is received, it will print a message to the console.
                      */
                     switch (obj) {
-                        case LoginSuccessResponse msg -> logInSuccess(msg);
-                        case LoginFailedResponse msg -> logInFailed(msg);
-                        case LobbyInfoResponse msg -> gotLobby(msg);
-                        case JoinLobbySuccessResponse msg -> joinLobbySuccess(msg);
-                        case LobbyNotFoundResponse msg -> lobbyNotFound(msg);
-                        case LobbyJoinRefusedResponse msg -> lobbyJoinRefused(msg);
-                        case CreateLobbySuccessResponse msg -> createLobbySuccess(msg);
-                        case CreateAccountSuccessResponse msg -> createAccountSuccess(msg);
-                        case ReceiveChatMessageResponse msg -> receiveChatMessage(msg);
+                        case LoginSuccessResponse msg -> logInSuccessResponse(msg);
+                        case LoginFailedResponse msg -> logInFailedResponse(msg);
+                        case LobbyInfoResponse msg -> lobbyInfoResponse(msg);
+                        case LobbyNotFoundResponse msg -> lobbyNotFoundResponse(msg);
+                        case LobbyJoinRefusedResponse msg -> lobbyJoinRefusedResponse(msg);
+                        case CreateAccountSuccessResponse msg -> createAccountSuccessResponse(msg);
+                        case ReceiveChatMessageResponse msg -> receiveChatMessageResponse(msg);
                         case ForgotPasswordResponse msg -> forgotPasswordResponse(msg);
                         case CheckIfUserAlreadyExistsResponse msg -> checkIfUserAlreadyExistsResponse(msg);
                         case StartGameResponse msg -> startGameResponse(msg);
@@ -92,8 +90,6 @@ public class ClientSocketConnection implements Closeable {
                         case CardPlayedResponse msg -> cardPlayedResponse(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
-
-
                 }
             } catch (Exception e) {
                 if (running) System.out.println("Receive error: " + e.getMessage());
@@ -115,37 +111,16 @@ public class ClientSocketConnection implements Closeable {
 
 
 
-    /**
-     * Handles a successful login response from the server by updating the user information
-     * and prompting the client to join or create a lobby.
-     *
-     * @param msg the login success response containing user information
-     */
-    private void logInSuccess(LoginSuccessResponse msg) {
+    private void logInSuccessResponse(LoginSuccessResponse msg) {
         this.user = msg.getUser();
         client.getLoginController().logInSuccess(user);
     }
 
-
-    /**
-     * Handles a failed login response from the server by notifying the user and prompting
-     * them to try logging in again.
-     *
-     * @param msg the login failed response containing error information
-     */
-    private void logInFailed(LoginFailedResponse msg) {
+    private void logInFailedResponse(LoginFailedResponse msg) {
         client.getLoginController().logInFailed(msg);
     }
 
-
-    /**
-     * Handles a lobby information response from the server by updating the lobby state
-     * and displaying the lobby details. If the lobby information is invalid, it prompts
-     * the client to join or create a lobby again.
-     *
-     * @param msg the lobby information response containing details about the lobby
-     */
-    private void gotLobby(LobbyInfoResponse msg) {
+    private void lobbyInfoResponse(LobbyInfoResponse msg) {
         this.lobby = msg;
 
         if (msg.getUsers() != null) {
@@ -159,55 +134,15 @@ public class ClientSocketConnection implements Closeable {
         }
     }
 
-
-    /**
-     * Handles a lobby not found response from the server by notifying the user and prompting
-     * them to join or create a lobby again.
-     *
-     * @param msg the lobby not found response indicating that the specified lobby does not exist
-     */
-    private void lobbyNotFound(LobbyNotFoundResponse msg) {
+    private void lobbyNotFoundResponse(LobbyNotFoundResponse msg) {
         client.getLobbyController().lobbyNotFound();
     }
 
-
-    /**
-     * Handles a lobby join refused response from the server by checking the status of the lobby
-     * and notifying the user accordingly. It then prompts the client to join or create a lobby again.
-     *
-     * @param msg the lobby join refused response containing information about why the join request was refused
-     */
-    private void lobbyJoinRefused(LobbyJoinRefusedResponse msg) {
-        if (msg.getLobbyInfo().getStatus() == 1) {
-            System.out.println("Lobby is full. Please try again.");
-        } else if (msg.getLobbyInfo().getStatus() == 2) {
-            System.out.println("Game already started. Please try again.");
-        } else {
-            System.out.println("Unknown error. Please try again.");
-        }
+    private void lobbyJoinRefusedResponse(LobbyJoinRefusedResponse msg) {
+        client.getLobbyController().joinPartyFailed(msg);
     }
 
-
-    /**
-     * Handles a successful lobby creation response from the server by notifying the user.
-     *
-     * @param msg the create lobby success response indicating that the lobby was created successfully
-     */
-    private void createLobbySuccess(CreateLobbySuccessResponse msg) {
-        System.out.println("Lobby created successfully.");
-    }
-
-
-    /**
-     * Handles a successful lobby join response from the server by notifying the user.
-     *
-     * @param msg the join lobby success response indicating that the lobby was joined successfully
-     */
-    private void joinLobbySuccess(JoinLobbySuccessResponse msg) {
-        System.out.println("Joined lobby successfully.");
-    }
-
-    private void createAccountSuccess(CreateAccountSuccessResponse msg) {
+    private void createAccountSuccessResponse(CreateAccountSuccessResponse msg) {
         client.getLoginController().createAccountSuccess(msg);
     }
 
@@ -215,15 +150,7 @@ public class ClientSocketConnection implements Closeable {
         client.getLoginController().createAccountFailedResponse(msg);
     }
 
-    public void leaveLobby() {
-        if (lobby != null) {
-            lobby = null;
-            LeaveLobbyRequest msg = new LeaveLobbyRequest(getUser());
-            sendMessage(msg);
-        }
-    }
-
-    private void receiveChatMessage(ReceiveChatMessageResponse msg) {
+    private void receiveChatMessageResponse(ReceiveChatMessageResponse msg) {
         if (client.getLobbyWaitController() != null) {
             client.getLobbyWaitController().receiveChatMessage(msg);
         } else if (client.getLobbyController() != null) {
@@ -256,9 +183,14 @@ public class ClientSocketConnection implements Closeable {
     }
 
 
+
+
     /**
      * End of the response handler methods.
      */
+
+
+
 
 
     /**
@@ -288,7 +220,6 @@ public class ClientSocketConnection implements Closeable {
         sendMessage(msg);
     }
 
-
     public void checkIfUserAlreadyExists(String username, String email) {
         CheckIfUserAlreadyExistsRequest msg = new CheckIfUserAlreadyExistsRequest(username, email);
         sendMessage(msg);
@@ -300,9 +231,31 @@ public class ClientSocketConnection implements Closeable {
     }
 
 
+
+
+
     /**
      * End of the request sending methods.
      */
+
+
+
+
+
+
+    /**
+     * Handles the logic for leaving a lobby by sending a leave lobby request to the server and updating the client state.
+     * This method is typically called when the user chooses to leave the lobby, either by clicking a "Leave Lobby" button
+     * or by closing the lobby window. It ensures that the server is notified of the user's departure and that the client
+     * state is updated accordingly.
+     */
+    public void leaveLobby() {
+        if (lobby != null) {
+            lobby = null;
+            LeaveLobbyRequest msg = new LeaveLobbyRequest(getUser());
+            sendMessage(msg);
+        }
+    }
 
 
     /**

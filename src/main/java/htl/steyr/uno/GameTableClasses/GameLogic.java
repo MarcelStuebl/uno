@@ -1,6 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.requests.client.CardPlayedRequest;
+import htl.steyr.uno.requests.client.RequestCardRequest;
 import htl.steyr.uno.requests.server.CardAddResponse;
 import htl.steyr.uno.requests.server.CardPlayedResponse;
 import htl.steyr.uno.requests.server.PlayerGetResponse;
@@ -27,18 +28,22 @@ public class GameLogic {
      */
     public void playerGetResponse(PlayerGetResponse msg) {
         gameTable.setPlayer(msg.getPlayer());
-        // @TODO: Update the UI to reflect the player's hand of cards
+        /*
+        @TODO: Update the UI to reflect the player's hand of cards.
+            After that, the Game is ready to start and the player can start playing cards from their hand if it's his turn.
+            !!!!!NOT BEFORE!!!!!
+         */
     }
 
 
     /**
-     * Handles the logic for when a card is added to the central stack.
-     * This method should update the game state and UI to reflect the new card on the stack.
+     * Handles the logic for when a card is added to the players hand.
+     * This method should update the game state and UI to reflect the new card.
      *
      * @param msg The CardAddResponse message containing information about the card that was added.
      */
     public void cardAddResponse(CardAddResponse msg) {
-        // @TODO: Implement logic for when a card is added to the central stack
+        // @TODO: Implement logic for when a card is added to the players hand (e.g., after drawing a card from the central stack).
     }
 
 
@@ -78,6 +83,16 @@ public class GameLogic {
 
     }
 
+
+    /**
+     * Handles the logic for when a player requests to draw a card from the central stack.
+     * This method should send a RequestCardRequest to the server with the number of cards the player wants to draw.
+     *
+     * @param ammount The number of cards the player is requesting to draw.
+     */
+    public void requestCard(int ammount) {
+        getGameTable().getClient().getConn().sendMessage(new RequestCardRequest(gameTable.getPlayer(), ammount));
+    }
 
 
 

@@ -8,6 +8,8 @@ import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.CardPlayedRequest;
+import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
+import htl.steyr.uno.requests.client.RequestCardRequest;
 import htl.steyr.uno.requests.server.CardAddResponse;
 import htl.steyr.uno.requests.server.CardPlayedResponse;
 import htl.steyr.uno.requests.server.PlayerGetResponse;
@@ -50,6 +52,38 @@ public class GameLogic {
             players.add(player);
             playerIndex++;
         }
+    }
+
+
+    /**
+     * Handles the logic for when a player indicates that they are ready in the game lobby.
+     * This method should update the player's ready status and check if all players are ready to start the game.
+     *
+     * @param msg The ReadyInGameTableRequest message containing information about the player who is ready.
+     */
+    public void readyInGameTable(ReadyInGameTableRequest msg) {
+        for (Player player : players) {
+            if (player.getUsername().equals(msg.getPlayer().getUsername())) {
+                player.setReady(true);
+                checkReadyInGameTable();
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * Checks if all players in the game lobby are ready to start the game.
+     * If all players are ready, this method will call the startGame() method to begin the game.
+     * If any player is not ready, this method will simply return without starting the game.
+     */
+    private void checkReadyInGameTable() {
+        for (Player player : players) {
+            if (!player.isReady()) {
+                return;
+            }
+        }
+        startGame();
     }
 
 
@@ -141,6 +175,14 @@ public class GameLogic {
 
 
 
+    public void requestCard(RequestCardRequest msg) {
+        Player player = msg.getPlayer();
+        int amount = msg.getAmount();
+
+        for (int i = 0; i < amount; i++) {
+            addCardsToPlayer(player, generateCard());
+        }
+    }
 
 
 

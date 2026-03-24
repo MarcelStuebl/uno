@@ -5,6 +5,7 @@ import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
 import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
 import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -48,7 +49,7 @@ public class GameTable implements Initializable {
         ArrayList<Enemy> enemies = startGameResponse.getEnemies();
         //@TODO: use the startGameResponse to initialize the game state and display the correct information on the game table
 
-
+        sendReadyToStart();
     }
 
     private void onSceneClose() {
@@ -134,6 +135,10 @@ public class GameTable implements Initializable {
         root.getChildren().add(closeBtn);
     }
 
+
+    private void sendReadyToStart() {
+        client.getConn().sendMessage(new ReadyInGameTableRequest(player));
+    }
 
     public GameLogic getGameLogic() {
         return gameLogic;

@@ -108,6 +108,8 @@ public class ServerSocketConnection {
                         case CheckIfUserAlreadyExistsRequest msg -> checkIfUserAlreadyExistsRequest(msg);
                         case StartGameRequest msg -> startGameRequest(msg);
                         case CardPlayedRequest msg -> cardPlayedRequest(msg);
+                        case ReadyInGameTableRequest msg -> readyInGameTableRequest(msg);
+                        case RequestCardRequest msg -> requestCardRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -157,7 +159,17 @@ public class ServerSocketConnection {
     }
 
 
-
+    /**
+     * The createAccountRequest method handles the account creation process for a client by validating the provided information and interacting with the database to create a new user account.
+     * It takes a CreateAccountRequest object as a parameter, which contains the necessary information for creating an account, including username, email, password, and an optional verification code.
+     * The method first checks if a verification code is required and if it matches the expected code. If not, it generates a new verification code and sends it to the client's email address using the MailSender class.
+     * If the verification code is valid, it creates a new User object with the provided information and checks if a user with the same username already exists in the database.
+     * If a user with the same username exists, it sends a CreateAccountFailedResponse back to the client indicating that the username is already taken.
+     * If the username is available, it adds the new user to the database and sends a CreateAccountSuccessResponse back to the client with the created user information.
+     * The method also logs the outcome of the account creation attempt using the sendLogMessage method to provide feedback on the server side.
+     * @param request
+     * @throws SQLException
+     */
     private void createAccountRequest(CreateAccountRequest request) throws SQLException {
         if (request.getCode() == null || createAccountCode == null) {
             createAccountCode = SECURE_RANDOM.nextInt(900000) + 100000; // Generate a random 6-digit code
@@ -197,9 +209,6 @@ public class ServerSocketConnection {
     private void createLobbyRequest(CreateLobbyRequest obj) {
         Lobby lobby = new Lobby(server);
         lobby.addConnection(this);
-        CreateLobbySuccessResponse msg = new CreateLobbySuccessResponse();
-        sendMessage(msg);
-        sendLogMessage(msg);
         lobby.updateJoined();
     }
 
@@ -229,6 +238,15 @@ public class ServerSocketConnection {
         }
     }
 
+
+    /**
+     * The sendChatMessageRequest method handles the process of a client sending a chat message to the lobby.
+     * It takes a SendChatMessageRequest object as a parameter, which contains the message that the client wants to send.
+     * The method first retrieves the lobby that the current connection (this) is part of by searching through the server's list of lobbies and checking if the connection is included in any of them.
+     * If the lobby is found, it calls the sendChatMessage method on the lobby instance, passing the SendChatMessageRequest object to it. This allows the lobby to broadcast the chat message to all connected clients in that lobby.
+     * If the lobby is not found (i.e., the connection is not part of any lobby), the method does nothing.
+     * @param obj
+     */
     private void sendChatMessageRequest(SendChatMessageRequest obj) {
         Lobby lobby = server.getLobbies().stream().filter(l -> l.getConnections().contains(this)).findFirst().orElse(null);
         if (lobby != null) {
@@ -236,6 +254,19 @@ public class ServerSocketConnection {
         }
     }
 
+
+    /**
+     * The forgotPasswordRequest method handles the process of a client requesting a password reset for their account.
+     * It takes a ForgotPasswordRequest object as a parameter, which contains the email address associated with the account for which the password reset is being requested.
+     * The method first checks if there is an existing password reset request for the provided email and if it is still valid (i.e., within 1 minute). If there is no valid request, it proceeds to handle the password reset request.
+     * It retrieves the user information based on the provided email address using the DatabaseUser class. If a user with the specified email exists, it generates a random 6-digit code and creates a new PasswordForgotten object to store the code and the request time.
+     * The method then sends an authentication code to the user's email address using the MailSender class and sends a ForgotPasswordResponse back to the client indicating that the password reset request was successful.
+     * If no user with the specified email exists, it sends a ForgotPasswordResponse back to the client indicating that the email is not associated with any account.
+     * If there is an existing valid password reset request, it sends a ForgotPasswordResponse back to the client indicating that a request has already been made and is still valid.
+     * The method also logs the outcome of the password reset request using the sendLogMessage method to provide feedback on the server side.
+     * @param msg
+     * @throws SQLException
+     */
     private void forgotPasswordRequest(ForgotPasswordRequest msg) throws SQLException {
         // Check if there is an existing password reset request for the provided email and if it is still valid (within 1 minute)
         if (passwordForgotten == null || passwordForgotten.getRequestTime().getTime() + 60000 < System.currentTimeMillis()) {
@@ -257,6 +288,16 @@ public class ServerSocketConnection {
 
     }
 
+
+    /**
+     * The forgotPasswordSendCodeRequest method handles the process of a client submitting the verification code for a password reset request.
+     * It takes a ForgotPasswordSendCodeRequest object as a parameter, which contains the code submitted by the client.
+     * The method checks if there is an existing password reset request and if the submitted code matches the code stored in the PasswordForgotten object.
+     * If the code is correct, it sends a ForgotPasswordResponse back to the client indicating that the code is valid and allowing the user to proceed with entering a new password.
+     * If the code is incorrect, it sends a ForgotPasswordResponse back to the client indicating that the code is invalid.
+     * The method also logs the outcome of the code verification using the sendLogMessage method to provide feedback on the server side.
+     * @param msg
+     */
     private void forgotPasswordSendCodeRequest(ForgotPasswordSendCodeRequest msg) {
         if (passwordForgotten != null && passwordForgotten.getCode().equals(msg.getCode())) {
             // Code is correct, allow the user to enter a new password
@@ -266,6 +307,18 @@ public class ServerSocketConnection {
         }
     }
 
+
+    /**
+     * The changePasswordRequest method handles the process of a client submitting a new password for their account after successfully verifying the password reset code.
+     * It takes a ChangePasswordRequest object as a parameter, which contains the email address associated with the account and the new password submitted by the client.
+     * The method checks if there is an existing password reset request and if the code stored in the PasswordForgotten object matches the expected code.
+     * If the code is correct, it retrieves the user information based on the provided email address using the DatabaseUser class and updates the user's password in the database with the new password provided by the client.
+     * It then sends a ForgotPasswordResponse back to the client indicating that the password has been successfully changed.
+     * If the code is incorrect, it sends a ForgotPasswordResponse back to the client indicating that the code is invalid and that the password change request cannot be processed.
+     * The method also logs the outcome of the password change request using the sendLogMessage method to provide feedback on the server side.
+     * @param msg
+     * @throws SQLException
+     */
     private void changePasswordRequest(ChangePasswordRequest msg) throws SQLException {
         if (passwordForgotten.getCode().equals(msg.getCode())) {
             DatabaseUser db = new DatabaseUser();
@@ -281,6 +334,19 @@ public class ServerSocketConnection {
         }
     }
 
+
+    /**
+     * The checkIfUserAlreadyExistsRequest method handles the process of a client checking if a username or email address is already associated with an existing account in the database.
+     * It takes a CheckIfUserAlreadyExistsRequest object as a parameter, which contains the username and email address that the client wants to check for availability.
+     * The method creates an instance of the DatabaseUser class to interact with the user database and checks if there is an existing user with the provided username and email address.
+     * It sets boolean flags to indicate whether the username and email already exist in the database.
+     * Finally, it sends a CheckIfUserAlreadyExistsResponse back to the client with the
+     * results of the checks, allowing the client to provide feedback to the user about the availability of the username and email address for account creation.
+     * The method also logs the outcome of the availability checks using the sendLogMessage method to
+     * provide feedback on the server side.
+     * @param msg
+     * @throws SQLException
+     */
     private void checkIfUserAlreadyExistsRequest(CheckIfUserAlreadyExistsRequest msg) throws SQLException {
         DatabaseUser db = new DatabaseUser();
         String username = msg.getUsername();
@@ -299,6 +365,7 @@ public class ServerSocketConnection {
 
         sendMessage(new CheckIfUserAlreadyExistsResponse(username, email, userAlreadyExists, emailAlreadyExists));
     }
+
 
     private void startGameRequest(StartGameRequest msg) {
         Lobby lobby = server.getLobbyByConnection(this);
@@ -320,6 +387,20 @@ public class ServerSocketConnection {
     }
 
 
+    private void readyInGameTableRequest(ReadyInGameTableRequest msg) {
+        Lobby lobby = server.getLobbyByConnection(this);
+        if (lobby != null) {
+            lobby.getGameLogic().readyInGameTable(msg);
+        }
+    }
+
+
+    private void requestCardRequest(RequestCardRequest msg) {
+        Lobby lobby = server.getLobbyByConnection(this);
+        if (lobby != null) {
+            lobby.getGameLogic().requestCard(msg);
+        }
+    }
 
     /**
      * End of the request handling methods.
