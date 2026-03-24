@@ -1,30 +1,32 @@
 package htl.steyr.uno.requests.server;
 
+import htl.steyr.uno.GameTableClasses.Enemy;
 import htl.steyr.uno.User;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class StartGameResponse implements Serializable {
 
 
-    private LobbyInfoResponse lobbyInfoResponse;
+    private ArrayList<Enemy> enemies;
 
-    public StartGameResponse(LobbyInfoResponse lobbyInfoResponse) {
-        setLobbyInfoResponse(lobbyInfoResponse);
+    public StartGameResponse(ArrayList<Enemy> enemies) {
+        setEnemies(enemies);
     }
 
     @Override
     public String toString() {
         return "StartGameRequest{" +
-                "user='" + getLobbyInfoResponse().getUsers().getFirst().getUsername() +
+                "enemy_username='" + getEnemies().getFirst().getUsername() +
                 "'}";
     }
 
-    public LobbyInfoResponse getLobbyInfoResponse() {
-        return lobbyInfoResponse;
+    public ArrayList<Enemy> getEnemies() {
+        return enemies;
     }
-    public void setLobbyInfoResponse(LobbyInfoResponse lobbyInfoResponse) {
-        this.lobbyInfoResponse = lobbyInfoResponse;
+    public void setEnemies(ArrayList<Enemy> enemies) {
+        this.enemies = enemies;
     }
 
 

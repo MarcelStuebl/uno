@@ -1,4 +1,4 @@
-package htl.steyr.uno.server.exceptions.user;
+package htl.steyr.uno.server.exceptions.database;
 
 public class UserException extends RuntimeException {
 

@@ -2,7 +2,9 @@ package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
 
-public class Card {
+import java.io.Serializable;
+
+public class Card implements Serializable {
     //CardValue 0 bis 9 stands for the Number on the Card
     /**
      * Special Cards
@@ -16,6 +18,8 @@ public class Card {
     //Colours: yellow, green, blue, red
     //the colour black stands for choose-colour cards
     private final String CardColour;
+
+    private String chosenColour;
 
     public Card(int value, String colour) throws InvalidCardException{
 
@@ -52,6 +56,11 @@ public class Card {
 
     }
 
+    @Override
+    public String toString() {
+        return getCardColour() + getCardValue() + "";
+    }
+
 
     public int getCardValue() {
         return this.CardValue;
@@ -60,4 +69,13 @@ public class Card {
     public String getCardColour() {
         return this.CardColour;
     }
+
+    public String getChosenColour() {
+        return this.chosenColour;
+    }
+    public void setChosenColour(String chosenColour) {
+        this.chosenColour = chosenColour;
+    }
+
+
 }

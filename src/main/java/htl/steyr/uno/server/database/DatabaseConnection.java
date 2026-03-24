@@ -9,10 +9,7 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    private static final Dotenv dotenv = Dotenv.configure()
-            .ignoreIfMissing()
-            .load();
-
+    private static final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
     private static String getEnv(String key) {
         String value = System.getenv(key);
         if (value != null) return value;
@@ -23,12 +20,11 @@ public class DatabaseConnection {
     private static final String DATABASE = getEnv("DB_DATABASE");
     private static final String USER = getEnv("DB_USER");
     private static final String PASSWORD = getEnv("DB_PASSWORD");
-
-    private static final String URL = "jdbc:mysql://" + HOST + ":3306/" + DATABASE
-            + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Berlin";
+    private static final String URL = "jdbc:mysql://" + HOST + ":3306/" + DATABASE + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Berlin";
 
     private static Connection connection = null;
 
+    private DatabaseConnection() {}
 
     /**
      * Establishes and returns a connection to the MySQL database.
@@ -41,7 +37,7 @@ public class DatabaseConnection {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);
             } catch (Exception e) {
-                throw new DatabaseException("JDBC-Treiber nicht gefunden");
+                throw new DatabaseException("Database connection failed: " + e.getMessage());
             }
         }
         return connection;

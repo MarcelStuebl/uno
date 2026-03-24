@@ -1,11 +1,11 @@
 package htl.steyr.uno.server.serverconnection;
 
+import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
 import htl.steyr.uno.requests.client.SendChatMessageRequest;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +19,7 @@ public class Lobby {
     private Integer status = 0; // 0 = waiting for players, 1 = full, 2 = in game
     private final LobbyInfoResponse lobbyInfoResponse = new LobbyInfoResponse(lobbyId, status);
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
+    private final GameLogic gameLogic = new GameLogic(this);
 
 
     /**
@@ -104,8 +105,9 @@ public class Lobby {
     public void startGame() {
         setStatus(2);
         checkLobbyInfoResponse();
+        getGameLogic().createGame(getLobbyInfoResponse().getUsers());
         for (ServerSocketConnection c : connections) {
-            c.sendMessage(new StartGameResponse(lobbyInfoResponse));
+            c.sendMessage(new StartGameResponse(gameLogic.getPlayersAsEnemies()));
         }
         updateJoined();
     }
@@ -140,6 +142,9 @@ public class Lobby {
         return lobbyInfoResponse;
     }
 
+    public GameLogic getGameLogic() {
+        return gameLogic;
+    }
 
 }
 

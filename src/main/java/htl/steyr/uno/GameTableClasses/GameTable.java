@@ -5,6 +5,7 @@ import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
 import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
 import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -25,7 +26,9 @@ public class GameTable implements Initializable {
     private final Client client;
     @FXML private StackPane root;
     CardStack centralStack = new CardStack();
-    private StartGameResponse startGameResponse;
+    private final StartGameResponse startGameResponse;
+    private final GameLogic gameLogic = new GameLogic(this);
+    private Player player;
 
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
@@ -43,9 +46,14 @@ public class GameTable implements Initializable {
             }
         });
 
+        ArrayList<Enemy> enemies = startGameResponse.getEnemies();
+        //@TODO: use the startGameResponse to initialize the game state and display the correct information on the game table
+
+        sendReadyToStart();
     }
 
     private void onSceneClose() {
+        client.setGameTable(null);
         if (client.getConn() != null) {
             client.getConn().close();
         }
@@ -87,7 +95,7 @@ public class GameTable implements Initializable {
         enemies.add(new Enemy("Sophie", false, 3,4));
 
 
-        Player player = new Player("Max",true,myHand,enemies);
+        Player player = new Player("Max", true, myHand, enemies, 0);
 
 
         StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
@@ -126,4 +134,25 @@ public class GameTable implements Initializable {
 
         root.getChildren().add(closeBtn);
     }
+
+
+    private void sendReadyToStart() {
+        client.getConn().sendMessage(new ReadyInGameTableRequest(player));
+    }
+
+    public GameLogic getGameLogic() {
+        return gameLogic;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
 }

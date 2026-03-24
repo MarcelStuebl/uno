@@ -208,6 +208,9 @@ public class LobbyWaitController implements Initializable {
 
         GameTable controller = new GameTable(client, msg);
         loader.setController(controller);
+        client.setLobbyController(null);
+        client.setLobbyWaitController(null);
+        client.setGameTable(controller);
 
         Scene scene = new Scene(loader.load());
         UiStyleUtil.applyGlobalFocusStyle(scene);
@@ -217,7 +220,7 @@ public class LobbyWaitController implements Initializable {
         thisStage.close();
     }
 
-    public void startGameResponse(StartGameResponse msg) throws IOException {
+    public void startGameResponse(StartGameResponse msg) {
         Platform.runLater(() -> {
             try {
                 startGame(msg);
