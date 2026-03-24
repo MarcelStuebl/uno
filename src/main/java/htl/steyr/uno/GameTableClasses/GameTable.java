@@ -26,12 +26,12 @@ public class GameTable implements Initializable {
     @FXML private StackPane root;
     CardStack centralStack = new CardStack();
     private StartGameResponse startGameResponse;
-    private final GameLogic gameLogic;
+    private final GameLogic gameLogic = new GameLogic(this);
+    private Player player;
 
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
         this.startGameResponse = msg;
-        gameLogic = new GameLogic(this);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class GameTable implements Initializable {
         enemies.add(new Enemy("Sophie", false, 3,4));
 
 
-        Player player = new Player("Max",true,myHand,enemies);
+        Player player = new Player("Max", true, myHand, enemies, 0);
 
 
         StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
@@ -135,5 +135,15 @@ public class GameTable implements Initializable {
         return gameLogic;
     }
 
+    public Client getClient() {
+        return client;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
 
 }

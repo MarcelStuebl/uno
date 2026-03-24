@@ -11,17 +11,19 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Player {
+public class Player implements Serializable {
     private final String username;
     private final boolean isCurrentTurn;
     private final ArrayList<Card> hand = new ArrayList<>();
     private final ArrayList<Enemy> enemies = new ArrayList<>();
+    private final Integer playerIndex;
 
     
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies) throws InvalidHandException, InvalidPlayerException {
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex) throws InvalidHandException, InvalidPlayerException {
         this.username = username;
         this.isCurrentTurn = isCurrentTurn;
         if(hand.size() != 7){
@@ -33,6 +35,7 @@ public class Player {
             throw new InvalidPlayerException("too many or too little Enemies");
         }
         this.enemies.addAll(enemies);
+        this.playerIndex = playerIndex;
         sortHand();
     }
 
@@ -168,13 +171,13 @@ public class Player {
         this.hand.add(card);
         sortHand();
     }
-    public void removeCard(Card card) {
-        this.hand.remove(card);
-    }
+
     public ArrayList<Card> getHand() {
         return this.hand;
     }
 
-
+    public Integer getPlayerIndex() {
+        return playerIndex;
+    }
 
 }

@@ -88,7 +88,8 @@ public class ClientSocketConnection implements Closeable {
                         case StartGameResponse msg -> startGameResponse(msg);
                         case CreateAccountFailedResponse msg -> createAccountFailedResponse(msg);
                         case CardAddResponse msg -> cardAddResponse(msg);
-                        case CardRemoveResponse msg -> cardRemoveResponse(msg);
+                        case PlayerGetResponse msg -> playerGetResponse(msg);
+                        case CardPlayedResponse msg -> cardPlayedResponse(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -100,6 +101,18 @@ public class ClientSocketConnection implements Closeable {
         });
         receiveThread.start();
     }
+
+
+
+    /**
+     * Start of the response handler methods.
+     * <p>
+     * Each method corresponds to a specific type of response from the server and is responsible
+     * for processing that response and updating the client state accordingly.
+     * These methods are called from the receive thread when a message of the corresponding type is received from the server.
+     */
+
+
 
 
     /**
@@ -130,16 +143,16 @@ public class ClientSocketConnection implements Closeable {
      * and displaying the lobby details. If the lobby information is invalid, it prompts
      * the client to join or create a lobby again.
      *
-     * @param lobby the lobby information response containing details about the lobby
+     * @param msg the lobby information response containing details about the lobby
      */
-    private void gotLobby(LobbyInfoResponse lobby) {
-        this.lobby = lobby;
+    private void gotLobby(LobbyInfoResponse msg) {
+        this.lobby = msg;
 
-        if (lobby.getUsers() != null) {
+        if (msg.getUsers() != null) {
             if (client.getLobbyWaitController() != null) {
-                client.getLobbyWaitController().setLobby(lobby);
+                client.getLobbyWaitController().setLobby(msg);
             } else if (client.getLobbyController() != null) {
-                client.getLobbyController().createOrJoinPartySuccess(lobby);
+                client.getLobbyController().createOrJoinPartySuccess(msg);
             }
         } else {
             System.out.println("Lobby operation failed.");
@@ -151,9 +164,9 @@ public class ClientSocketConnection implements Closeable {
      * Handles a lobby not found response from the server by notifying the user and prompting
      * them to join or create a lobby again.
      *
-     * @param lobby the lobby not found response indicating that the specified lobby does not exist
+     * @param msg the lobby not found response indicating that the specified lobby does not exist
      */
-    private void lobbyNotFound(LobbyNotFoundResponse lobby) {
+    private void lobbyNotFound(LobbyNotFoundResponse msg) {
         client.getLobbyController().lobbyNotFound();
     }
 
@@ -222,6 +235,44 @@ public class ClientSocketConnection implements Closeable {
         client.getLoginController().forgotPasswordResponse(msg);
     }
 
+    private void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
+        client.getLoginController().checkIfUserAlreadyExistsResponse(msg);
+    }
+
+    private void startGameResponse(StartGameResponse msg) throws IOException {
+        client.getLobbyWaitController().startGameResponse(msg);
+    }
+
+    private void cardAddResponse(CardAddResponse msg) {
+        client.getGameTable().getGameLogic().cardAddResponse(msg);
+    }
+
+    private void playerGetResponse(PlayerGetResponse msg) {
+        client.getGameTable().getGameLogic().playerGetResponse(msg);
+    }
+
+    private void cardPlayedResponse(CardPlayedResponse msg) {
+        client.getGameTable().getGameLogic().cardPlayedResponse(msg);
+    }
+
+
+    /**
+     * End of the response handler methods.
+     */
+
+
+    /**
+     * Start of the request sending methods.
+     * <p>
+     * Each method corresponds to a specific type of request that the client can send to the server,
+     * such as requesting a password reset, verifying a password reset code, setting a new password,
+     * checking if a user already exists, and starting a game.
+     * These methods create the appropriate request object and send it to the server using the sendMessage method.
+     * They are typically called from the client UI when the user performs an action that requires communication with the server,
+     * such as clicking a button to reset their password or start a game.
+     */
+
+
     public void requestPasswordReset(String email) {
         ForgotPasswordRequest msg = new ForgotPasswordRequest(email);
         sendMessage(msg);
@@ -237,9 +288,6 @@ public class ClientSocketConnection implements Closeable {
         sendMessage(msg);
     }
 
-    private void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
-        client.getLoginController().checkIfUserAlreadyExistsResponse(msg);
-    }
 
     public void checkIfUserAlreadyExists(String username, String email) {
         CheckIfUserAlreadyExistsRequest msg = new CheckIfUserAlreadyExistsRequest(username, email);
@@ -251,17 +299,11 @@ public class ClientSocketConnection implements Closeable {
         sendMessage(msg);
     }
 
-    private void startGameResponse(StartGameResponse msg) throws IOException {
-        client.getLobbyWaitController().startGameResponse(msg);
-    }
 
-    private void cardAddResponse(CardAddResponse msg) {
-        client.getGameTable().getGameLogic().cardAddResponse(msg);
-    }
+    /**
+     * End of the request sending methods.
+     */
 
-    private void cardRemoveResponse(CardRemoveResponse msg) {
-        client.getGameTable().getGameLogic().cardRemoveResponse(msg);
-    }
 
     /**
      * Closes the socket connection and stops the receiving thread. This method is called when the client

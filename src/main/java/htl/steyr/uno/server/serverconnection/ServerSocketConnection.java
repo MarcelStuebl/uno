@@ -107,6 +107,7 @@ public class ServerSocketConnection {
                         case ChangePasswordRequest msg -> changePasswordRequest(msg);
                         case CheckIfUserAlreadyExistsRequest msg -> checkIfUserAlreadyExistsRequest(msg);
                         case StartGameRequest msg -> startGameRequest(msg);
+                        case CardPlayedRequest msg -> cardPlayedRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -119,6 +120,15 @@ public class ServerSocketConnection {
         });
         receivethread.start();
     }
+
+
+    /**
+     * Start of the request handling methods.
+     * <p>
+     * Each method corresponds to a specific type of request that the server can receive from the client such as login requests,
+     * account creation requests, lobby management requests, chat messages, password reset requests, and game start requests.
+     */
+
 
 
 
@@ -297,9 +307,26 @@ public class ServerSocketConnection {
     }
 
 
-    private void leftLobbyRequest(LeaveLobbyRequest obj) {
+    private void leftLobbyRequest(LeaveLobbyRequest msg) {
         server.leaveLobby(this);
     }
+
+
+    private void cardPlayedRequest(CardPlayedRequest msg) {
+        Lobby lobby = server.getLobbyByConnection(this);
+        if (lobby != null) {
+            lobby.getGameLogic().cardPlayed(msg);
+        }
+    }
+
+
+
+    /**
+     * End of the request handling methods.
+     */
+
+
+
 
 
     public User getUser() {
