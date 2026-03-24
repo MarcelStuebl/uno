@@ -1,16 +1,19 @@
 package htl.steyr.uno.server.serverconnection;
 
 import htl.steyr.uno.GameTableClasses.Card;
+import htl.steyr.uno.GameTableClasses.Enemy;
 import htl.steyr.uno.GameTableClasses.Player;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
+import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.CardPlayedRequest;
 import htl.steyr.uno.requests.server.CardAddResponse;
 import htl.steyr.uno.requests.server.CardPlayedResponse;
 import htl.steyr.uno.requests.server.PlayerGetResponse;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GameLogic {
 
@@ -23,22 +26,54 @@ public class GameLogic {
     public GameLogic(Lobby lobby) {
         setLobby(lobby);
     }
-
-
-    public void startGame() throws InvalidPlayerException, InvalidHandException {
+    
+    
+    /**
+     * Game Setup Methods for initializing the game state and preparing the game for play.
+     * <p>
+     * This includes methods for creating the game, starting the game, and generating the initial hands for each player.
+     * The GameLogic class is responsible for setting up the game state based on the players in the lobby and ensuring that each player receives their initial hand of cards.
+     * The methods in this class should interact with the Lobby and Player classes to manage the game state and communicate with the clients as needed.
+     */
+    public void createGame(List<User> users) {
         int playerIndex = 0;
-        for (ServerSocketConnection c : lobby.getConnections()) {
-            Player player = new Player(c.getUser().getUsername(), false, new ArrayList<>(), new ArrayList<>(), playerIndex);
+        for (User user : users) {
+            Player player;
+            try {
+                player = new Player(user.getUsername(), false, new ArrayList<>(), new ArrayList<>(), playerIndex);
+            } catch (InvalidHandException | InvalidPlayerException e) {
+                throw new RuntimeException(e);
+            }
             for (int i = 0; i < 7; i++) {
                 player.addCardToHand(generateCard());
             }
-            c.sendMessage(new PlayerGetResponse(player));
             players.add(player);
             playerIndex++;
         }
     }
 
 
+    /**
+     * Starts the game by sending the initial game state to all players in the lobby.
+     * This method should send a PlayerGetResponse to each player with their initial hand of cards and any relevant game information.
+     */
+    public void startGame(){
+        for (Player player : players) {
+            for (ServerSocketConnection c : lobby.getConnections()) {
+                if (c.getUser().getUsername().equals(player.getUsername())) {
+                    c.sendMessage(new PlayerGetResponse(player));
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Generates a random card for the game.
+     * The card's value is randomly determined to be between 0 and 14, and the color is randomly selected from the four possible colors (yellow, green, blue, red).
+     * The method ensures that the generated card is valid according to the game rules and returns a new Card object with the generated value and color.
+     * @return A randomly generated Card object for use in the game.
+     */
     private Card generateCard() {
         int value = (int) (Math.random() * 15);
         String colour;
@@ -149,5 +184,13 @@ public class GameLogic {
     }
     public void setDirectionClockwise(boolean directionClockwise) {
         this.directionClockwise = directionClockwise;
+    }
+
+    public ArrayList<Enemy> getPlayersAsEnemies() {
+        ArrayList<Enemy> enemies = new ArrayList<>();
+        for (Player player : players) {
+            enemies.add(new Enemy(player));
+        }
+        return enemies;
     }
 }

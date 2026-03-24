@@ -25,7 +25,7 @@ public class GameTable implements Initializable {
     private final Client client;
     @FXML private StackPane root;
     CardStack centralStack = new CardStack();
-    private StartGameResponse startGameResponse;
+    private final StartGameResponse startGameResponse;
     private final GameLogic gameLogic = new GameLogic(this);
     private Player player;
 
@@ -44,6 +44,10 @@ public class GameTable implements Initializable {
                 throw new RuntimeException(e);
             }
         });
+
+        ArrayList<Enemy> enemies = startGameResponse.getEnemies();
+        //@TODO: use the startGameResponse to initialize the game state and display the correct information on the game table
+
 
     }
 

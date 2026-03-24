@@ -220,7 +220,7 @@ public class LobbyWaitController implements Initializable {
         thisStage.close();
     }
 
-    public void startGameResponse(StartGameResponse msg) throws IOException {
+    public void startGameResponse(StartGameResponse msg) {
         Platform.runLater(() -> {
             try {
                 startGame(msg);
