@@ -113,6 +113,23 @@ public class LoginController implements Initializable {
     }
 
 
+    public void readyToLogin() {
+        //@ToDo: Show login screen
+        Platform.runLater(() -> {
+            showLoginScreen.setVisible(true);
+        });
+    }
+
+
+    public void cantLogin() {
+        //@TODO: set visible of login screen to false and show loading screen
+
+        Platform.runLater(() -> {
+            showLoginScreen.setVisible(false);
+        });
+    }
+
+
     @FXML
     private void onCreateAccountButtonClicked(ActionEvent actionEvent) {
         showLoginScreen.setVisible(false);

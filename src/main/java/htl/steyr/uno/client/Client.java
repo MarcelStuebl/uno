@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class Client {
 
-    private String host = "localhost";
+    private String host = "server.uno.clouddb.at";
     private int port = 59362;
     private ClientSocketConnection conn;
     private final LoginController loginController;
@@ -22,15 +22,25 @@ public class Client {
     }
 
     public void start() {
-        try {
-            conn = new ClientSocketConnection(host, port, this);
-            conn.startReceiving();
+        Thread connectionThread = new Thread(() -> {
+            do {
+                try {
+                    conn = new ClientSocketConnection(host, port, this);
+                    conn.startReceiving();
 
-            System.out.println("Connected to " + host + ":" + port);
-            System.out.println("---------------------------------------------");
-        } catch (IOException e) {
-            System.out.println("Failed to connect to " + host + ":" + port);
-        }
+                    getLoginController().readyToLogin();
+                } catch (IOException e) {
+                    conn = null;
+                    getLoginController().cantLogin();
+                }
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            } while (conn == null);
+        });
+        connectionThread.start();
     }
 
     public void logIn(String username, String password) {
@@ -74,6 +84,7 @@ public class Client {
     public LobbyController getLobbyController() {
         return lobbyController;
     }
+
     public void setLobbyController(LobbyController lobbyController) {
         this.lobbyController = lobbyController;
     }
@@ -81,6 +92,7 @@ public class Client {
     public LobbyWaitController getLobbyWaitController() {
         return lobbyWaitController;
     }
+
     public void setLobbyWaitController(LobbyWaitController lobbyWaitController) {
         this.lobbyWaitController = lobbyWaitController;
     }
