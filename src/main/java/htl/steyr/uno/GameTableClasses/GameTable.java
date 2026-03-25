@@ -30,10 +30,14 @@ public class GameTable implements Initializable {
     private final GameLogic gameLogic = new GameLogic(this);
     private Player player;
 
+
+
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
         this.startGameResponse = msg;
     }
+
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -47,10 +51,14 @@ public class GameTable implements Initializable {
         });
 
         ArrayList<Enemy> enemies = startGameResponse.getEnemies();
-        //@TODO: use the startGameResponse to initialize the game state and display the correct information on the game table
+        /*
+        @TODO: use the startGameResponse to initialize the game state and display the correct information on the game table.
+          Attention: the player itself is also included in the startGameResponse.
+         */
 
         sendReadyToStart();
     }
+
 
     private void onSceneClose() {
         client.setGameTable(null);
@@ -109,6 +117,9 @@ public class GameTable implements Initializable {
 
 
     }
+
+
+
     public void addCloseButton(StackPane root, Stage stage) {
 
         Button closeBtn = new Button("X"); // X to make it look like a Close Button
@@ -136,9 +147,13 @@ public class GameTable implements Initializable {
     }
 
 
+
     private void sendReadyToStart() {
         client.getConn().sendMessage(new ReadyInGameTableRequest(player));
     }
+
+
+
 
     public GameLogic getGameLogic() {
         return gameLogic;

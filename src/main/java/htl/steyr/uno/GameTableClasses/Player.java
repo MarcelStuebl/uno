@@ -17,74 +17,31 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Player implements Serializable {
-    private final String username;
-    private final boolean isCurrentTurn;
+    private String username;
+    private boolean isCurrentTurn;
     private final ArrayList<Card> hand = new ArrayList<>();
     private final ArrayList<Enemy> enemies = new ArrayList<>();
-    private final Integer playerIndex;
+    private Integer playerIndex;
     private boolean isReady = false;
-    private boolean isPassive = false;
+    private boolean isPassive;
 
 
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, boolean isPassive) throws InvalidHandException, InvalidPlayerException {
-        this.username = username;
-        this.isCurrentTurn = isCurrentTurn;
-        if (hand.size() != 7) {
-            throw new InvalidHandException("too many or too little Cards");
-        }
-        this.hand.addAll(hand);
-
-        if (enemies.size() >= 7) {
-            throw new InvalidPlayerException("too many or too little Enemies");
-        }
-        this.enemies.addAll(enemies);
-        this.playerIndex = playerIndex;
-        this.isPassive = isPassive;
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, boolean isPassive) {
+        setUsername(username);
+        setCurrentTurn(isCurrentTurn);
+        getHand().addAll(hand);
+        setEnemies(enemies);
+        setPlayerIndex(playerIndex);
+        setPassive(isPassive);
         sortHand();
     }
 
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex) throws InvalidHandException, InvalidPlayerException {
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex){
         this(username, isCurrentTurn, hand, enemies, playerIndex, false);
     }
 
 
-    public String getUsername() {
-        return this.username;
-    }
 
-    public ArrayList<Card> getPlayerHand() {
-        return this.hand;
-    }
-
-    public void setPlayerHand(ArrayList<Card> arr) {
-        this.hand.clear();
-        this.hand.addAll(arr);
-    }
-
-    public void addCardToHand(Card card) {
-        this.hand.add(card);
-    }
-
-    public void removeCardFromHand(Card card) {
-        this.hand.remove(card);
-    }
-
-    public boolean isCurrentTurn() {
-        return isCurrentTurn;
-    }
-
-    public ArrayList<Enemy> getEnemies() {
-        return this.enemies;
-    }
-
-    public Enemy getEnemyByUsername(String username) {
-        for (Enemy e : this.enemies) {
-            if (e.getUsername().equals(username)) {
-                return e;
-            }
-        }
-        return null;
-    }
 
     private void sortHand() {
         this.hand.sort((c1, c2) -> {
@@ -101,20 +58,14 @@ public class Player implements Serializable {
     }
 
     private int getColorOrder(String color) {
-        switch (color) {
-            case "red":
-                return 0;
-            case "green":
-                return 1;
-            case "yellow":
-                return 2;
-            case "blue":
-                return 3;
-            case "black":
-                return 4;
-            default:
-                return 5;
-        }
+        return switch (color) {
+            case "red" -> 0;
+            case "green" -> 1;
+            case "yellow" -> 2;
+            case "blue" -> 3;
+            case "black" -> 4;
+            default -> 5;
+        };
     }
 
 
@@ -123,7 +74,7 @@ public class Player implements Serializable {
         handBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
         handBox.setSpacing(-100);
 
-        for (Card c : player.getPlayerHand()) {
+        for (Card c : player.getHand()) {
             String path = "../Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
             ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
             iv.setFitWidth(137);
@@ -149,7 +100,7 @@ public class Player implements Serializable {
             cardBtn.setOnAction(e -> {
                 middleCardStack.layCard(c, cardBtn, player);
                 if (middleCardStack.getTopCard() == c) {
-                    player.getPlayerHand().remove(c);
+                    player.getHand().remove(c);
                     handBox.getChildren().remove(cardBtn);
                 }
             });
@@ -188,23 +139,26 @@ public class Player implements Serializable {
     }
 
 
-    public void addCard(Card card) {
-        this.hand.add(card);
-        sortHand();
-    }
 
-    public ArrayList<Card> getHand() {
-        return this.hand;
+
+
+    public String getUsername() {
+        return this.username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public Integer getPlayerIndex() {
         return playerIndex;
     }
+    public void setPlayerIndex(Integer playerIndex) {
+        this.playerIndex = playerIndex;
+    }
 
     public boolean isReady() {
         return isReady;
     }
-
     public void setReady(boolean ready) {
         isReady = ready;
     }
@@ -212,8 +166,44 @@ public class Player implements Serializable {
     public boolean isPassive() {
         return isPassive;
     }
-
     public void setPassive(boolean passive) {
         isPassive = passive;
     }
+
+    public boolean isCurrentTurn() {
+        return isCurrentTurn;
+    }
+    public void setCurrentTurn(boolean currentTurn) {
+        this.isCurrentTurn = currentTurn;
+    }
+
+    public ArrayList<Enemy> getEnemies() {
+        return this.enemies;
+    }
+    public void setEnemies(ArrayList<Enemy> enemies) {
+        this.enemies.clear();
+        this.enemies.addAll(enemies);
+    }
+
+    public Enemy getEnemyByUsername(String username) {
+        for (Enemy e : this.enemies) {
+            if (e.getUsername().equals(username)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Card> getHand() {
+        return this.hand;
+    }
+
+    public void addCardToHand(Card card) {
+        this.hand.add(card);
+        sortHand();
+    }
+    public void removeCardFromHand(Card card) {
+        this.hand.remove(card);
+    }
+
 }

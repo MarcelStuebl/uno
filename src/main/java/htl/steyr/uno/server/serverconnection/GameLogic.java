@@ -47,14 +47,7 @@ public class GameLogic {
                 hand.add(generateCard());
             }
 
-            Player player;
-            try {
-                player = new Player(user.getUsername(), false, hand, new ArrayList<>(), playerIndex);
-            } catch (InvalidHandException | InvalidPlayerException e) {
-                throw new RuntimeException(e);
-            }
-
-            players.add(player);
+            players.add(new Player(user.getUsername(), false, hand, new ArrayList<>(), playerIndex));
             playerIndex++;
         }
     }
