@@ -100,9 +100,6 @@ public class GameLogic {
 
 
 
-
-
-
     public GameTable getGameTable() {
         return gameTable;
     }

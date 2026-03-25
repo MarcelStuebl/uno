@@ -84,13 +84,6 @@ public class Player implements Serializable {
 
             StackPane cardPane = new StackPane(iv);
             cardPane.setPrefSize(137, 192);
-            cardPane.setStyle(
-                    "-fx-background-color: transparent;" +
-                    "-fx-border-color: green;" +
-                            "-fx-border-width: 6;" +
-                            "-fx-border-radius: 6;" +
-                            "-fx-background-radius: 6;"
-            );
 
             Button cardBtn = new Button();
             cardBtn.setGraphic(cardPane);
