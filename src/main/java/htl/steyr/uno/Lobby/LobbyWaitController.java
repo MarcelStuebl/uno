@@ -55,7 +55,11 @@ public class LobbyWaitController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Platform.runLater(() -> playButton.getScene().getWindow().setOnCloseRequest(event -> onSceneClose()));
+        Platform.runLater(() -> {
+            if (playButton.getScene() != null && playButton.getScene().getWindow() != null) {
+                playButton.getScene().getWindow().setOnCloseRequest(event -> onSceneClose());
+            }
+        });
 
         String lobbyCode = lobby.getLobbyId().toString();
         lobbyCodeLabel.setText("Lobby Code: " + lobbyCode);
@@ -144,13 +148,9 @@ public class LobbyWaitController implements Initializable {
         gameChatTextField.setOnMouseClicked(e -> chatExpanded.set(!chatExpanded.get()));
 
         updateLobbyInfo();
-
-        System.out.println("Es geht:\n" + client.getConn().getUser());
-        System.out.println("Lobby:\n" + lobby);
     }
 
     public void updateLobbyInfo() {
-        System.out.println("Lobby Info Updated: " + lobby);
         String currentUsername = client.getConn().getUser().getUsername();
 
         playerListView.getItems().clear();
@@ -208,6 +208,9 @@ public class LobbyWaitController implements Initializable {
 
         GameTable controller = new GameTable(client, msg);
         loader.setController(controller);
+        client.setLobbyController(null);
+        client.setLobbyWaitController(null);
+        client.setGameTable(controller);
 
         Scene scene = new Scene(loader.load());
         UiStyleUtil.applyGlobalFocusStyle(scene);
@@ -217,7 +220,7 @@ public class LobbyWaitController implements Initializable {
         thisStage.close();
     }
 
-    public void startGameResponse(StartGameResponse msg) throws IOException {
+    public void startGameResponse(StartGameResponse msg) {
         Platform.runLater(() -> {
             try {
                 startGame(msg);

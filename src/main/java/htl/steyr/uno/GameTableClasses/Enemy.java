@@ -6,21 +6,32 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Enemy {
+public class Enemy implements Serializable {
 
     private String username;
     private boolean isCurrentTurn;
-    private int cardCount;
-    private int playerNumber;
+    private int handSize;
+    private Integer playerIndex;
+    private boolean isPassive = false;
 
 
-    public Enemy(String username, boolean isCurrentTurn, int cardCount, int totalPlayers) {
+    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex, boolean isPassive) {
         this.username = username;
         this.isCurrentTurn = isCurrentTurn;
-        this.cardCount = cardCount;
-        this.playerNumber = playerNumber;
+        this.handSize = cardCount;
+        this.playerIndex = playerIndex;
+        this.isPassive = isPassive;
+    }
+
+    public Enemy(Player player) {
+        this(player.getUsername(), player.isCurrentTurn(), player.getHand().size(), player.getPlayerIndex(), player.isPassive());
+    }
+
+    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex) {
+        this(username, isCurrentTurn, cardCount, playerIndex, false);
     }
 
     public String getUsername() {
@@ -37,17 +48,33 @@ public class Enemy {
         isCurrentTurn = currentTurn;
     }
 
-    public int getCardCount() {
-        return cardCount;
+    public int getHandSize() {
+        return handSize;
     }
-    public void setCardCount(int cardCount) {
-        this.cardCount = cardCount;
+    public void setHandSize(int handSize) {
+        this.handSize = handSize;
     }
     public void incrementCardCount(int count) {
-        this.cardCount += count;
+        this.handSize += count;
     }
     public void decrementCardCount(int count) {
-        this.cardCount -= count;
+        this.handSize -= count;
+    }
+
+    public Integer getPlayerIndex() {
+        return playerIndex;
+    }
+
+    public boolean isPassive() {
+        return isPassive;
+    }
+
+    public void setEnemy(Enemy enemy) {
+        this.username = enemy.getUsername();
+        this.isCurrentTurn = enemy.isCurrentTurn();
+        this.handSize = enemy.getHandSize();
+        this.playerIndex = enemy.getPlayerIndex();
+        this.isPassive = enemy.isPassive();
     }
 
 
@@ -66,7 +93,7 @@ public class Enemy {
             Pane handPane = new Pane();
             handPane.setMouseTransparent(true);
 
-            int count = enemy.getCardCount();
+            int count = enemy.getHandSize();
 
             switch(position) {
                 case 2: // oben

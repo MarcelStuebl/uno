@@ -1,5 +1,6 @@
 package htl.steyr.uno.client;
 
+import htl.steyr.uno.GameTableClasses.GameTable;
 import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.LoginController;
@@ -16,6 +17,7 @@ public class Client {
     private final LoginController loginController;
     private LobbyController lobbyController;
     private LobbyWaitController lobbyWaitController;
+    private GameTable gameTable;
 
     public Client(LoginController controller) {
         this.loginController = controller;
@@ -95,6 +97,13 @@ public class Client {
 
     public void setLobbyWaitController(LobbyWaitController lobbyWaitController) {
         this.lobbyWaitController = lobbyWaitController;
+    }
+
+    public GameTable getGameTable() {
+        return gameTable;
+    }
+    public void setGameTable(GameTable gameTable) {
+        this.gameTable = gameTable;
     }
 
 

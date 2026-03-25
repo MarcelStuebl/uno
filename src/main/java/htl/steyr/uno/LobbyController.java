@@ -3,6 +3,7 @@ package htl.steyr.uno;
 import htl.steyr.uno.Lobby.LobbyWaitController;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
+import htl.steyr.uno.requests.server.LobbyJoinRefusedResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -60,6 +61,17 @@ public class LobbyController implements Initializable {
         }
     }
 
+    public void joinPartyFailed(LobbyJoinRefusedResponse msg) {
+        if (msg.getLobbyInfo().getStatus() == 1) {
+            System.out.println("Lobby is full. Please try again.");
+        } else if (msg.getLobbyInfo().getStatus() == 2) {
+            System.out.println("Game already started. Please try again.");
+        } else {
+            System.out.println("Unknown error. Please try again.");
+        }
+        // @TODO: show error message in UI
+    }
+
 
     /**
      * Generats a new LobbyCode used to join s lobby
@@ -67,7 +79,6 @@ public class LobbyController implements Initializable {
      */
     @FXML
     private void onCreatePartyButtonClicked(ActionEvent actionEvent) {
-        System.out.println(client.getConn().getUser());
         client.createLobby();
     }
 
