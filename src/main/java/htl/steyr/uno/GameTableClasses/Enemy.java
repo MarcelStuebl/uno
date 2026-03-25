@@ -52,45 +52,6 @@ public class Enemy {
 
 
 
-
-    public static Pane createEnemyHand(Enemy enemy, double angleRad) {
-
-        Pane pane = new Pane();
-
-        String cardBackside = "/Uno_Cards/backside.png";
-
-        double scale = 0.5;
-        double cardWidth = 137 * scale;
-        double cardHeight = 192 * scale;
-        double overlap = 20;
-
-        int count = enemy.getCardCount();
-        double totalWidth = cardWidth + (count - 1) * overlap;
-
-        for (int i = 0; i < count; i++) {
-
-            ImageView iv = new ImageView(new Image(
-                    Objects.requireNonNull(Enemy.class.getResourceAsStream(cardBackside))
-            ));
-
-            iv.setFitWidth(cardWidth);
-            iv.setFitHeight(cardHeight);
-
-            double x = i * overlap - totalWidth / 2;
-            iv.setLayoutX(x);
-
-            // 👉 Karten zeigen zur Tischmitte
-            double angleDeg = Math.toDegrees(angleRad);
-            iv.setRotate(angleDeg + 90);
-
-            pane.getChildren().add(iv);
-        }
-
-        return pane;
-    }
-
-
-
 }
 
 

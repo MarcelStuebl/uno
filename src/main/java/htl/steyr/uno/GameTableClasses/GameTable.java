@@ -104,7 +104,7 @@ public class GameTable implements Initializable {
         enemies.add(new Enemy("Sophie", false, 3,4));
 
 
-        Player player = new Player("Max", true, myHand, enemies, 0);
+        Player player = new Player("Max", true, myHand, enemies);
 
 
         StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
@@ -112,15 +112,6 @@ public class GameTable implements Initializable {
 
 
         player.displayPlayerHand(pane, player, centralStack);
-
-        Platform.runLater(() -> {
-            double centerX = root.getWidth() / 2;
-            double centerY = root.getHeight() / 2;
-
-            player.displayEnemies(root, centerX, centerY, 250);
-        });
-
-
 
         addCloseButton(pane, stage);  //for readabiity
 

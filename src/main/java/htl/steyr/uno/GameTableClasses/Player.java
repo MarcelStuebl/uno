@@ -167,34 +167,6 @@ public class Player {
         root.getChildren().add(handBox);
     }
 
-    public void displayEnemies(StackPane root, double centerX, double centerY, double radius) {
-
-        int count = enemies.size();
-
-        double angleStep = 360.0 / count;
-
-        // leicht verschoben damit keiner genau unten sitzt
-        double startAngle = -90 + (angleStep / 2);
-
-        for (int i = 0; i < count; i++) {
-
-            Enemy enemy = enemies.get(i);
-
-            double angleDeg = startAngle + i * angleStep;
-            double angleRad = Math.toRadians(angleDeg);
-
-            double x = centerX + radius * Math.cos(angleRad);
-            double y = centerY + radius * Math.sin(angleRad);
-
-            Pane hand = Enemy.createEnemyHand(enemy, angleRad);
-
-            hand.setLayoutX(x - 50);
-            hand.setLayoutY(y - 50);
-
-            root.getChildren().add(hand);
-        }
-    }
-
 
 
 
