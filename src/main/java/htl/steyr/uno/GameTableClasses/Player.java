@@ -41,18 +41,16 @@ public class Player implements Serializable {
     }
 
 
-
-
     private void sortHand() {
         this.hand.sort((c1, c2) -> {
 
-            // Farben-Reihenfolge
+
             int colorCompare = getColorOrder(c1.getCardColour())
                     - getColorOrder(c2.getCardColour());
 
             if (colorCompare != 0) return colorCompare;
 
-            // Dann einfach nach Wert sortieren
+
             return c1.getCardValue() - c2.getCardValue();
         });
     }
@@ -69,14 +67,14 @@ public class Player implements Serializable {
     }
 
 
-    public void displayPlayerHand(StackPane root, Player player, CardStack middleCardStack) {
+    public static void displayPlayerHand(StackPane root, Player player, CardStack middleCardStack) {
         HBox handBox = new HBox();
         handBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
         handBox.setSpacing(-100);
 
         for (Card c : player.getHand()) {
             String path = "../Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
-            ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+            ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(Player.class.getResourceAsStream(path))));
             iv.setFitWidth(137);
             iv.setFitHeight(192);
             iv.setPreserveRatio(true);

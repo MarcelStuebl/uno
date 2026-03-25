@@ -110,7 +110,11 @@ public class GameTable implements Initializable {
         root.getChildren().add(centralStack.getVisual());
 
 
-        player.displayPlayerHand(root, player, centralStack);
+        Player.displayPlayerHand(root, player, centralStack);
+
+
+        Enemy.displayEnemiesCards(root,player.getEnemies());
+
 
 
 

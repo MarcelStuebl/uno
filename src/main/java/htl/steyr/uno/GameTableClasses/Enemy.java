@@ -4,10 +4,12 @@ import htl.steyr.uno.UiStyleUtil;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 public class Enemy implements Serializable {
@@ -78,88 +80,38 @@ public class Enemy implements Serializable {
         this.isPassive = enemy.isPassive();
     }
 
+    public static void displayTopEnemyHand(StackPane root, Enemy enemy) {
+        HBox handBox = new HBox();
+        handBox.setSpacing(-50);
+        handBox.setAlignment(Pos.TOP_CENTER);
 
+        enemy.displayHandSize(root, enemy, handBox);
 
+        StackPane.setAlignment(handBox, javafx.geometry.Pos.TOP_CENTER); // position on top or wherever
+        StackPane.setMargin(handBox, new javafx.geometry.Insets(20)); // optional spacing
+        root.getChildren().add(handBox);
+    }
 
-    //needs immediate fixing :3 (please)
-    public void displayEnemyHand(StackPane root, Enemy enemy, int position) {
+    public static void displaySideEnemy(StackPane root,Enemy enemy, int pos) {
+        HBox handBox = new HBox();
+        handBox.setSpacing(-50);
 
-        String cardBackside = "../Uno_Cards/backside.png";
-        double scale = 0.5;
-        double cardWidth = 137 * scale;
-        double cardHeight = 192 * scale;
-        final double overlap = 20; // constant for the amount of overlap on the cards
+        //pos can either be 1 or 2
 
-        Runnable drawCards = () -> {
-            Pane handPane = new Pane();
-            handPane.setMouseTransparent(true);
+        enemy.displayHandSize(root, enemy, handBox);
 
-            int count = enemy.getHandSize();
+        // is left, 2 is right
+        if(pos == 1){
+            handBox.setAlignment(Pos.CENTER_LEFT);
+            StackPane.setAlignment(handBox, Pos.CENTER_LEFT); // position on top or wherever
+        }else if(pos == 2){
+            handBox.setAlignment(Pos.CENTER_RIGHT);
+            StackPane.setAlignment(handBox, Pos.CENTER_RIGHT);
+        }
 
-            switch(position) {
-                case 2: // oben
-                    double totalWidth = count * (cardWidth - overlap) + overlap;
-                    double startX = (root.getWidth() - totalWidth) / 2;
+        StackPane.setMargin(handBox, new javafx.geometry.Insets(20)); // optional spacing
+        root.getChildren().add(handBox);
 
-                    for (int i = 0; i < count; i++) {
-                        ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(cardBackside))));
-                        iv.setFitWidth(cardWidth);
-                        iv.setFitHeight(cardHeight);
-                        iv.setPreserveRatio(true);
-                        UiStyleUtil.applyRoundedCardClip(iv, cardWidth, cardHeight, 14);
-                        iv.setRotate(180);
-                        iv.setLayoutX(startX + i * (cardWidth - overlap));
-                        iv.setLayoutY(0);
-
-                        handPane.getChildren().add(iv);
-                    }
-                    StackPane.setAlignment(handPane, Pos.TOP_CENTER);
-                    break;
-
-                case 1: // links
-                    double totalHeightLeft = count * (cardHeight - overlap) + overlap;
-                    double startYLeft = (root.getHeight() - totalHeightLeft) / 2;
-
-                    for (int i = 0; i < count; i++) {
-                        ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(cardBackside))));
-                        iv.setFitWidth(cardWidth);
-                        iv.setFitHeight(cardHeight);
-                        iv.setPreserveRatio(true);
-                        UiStyleUtil.applyRoundedCardClip(iv, cardWidth, cardHeight, 14);
-                        iv.setRotate(90); // rotate
-                        iv.setLayoutX(0);
-                        iv.setLayoutY(startYLeft + i * (cardHeight - overlap));
-
-                        handPane.getChildren().add(iv);
-                    }
-                    StackPane.setAlignment(handPane, Pos.CENTER_LEFT);
-                    break;
-
-                case 3: // rechts
-                    double totalHeightRight = count * (cardHeight - overlap) + overlap;
-                    double startYRight = (root.getHeight() - totalHeightRight) / 2;
-
-                    for (int i = 0; i < count; i++) {
-                        ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(cardBackside))));
-                        iv.setFitWidth(cardWidth);
-                        iv.setFitHeight(cardHeight);
-                        iv.setPreserveRatio(true);
-                        UiStyleUtil.applyRoundedCardClip(iv, cardWidth, cardHeight, 14);
-                        iv.setRotate(-90 * (i - count/2.0));
-
-                        iv.setLayoutX(root.getWidth() - cardWidth);
-                        iv.setLayoutY(startYRight + i * (cardHeight - overlap));
-
-                        handPane.getChildren().add(iv);
-                    }
-                    StackPane.setAlignment(handPane, Pos.CENTER_RIGHT);
-                    break;
-            }
-
-            root.getChildren().add(handPane);
-
-        };
-        drawCards.run();
     }
 
 
@@ -172,6 +124,20 @@ public class Enemy implements Serializable {
                 ", playerIndex=" + playerIndex +
                 ", isPassive=" + isPassive +
                 '}';
+    }
+
+
+    public void displayHandSize(StackPane root, Enemy enemy, HBox handBox) {
+        for (int i = 0; i < enemy.getHandSize(); i++) {
+            Image backImage = new Image(Objects.requireNonNull(Enemy.class.getResourceAsStream("/Uno_Cards/back.png")));
+            ImageView iv = new ImageView(backImage);
+
+            iv.setFitWidth(137);
+            iv.setFitHeight(192);
+            iv.setPreserveRatio(true);
+
+            handBox.getChildren().add(iv);
+        }
     }
 
 }
