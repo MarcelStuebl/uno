@@ -53,11 +53,12 @@ public class GameTable implements Initializable {
 
 
     private void open(Stage stage) throws InvalidHandException, InvalidCardException, InvalidPlayerException {
-        StackPane root = null;
+        StackPane pane = null;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));
-            root = loader.load();
+            pane = loader.load();
 
+            stage.setScene(new Scene(pane));
             Scene scene = new Scene(root);
             UiStyleUtil.applyGlobalFocusStyle(scene);
             stage.setScene(scene);
