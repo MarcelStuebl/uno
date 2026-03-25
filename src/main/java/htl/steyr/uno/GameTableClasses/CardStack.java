@@ -1,5 +1,6 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.UiStyleUtil;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.scene.control.Button;
@@ -25,7 +26,8 @@ public class CardStack {
         this.visual = new StackPane();
         this.visual.setPrefSize(137, 192);
         this.visual.setMaxSize(137, 192);
-        this.visual.setStyle("-fx-border-color: green;" +
+        this.visual.setStyle("-fx-background-color: transparent;" +
+                "-fx-border-color: green;" +
                 "-fx-border-width: 6;" +
                 "-fx-border-radius: 5;" +
                 "-fx-background-radius: 5;");
@@ -52,6 +54,7 @@ public class CardStack {
         iv.setFitWidth(137);
         iv.setFitHeight(192);
         iv.setPreserveRatio(true);
+        UiStyleUtil.applyRoundedCardClip(iv, 137, 192, 18);
         visual.getChildren().add(iv);
 
 

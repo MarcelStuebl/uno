@@ -2,6 +2,7 @@ package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
+import htl.steyr.uno.UiStyleUtil;
 import javafx.animation.ScaleTransition;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
@@ -128,10 +129,12 @@ public class Player implements Serializable {
             iv.setFitWidth(137);
             iv.setFitHeight(192);
             iv.setPreserveRatio(true);
+            UiStyleUtil.applyRoundedCardClip(iv, 137, 192, 18);
 
             StackPane cardPane = new StackPane(iv);
             cardPane.setPrefSize(137, 192);
             cardPane.setStyle(
+                    "-fx-background-color: transparent;" +
                     "-fx-border-color: green;" +
                             "-fx-border-width: 6;" +
                             "-fx-border-radius: 6;" +
