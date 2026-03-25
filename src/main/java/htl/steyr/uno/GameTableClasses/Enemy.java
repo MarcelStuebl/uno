@@ -1,5 +1,6 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.UiStyleUtil;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -105,8 +106,8 @@ public class Enemy implements Serializable {
                         iv.setFitWidth(cardWidth);
                         iv.setFitHeight(cardHeight);
                         iv.setPreserveRatio(true);
+                        UiStyleUtil.applyRoundedCardClip(iv, cardWidth, cardHeight, 14);
                         iv.setRotate(180);
-
                         iv.setLayoutX(startX + i * (cardWidth - overlap));
                         iv.setLayoutY(0);
 
@@ -124,8 +125,8 @@ public class Enemy implements Serializable {
                         iv.setFitWidth(cardWidth);
                         iv.setFitHeight(cardHeight);
                         iv.setPreserveRatio(true);
+                        UiStyleUtil.applyRoundedCardClip(iv, cardWidth, cardHeight, 14);
                         iv.setRotate(90); // rotate
-
                         iv.setLayoutX(0);
                         iv.setLayoutY(startYLeft + i * (cardHeight - overlap));
 
@@ -143,6 +144,7 @@ public class Enemy implements Serializable {
                         iv.setFitWidth(cardWidth);
                         iv.setFitHeight(cardHeight);
                         iv.setPreserveRatio(true);
+                        UiStyleUtil.applyRoundedCardClip(iv, cardWidth, cardHeight, 14);
                         iv.setRotate(-90 * (i - count/2.0));
 
                         iv.setLayoutX(root.getWidth() - cardWidth);

@@ -23,70 +23,38 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
-    @FXML
-    public Button anmeldeButton;
-    @FXML
-    public Label errorLabel;
-    @FXML
-    public Label errorLabelCreateAcc;
-    @FXML
-    public TextField newAccEmail;
-    @FXML
-    public TextField twoFACode;
-    @FXML
-    public VBox show2FA;
-    @FXML
-    public Label errorLabel2FA;
-    @FXML
-    public VBox showForgotPassword;
-    @FXML
-    public TextField resetPasswordEmail;
-    @FXML
-    public Label errorLabelForgotPassword;
-    @FXML
-    public VBox showResetPassword2FA;
-    @FXML
-    public TextField resetPassword2FACode;
-    @FXML
-    public Label errorLabelReset2FA;
-    @FXML
-    public VBox showNewPasswordScreen;
-    @FXML
-    public PasswordField newPassword;
-    @FXML
-    public PasswordField confirmNewPassword;
-    @FXML
-    public Label errorLabelNewPassword;
-    @FXML
-    public VBox showAccountVerificationScreen;
-    @FXML
-    public TextField verifyAccount;
-    @FXML
-    private Button showLogin;
-    @FXML
-    private VBox showNewAccScreen;
-    @FXML
-    private Button createAcc;
-    @FXML
-    private VBox showLoginScreen;
-    @FXML
-    private StackPane loginPane;
-    @FXML
-    private StackPane brandingPane;
-    @FXML
-    private PasswordField newAccPassword;
-    @FXML
-    private TextField newAccUserName;
-    @FXML
-    private TextField newAccLastName;
-    @FXML
-    private TextField newAccFirstName;
-    @FXML
-    private PasswordField welcomeBackPasswd;
-    @FXML
-    private TextField welcomeBackUserName;
-    @FXML
-    private HBox rootContainer;
+    @FXML public Button anmeldeButton;
+    @FXML public Label errorLabel;
+    @FXML public Label errorLabelCreateAcc;
+    @FXML public TextField newAccEmail;
+    @FXML public TextField twoFACode;
+    @FXML public VBox show2FA;
+    @FXML public Label errorLabel2FA;
+    @FXML public VBox showForgotPassword;
+    @FXML public TextField resetPasswordEmail;
+    @FXML public Label errorLabelForgotPassword;
+    @FXML public VBox showResetPassword2FA;
+    @FXML public TextField resetPassword2FACode;
+    @FXML public Label errorLabelReset2FA;
+    @FXML public VBox showNewPasswordScreen;
+    @FXML public PasswordField newPassword;
+    @FXML public PasswordField confirmNewPassword;
+    @FXML public Label errorLabelNewPassword;
+    @FXML public VBox showAccountVerificationScreen;
+    @FXML public TextField verifyAccount;
+    @FXML private Button showLogin;
+    @FXML private VBox showNewAccScreen;
+    @FXML private Button createAcc;
+    @FXML private VBox showLoginScreen;
+    @FXML private StackPane loginPane;
+    @FXML private StackPane brandingPane;
+    @FXML private PasswordField newAccPassword;
+    @FXML private TextField newAccUserName;
+    @FXML private TextField newAccLastName;
+    @FXML private TextField newAccFirstName;
+    @FXML private PasswordField welcomeBackPasswd;
+    @FXML private TextField welcomeBackUserName;
+    @FXML private HBox rootContainer;
 
     private Client client;
     private String username;

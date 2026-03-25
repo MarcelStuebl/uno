@@ -3,6 +3,8 @@ package htl.steyr.uno;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.ImageView;
+import javafx.scene.shape.Rectangle;
 
 import java.util.Objects;
 
@@ -24,6 +26,13 @@ public final class UiStyleUtil {
 
         root.setFocusTraversable(true);
         Platform.runLater(root::requestFocus);
+    }
+
+    public static void applyRoundedCardClip(ImageView imageView, double width, double height, double arcSize) {
+        Rectangle clip = new Rectangle(width, height);
+        clip.setArcWidth(arcSize);
+        clip.setArcHeight(arcSize);
+        imageView.setClip(clip);
     }
 }
 
