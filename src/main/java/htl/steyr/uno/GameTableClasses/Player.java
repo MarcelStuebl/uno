@@ -2,46 +2,75 @@ package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
-import htl.steyr.uno.UiStyleUtil;
 import javafx.animation.ScaleTransition;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Player implements Serializable {
-    private String username;
+public class Player {
+    private final String username;
     private boolean isCurrentTurn;
-    private final ArrayList<Card> hand = new ArrayList<>();
-    private final ArrayList<Enemy> enemies = new ArrayList<>();
-    private Integer playerIndex;
-    private boolean isReady = false;
-    private boolean isPassive;
+    private  ArrayList<Card> hand = new ArrayList<>();
+    private  ArrayList<Enemy> enemies = new ArrayList<>();
 
+    
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies) throws InvalidHandException, InvalidPlayerException {
+        this.username = username;
+        this.isCurrentTurn = isCurrentTurn;
+        if(hand.size() != 7){
+            throw new InvalidHandException("too many or too little Cards");
+        }
+        this.hand.addAll(hand);
 
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, boolean isPassive) {
-        setUsername(username);
-        setCurrentTurn(isCurrentTurn);
-        getHand().addAll(hand);
-        setEnemies(enemies);
-        setPlayerIndex(playerIndex);
-        setPassive(isPassive);
+        if(enemies.size() > 7){
+            throw new InvalidPlayerException("too many or too little Enemies");
+        }
+        this.enemies.addAll(enemies);
         sortHand();
     }
 
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex){
-        this(username, isCurrentTurn, hand, enemies, playerIndex, false);
+
+    public String getUsername() {
+        return this.username;
     }
 
+    public ArrayList<Card> getPlayerHand() {
+        return this.hand;
+    }
 
+    public void setPlayerHand(ArrayList<Card> arr) {
+        this.hand.clear();
+        this.hand.addAll(arr);
+    }
+    public void addCardToHand(Card card) {
+        this.hand.add(card);
+    }
+    public void removeCardFromHand(Card card) {
+        this.hand.remove(card);
+    }
 
+    public boolean isCurrentTurn() {
+        return isCurrentTurn;
+    }
+    public void setCurrentTurn(boolean isTurn) {
+        isCurrentTurn = isTurn;
+    }
+
+    public ArrayList<Enemy> getEnemies() {
+        return this.enemies;
+    }
+
+    public Enemy getEnemy(int index) {
+        return this.enemies.get(index);
+    }
 
     private void sortHand() {
         this.hand.sort((c1, c2) -> {
@@ -58,15 +87,17 @@ public class Player implements Serializable {
     }
 
     private int getColorOrder(String color) {
-        return switch (color) {
-            case "red" -> 0;
-            case "green" -> 1;
-            case "yellow" -> 2;
-            case "blue" -> 3;
-            case "black" -> 4;
-            default -> 5;
-        };
+        switch (color) {
+            case "red": return 0;
+            case "green": return 1;
+            case "yellow": return 2;
+            case "blue": return 3;
+            case "black": return 4;
+            default: return 5;
+        }
     }
+
+
 
 
     public void displayPlayerHand(StackPane root, Player player, CardStack middleCardStack) {
@@ -74,18 +105,16 @@ public class Player implements Serializable {
         handBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
         handBox.setSpacing(-100);
 
-        for (Card c : player.getHand()) {
+        for (Card c : player.getPlayerHand()) {
             String path = "../Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
             ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
             iv.setFitWidth(137);
             iv.setFitHeight(192);
             iv.setPreserveRatio(true);
-            UiStyleUtil.applyRoundedCardClip(iv, 137, 192, 18);
 
             StackPane cardPane = new StackPane(iv);
             cardPane.setPrefSize(137, 192);
             cardPane.setStyle(
-                    "-fx-background-color: transparent;" +
                     "-fx-border-color: green;" +
                             "-fx-border-width: 6;" +
                             "-fx-border-radius: 6;" +
@@ -100,7 +129,7 @@ public class Player implements Serializable {
             cardBtn.setOnAction(e -> {
                 middleCardStack.layCard(c, cardBtn, player);
                 if (middleCardStack.getTopCard() == c) {
-                    player.getHand().remove(c);
+                    player.getPlayerHand().remove(c);
                     handBox.getChildren().remove(cardBtn);
                 }
             });
@@ -138,84 +167,35 @@ public class Player implements Serializable {
         root.getChildren().add(handBox);
     }
 
+    public void displayEnemies(StackPane root, double centerX, double centerY, double radius) {
 
+        int count = enemies.size();
 
-    @Override
-    public String toString() {
-        return "Player{" +
-                "username='" + username + '\'' +
-                ", isCurrentTurn=" + isCurrentTurn +
-                ", hand=" + hand +
-                ", enemies=" + enemies +
-                ", playerIndex=" + playerIndex +
-                ", isReady=" + isReady +
-                ", isPassive=" + isPassive +
-                '}';
-    }
+        double angleStep = 360.0 / count;
 
+        // leicht verschoben damit keiner genau unten sitzt
+        double startAngle = -90 + (angleStep / 2);
 
-    public String getUsername() {
-        return this.username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
+        for (int i = 0; i < count; i++) {
 
-    public Integer getPlayerIndex() {
-        return playerIndex;
-    }
-    public void setPlayerIndex(Integer playerIndex) {
-        this.playerIndex = playerIndex;
-    }
+            Enemy enemy = enemies.get(i);
 
-    public boolean isReady() {
-        return isReady;
-    }
-    public void setReady(boolean ready) {
-        isReady = ready;
-    }
+            double angleDeg = startAngle + i * angleStep;
+            double angleRad = Math.toRadians(angleDeg);
 
-    public boolean isPassive() {
-        return isPassive;
-    }
-    public void setPassive(boolean passive) {
-        isPassive = passive;
-    }
+            double x = centerX + radius * Math.cos(angleRad);
+            double y = centerY + radius * Math.sin(angleRad);
 
-    public boolean isCurrentTurn() {
-        return isCurrentTurn;
-    }
-    public void setCurrentTurn(boolean currentTurn) {
-        this.isCurrentTurn = currentTurn;
-    }
+            Pane hand = Enemy.createEnemyHand(enemy, angleRad);
 
-    public ArrayList<Enemy> getEnemies() {
-        return this.enemies;
-    }
-    public void setEnemies(ArrayList<Enemy> enemies) {
-        this.enemies.clear();
-        this.enemies.addAll(enemies);
-    }
+            hand.setLayoutX(x - 50);
+            hand.setLayoutY(y - 50);
 
-    public Enemy getEnemyByUsername(String username) {
-        for (Enemy e : this.enemies) {
-            if (e.getUsername().equals(username)) {
-                return e;
-            }
+            root.getChildren().add(hand);
         }
-        return null;
     }
 
-    public ArrayList<Card> getHand() {
-        return this.hand;
-    }
 
-    public void addCardToHand(Card card) {
-        this.hand.add(card);
-        sortHand();
-    }
-    public void removeCardFromHand(Card card) {
-        this.hand.remove(card);
-    }
+
 
 }
