@@ -73,7 +73,7 @@
 
                                         <AnchorPane prefHeight="31.0" prefWidth="372.0" styleClass="chatPane">
                                             <children>
-                                                <TextField fx:id="gameChatTextField" layoutX="10.0" layoutY="3.0" onAction="#onSendMassage" opacity="0.78" prefHeight="25.0" prefWidth="242.0" styleClass="gameChatTextField" />
+                                                <TextField fx:id="gameChatTextField" layoutX="10.0" layoutY="3.0" onAction="#onSendMassage" opacity="0.78" prefHeight="25.0" prefWidth="242.0" promptText="Sende eine Nachricht an deine Freunde..." styleClass="gameChatTextField" />
                                             </children>
                                         </AnchorPane>
                                     </children>

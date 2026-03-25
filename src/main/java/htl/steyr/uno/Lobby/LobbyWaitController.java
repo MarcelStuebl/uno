@@ -156,7 +156,41 @@ public class LobbyWaitController implements Initializable {
         if (lobby.getUsers().getFirst().getUsername().equals(currentUsername)) {
             playButton.setVisible(true);
 
+
+
+
             playerListView.getItems().add(lobby.getUsers().getFirst().getUsername());
+
+            playerListView.setCellFactory(list -> new ListCell<String>() {
+                private final HBox hBox = new HBox();
+                public final Button button = new Button("Kick");
+
+                {
+                    hBox.getChildren().add(button);
+                    hBox.setAlignment(Pos.CENTER);
+                }
+
+
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        //setGraphic(hbox);
+                    }
+                }
+
+
+
+
+            });
+
+
+
+
 
             if (lobby.getUsers().size() > 1) {
                 playerListView.getItems().add(lobby.getUsers().getLast().getUsername());
