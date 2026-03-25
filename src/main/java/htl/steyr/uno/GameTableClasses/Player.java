@@ -1,8 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
-import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
-import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
 import htl.steyr.uno.UiStyleUtil;
+import htl.steyr.uno.User;
 import javafx.animation.ScaleTransition;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
@@ -38,6 +37,10 @@ public class Player implements Serializable {
 
     public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex){
         this(username, isCurrentTurn, hand, enemies, playerIndex, false);
+    }
+
+    public Player(User user) {
+        this(user.getUsername(), false, new ArrayList<>(), new ArrayList<>(), -1, false);
     }
 
 

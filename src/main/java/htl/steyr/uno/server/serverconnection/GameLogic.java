@@ -103,7 +103,8 @@ public class GameLogic {
                     continue;
                 }
                 if (c.getUser().getUsername().equals(player.getUsername())) {
-                    c.sendMessage(new PlayerGetResponse(player));
+                    PlayerGetResponse msg = new  PlayerGetResponse(player);
+                    c.sendMessage(msg);
                     break;
                 }
             }

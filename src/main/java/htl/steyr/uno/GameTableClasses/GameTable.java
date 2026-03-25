@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class GameTable implements Initializable {
@@ -27,7 +28,7 @@ public class GameTable implements Initializable {
     @FXML private StackPane root;
     CardStack centralStack = new CardStack();
     private final StartGameResponse startGameResponse;
-    private final GameLogic gameLogic = new GameLogic(this);
+    private GameLogic gameLogic;
     private Player player;
 
 
@@ -35,6 +36,18 @@ public class GameTable implements Initializable {
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
         this.startGameResponse = msg;
+        player = new Player(getClient().getConn().getUser());
+        updatePlayerFromStartGameResponse();
+    }
+
+    private void updatePlayerFromStartGameResponse() {
+        for (Enemy enemy : startGameResponse.getEnemies()) {
+            if (!Objects.equals(enemy.getUsername(), player.getUsername())) {
+                player.getEnemies().add(enemy);
+                break;
+            }
+        }
+        gameLogic = new GameLogic(this);
     }
 
 
@@ -49,12 +62,6 @@ public class GameTable implements Initializable {
                 throw new RuntimeException(e);
             }
         });
-
-        ArrayList<Enemy> enemies = startGameResponse.getEnemies();
-        /*
-        @TODO: use the startGameResponse to initialize the game state and display the correct information on the game table.
-          Attention: the player itself is also included in the startGameResponse.
-         */
 
         sendReadyToStart();
     }
@@ -137,7 +144,8 @@ public class GameTable implements Initializable {
         );
 
         closeBtn.setOnAction(e -> stage.close());
-        onSceneClose();
+        // only call onSceneClose when the window is actually closed by the user
+        stage.setOnCloseRequest(ev -> onSceneClose());
 
         //align top right on the stackpane
         StackPane.setAlignment(closeBtn, javafx.geometry.Pos.TOP_RIGHT);

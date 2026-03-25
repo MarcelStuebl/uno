@@ -64,6 +64,7 @@ public class ServerSocketConnection {
             out.writeObject(message);
             out.flush();
         } catch (IOException e) {
+            System.out.println("Error sending message: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -416,6 +417,7 @@ public class ServerSocketConnection {
 
 
 }
+
 
 
 

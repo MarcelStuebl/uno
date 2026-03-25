@@ -42,6 +42,7 @@ public class LobbyWaitController implements Initializable {
     public ListView<String> playerListView = new ListView<>();
     public ListView<ChatMessage> gameChatListView = new ListView<>();
     public TextField gameChatTextField;
+    private boolean intentionalClose = false;
 
     private final BooleanProperty chatExpanded = new SimpleBooleanProperty(false);
 
@@ -57,7 +58,9 @@ public class LobbyWaitController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Platform.runLater(() -> {
             if (playButton.getScene() != null && playButton.getScene().getWindow() != null) {
-                playButton.getScene().getWindow().setOnCloseRequest(event -> onSceneClose());
+                playButton.getScene().getWindow().setOnCloseRequest(event -> {
+                    if (!intentionalClose) onSceneClose(); // nur schließen wenn wirklich gewollt
+                });
             }
         });
 
@@ -201,6 +204,8 @@ public class LobbyWaitController implements Initializable {
     }
 
     private void startGame(StartGameResponse msg) throws IOException {
+        intentionalClose = true;
+
         Stage stage = new Stage();
         Stage thisStage = (Stage) playButton.getScene().getWindow();
 
@@ -217,6 +222,10 @@ public class LobbyWaitController implements Initializable {
 
         stage.setScene(scene);
         stage.show();
+        // prevent the wait-stage close handler from closing the socket while transitioning
+        try {
+            thisStage.setOnCloseRequest(null);
+        } catch (Exception ignored) {}
         thisStage.close();
     }
 
@@ -231,6 +240,8 @@ public class LobbyWaitController implements Initializable {
     }
 
     public void leaveLobbyButtonClicked(ActionEvent actionEvent) throws IOException {
+        intentionalClose = true;
+
         client.getConn().leaveLobby();
 
         Stage stage = new Stage();
