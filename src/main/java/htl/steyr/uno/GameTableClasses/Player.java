@@ -140,6 +140,18 @@ public class Player implements Serializable {
 
 
 
+    @Override
+    public String toString() {
+        return "Player{" +
+                "username='" + username + '\'' +
+                ", isCurrentTurn=" + isCurrentTurn +
+                ", hand=" + hand +
+                ", enemies=" + enemies +
+                ", playerIndex=" + playerIndex +
+                ", isReady=" + isReady +
+                ", isPassive=" + isPassive +
+                '}';
+    }
 
 
     public String getUsername() {

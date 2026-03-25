@@ -162,6 +162,18 @@ public class Enemy implements Serializable {
         drawCards.run();
     }
 
+
+    @Override
+    public String toString() {
+        return "Enemy{" +
+                "username='" + username + '\'' +
+                ", isCurrentTurn=" + isCurrentTurn +
+                ", handSize=" + handSize +
+                ", playerIndex=" + playerIndex +
+                ", isPassive=" + isPassive +
+                '}';
+    }
+
 }
 
 

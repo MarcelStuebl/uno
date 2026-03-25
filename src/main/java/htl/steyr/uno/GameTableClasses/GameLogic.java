@@ -28,6 +28,7 @@ public class GameLogic {
      */
     public void playerGetResponse(PlayerGetResponse msg) {
         gameTable.setPlayer(msg.getPlayer());
+        System.out.println("Player: " + msg.getPlayer());
         /*
         @TODO: Update the UI to reflect the player's hand of cards.
             After that, the Game is ready to start and the player can start playing cards from their hand if it's his turn.
