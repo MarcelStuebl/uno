@@ -103,6 +103,11 @@ public class GameLogic {
                     continue;
                 }
                 if (c.getUser().getUsername().equals(player.getUsername())) {
+                    for (Player enemy : players) {
+                        if (!enemy.getUsername().equals(c.getUser().getUsername())) {
+                            player.getEnemies().add(new Enemy(enemy));
+                        }
+                    }
                     PlayerGetResponse msg = new  PlayerGetResponse(player);
                     c.sendMessage(msg);
                     break;

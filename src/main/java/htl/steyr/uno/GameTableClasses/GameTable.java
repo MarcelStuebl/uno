@@ -37,7 +37,6 @@ public class GameTable implements Initializable {
         this.client = client;
         this.startGameResponse = msg;
         player = new Player(getClient().getConn().getUser());
-        updatePlayerFromStartGameResponse();
     }
 
     private void updatePlayerFromStartGameResponse() {
@@ -47,7 +46,6 @@ public class GameTable implements Initializable {
                 break;
             }
         }
-        gameLogic = new GameLogic(this);
     }
 
 
@@ -62,8 +60,9 @@ public class GameTable implements Initializable {
                 throw new RuntimeException(e);
             }
         });
-
-        sendReadyToStart();
+        updatePlayerFromStartGameResponse();
+        gameLogic = new GameLogic(this);
+        gameLogic.sendReadyToStart();
     }
 
 
@@ -156,9 +155,7 @@ public class GameTable implements Initializable {
 
 
 
-    private void sendReadyToStart() {
-        client.getConn().sendMessage(new ReadyInGameTableRequest(player));
-    }
+
 
 
 

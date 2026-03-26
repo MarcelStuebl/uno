@@ -1,6 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.requests.client.CardPlayedRequest;
+import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
 import htl.steyr.uno.requests.client.RequestCardRequest;
 import htl.steyr.uno.requests.server.CardAddResponse;
 import htl.steyr.uno.requests.server.CardPlayedResponse;
@@ -21,6 +22,10 @@ public class GameLogic {
         setGameTable(gameTable);
     }
 
+
+    public void sendReadyToStart() {
+        getGameTable().getClient().getConn().sendMessage(new ReadyInGameTableRequest(getGameTable().getPlayer()));
+    }
 
     /**
      * Handles the logic for when a player receives their initial hand of cards.
