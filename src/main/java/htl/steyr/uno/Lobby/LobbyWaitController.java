@@ -59,7 +59,7 @@ public class LobbyWaitController implements Initializable {
         Platform.runLater(() -> {
             if (playButton.getScene() != null && playButton.getScene().getWindow() != null) {
                 playButton.getScene().getWindow().setOnCloseRequest(event -> {
-                    if (!intentionalClose) onSceneClose(); // nur schließen wenn wirklich gewollt
+                    if (!intentionalClose) onSceneClose();
                 });
             }
         });

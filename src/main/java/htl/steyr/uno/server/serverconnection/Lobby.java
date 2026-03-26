@@ -1,5 +1,6 @@
 package htl.steyr.uno.server.serverconnection;
 
+import htl.steyr.uno.GameTableClasses.Player;
 import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
 import htl.steyr.uno.requests.client.SendChatMessageRequest;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
@@ -68,6 +69,7 @@ public class Lobby {
 
     public void playerLeft(ServerSocketConnection connection) {
         connections.remove(connection);
+        getGameLogic().getPlayers().removeIf(player -> player.getUsername().equals(connection.getUser().getUsername()));
         updateJoined();
     }
 
