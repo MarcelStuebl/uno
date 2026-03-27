@@ -6,6 +6,7 @@ import htl.steyr.uno.requests.client.RequestCardRequest;
 import htl.steyr.uno.requests.server.CardAddResponse;
 import htl.steyr.uno.requests.server.CardPlayedResponse;
 import htl.steyr.uno.requests.server.PlayerGetResponse;
+import javafx.application.Platform;
 
 import java.util.ArrayList;
 
@@ -34,8 +35,12 @@ public class GameLogic {
      * @param msg The PlayerGetResponse message containing information about the player's hand.
      */
     public void playerGetResponse(PlayerGetResponse msg) {
-        gameTable.setPlayer(msg.getPlayer());
+        getGameTable().setPlayer(msg.getPlayer());
         System.out.println(gameTable.getPlayer());
+        Platform.runLater(() -> {
+            gameTable.setEnemies();
+        });
+
         /*
         @TODO: Update the UI to reflect the player's hand of cards.
             After that, the Game is ready to start and the player can start playing cards from their hand if it's his turn.

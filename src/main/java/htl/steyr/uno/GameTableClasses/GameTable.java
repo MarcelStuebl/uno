@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -19,6 +20,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -31,6 +33,11 @@ public class GameTable implements Initializable {
     private GameLogic gameLogic;
     private Player player;
 
+    @FXML private StackPane enemy1;
+    @FXML private StackPane enemy2;
+    @FXML private StackPane enemy3;
+
+    ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
 
 
     public GameTable(Client client, StartGameResponse msg) {
@@ -52,18 +59,83 @@ public class GameTable implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Platform.runLater(() -> {
-            Stage stage = (Stage) root.getScene().getWindow();
-            try {
-                open(stage);
-            } catch (InvalidHandException | InvalidCardException | InvalidPlayerException e) {
-                throw new RuntimeException(e);
-            }
-        });
         updatePlayerFromStartGameResponse();
         gameLogic = new GameLogic(this);
         gameLogic.sendReadyToStart();
+
+        Platform.runLater(() -> {
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setTitle("UNO - Game Table");
+            stage.setMaximized(true);
+            stage.setResizable(true);
+
+            setupCentralStack();
+            addCloseButton(root, stage);
+
+            try {
+                open(stage);
+            } catch (InvalidCardException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
+
+    private void setupCentralStack() {
+        StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
+        root.getChildren().add(centralStack.getVisual());
+    }
+
+    public void setEnemies() {
+        List<Enemy> enemies = player.getEnemies();
+        int myIndex = player.getPlayerIndex();
+        int totalPlayers = enemies.size() + 1;
+
+        List<Enemy> sorted = new ArrayList<>(enemies);
+        sorted.sort((a, b) -> {
+            int ai = (a.getPlayerIndex() - myIndex + totalPlayers) % totalPlayers;
+            int bi = (b.getPlayerIndex() - myIndex + totalPlayers) % totalPlayers;
+            return Integer.compare(ai, bi);
+        });
+
+        StackPane[] slotOrder = { enemy3, enemy1, enemy2 };
+
+        int[] slotIndices = switch (sorted.size()) {
+            case 1 -> new int[]{ 1 };           // nur enemy1
+            case 2 -> new int[]{ 0, 2 };        // enemy3, enemy2
+            case 3 -> new int[]{ 0, 1, 2 };     // enemy3, enemy1, enemy2
+            default -> new int[]{};
+        };
+
+        for (int i = 0; i < slotIndices.length && i < sorted.size(); i++) {
+            Enemy enemy = sorted.get(i);
+            StackPane slot = slotOrder[slotIndices[i]];
+            EnemyDisplayController ctrl = addPlayer(slot, enemy.getUsername(), "/htl/steyr/uno/img/profile.png", enemy.getHandSize());
+            if (ctrl != null) {
+                enemyControllers.add(ctrl);
+            }
+        }
+    }
+
+
+    private EnemyDisplayController addPlayer(StackPane slot, String name, String imagePath, int cardCount) {
+        URL url = GameTable.class.getResource("/htl/steyr/uno/enemy.fxml");
+        try {
+            FXMLLoader loader = new FXMLLoader(url);
+            Node panel = loader.load();
+            EnemyDisplayController ctrl = loader.getController();
+            ctrl.setUsername(name);
+            ctrl.setCardCount(cardCount);
+            if (imagePath != null) {
+                ctrl.setProfileImage(imagePath);
+            }
+            slot.getChildren().setAll(panel);
+            return ctrl;
+        } catch (IOException e) {
+            System.err.println("Fehler beim Laden von enemy.fxml");
+            return null;
+        }
+    }
+
 
 
     private void onSceneClose() {
@@ -74,24 +146,7 @@ public class GameTable implements Initializable {
     }
 
 
-    private void open(Stage stage) throws InvalidHandException, InvalidCardException, InvalidPlayerException {
-        StackPane root = null;
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/htl/steyr/uno/gameTable.fxml"));
-            root = loader.load();
-
-            Scene scene = new Scene(root);
-            UiStyleUtil.applyGlobalFocusStyle(scene);
-            stage.setScene(scene);
-            stage.setTitle("UNO - Game Table");
-            stage.setMaximized(true);
-            stage.setResizable(true);
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    private void open(Stage stage) throws InvalidCardException {
         ArrayList<Card> myHand = new ArrayList<>();
         myHand.add(new Card(5, "red"));
         myHand.add(new Card(9, "blue"));
@@ -101,27 +156,10 @@ public class GameTable implements Initializable {
         myHand.add(new Card(13, "black"));
         myHand.add(new Card(14, "black"));
 
-
-
-        ArrayList<Enemy> enemies = new ArrayList<>();
-        enemies.add(new Enemy("Anna", false, 5,1));
-        enemies.add(new Enemy("Lukas", false, 7,4));
-        enemies.add(new Enemy("Sophie", false, 3,4));
-
-
-        Player player = new Player("Max", true, myHand, enemies, 0);
-
-
-        StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
-        root.getChildren().add(centralStack.getVisual());
+        Player player = new Player("Max", true, myHand, getPlayer().getEnemies(), 0);
 
 
         player.displayPlayerHand(root, player, centralStack);
-
-
-        addCloseButton(root, stage);  //for readabiity
-
-
     }
 
 

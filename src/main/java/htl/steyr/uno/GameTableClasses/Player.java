@@ -45,7 +45,6 @@ public class Player implements Serializable {
 
 
 
-
     private void sortHand() {
         this.hand.sort((c1, c2) -> {
 
