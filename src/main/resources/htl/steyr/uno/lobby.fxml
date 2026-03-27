@@ -27,7 +27,7 @@
                                  <children>
                                     <Label styleClass="partyLable" text="Party erstellen" />
                                     <Label maxWidth="240.0" styleClass="subtitle" text="Erstelle eine neue Party und lade deine Freunde mit dem code ein" textAlignment="CENTER" wrapText="true" />
-                                    <Button fx:id="createPartyButton" mnemonicParsing="false" onAction="#onCreatePartyButtonClicked" styleClass="createPartyButton" text="Party erstellen" />
+                                    <Button fx:id="createPartyButton" defaultButton="true" mnemonicParsing="false" onAction="#onCreatePartyButtonClicked" styleClass="createPartyButton" text="Party erstellen" />
                                  </children>
                               </VBox>
                            </children>

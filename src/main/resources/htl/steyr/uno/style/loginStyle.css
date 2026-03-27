@@ -159,3 +159,65 @@
     -fx-font-weight: bold;
     -fx-font-size: 1.2em;
 }
+
+/* Loading Overlay for missing server connection */
+.loadingOverlay {
+    -fx-background-color: rgba(7, 10, 18, 0.72);
+}
+
+.loadingHint {
+    -fx-text-fill: #d2d8ea;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.spinner {
+    -fx-pref-width: 56;
+    -fx-pref-height: 56;
+    -fx-progress-color: #4da3ff;
+    -fx-background-color: transparent;
+}
+
+.fieldHeaderRow {
+    -fx-alignment: center-left;
+}
+
+.infoIcon {
+    -fx-min-width: 16;
+    -fx-min-height: 16;
+    -fx-max-width: 16;
+    -fx-max-height: 16;
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+    -fx-alignment: center;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #cdd7ff;
+    -fx-background-color: rgba(77, 163, 255, 0.22);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(77, 163, 255, 0.65);
+    -fx-border-width: 1;
+    -fx-border-radius: 999;
+    -fx-cursor: hand;
+}
+
+.infoIcon:focused {
+    -fx-border-color: rgba(77, 163, 255, 1.0);
+    -fx-effect: dropshadow(gaussian, rgba(77, 163, 255, 0.45), 8, 0.25, 0, 0);
+}
+
+.infoIcon:hover {
+    -fx-background-color: rgba(77, 163, 255, 0.34);
+    -fx-border-color: rgba(77, 163, 255, 0.95);
+}
+
+.infoTooltip {
+    -fx-background-color: #161a2b;
+    -fx-text-fill: #e9edff;
+    -fx-font-size: 11px;
+    -fx-padding: 8 10 8 10;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(77, 163, 255, 0.7);
+    -fx-border-radius: 10;
+}
+

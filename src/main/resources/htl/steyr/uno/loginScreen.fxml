@@ -3,13 +3,17 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.util.Duration?>
 
-<HBox fx:id="rootContainer" alignment="CENTER" focusTraversable="true" stylesheets="@style/loginStyle.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="htl.steyr.uno.LoginController">
+<HBox fx:id="rootContainer" alignment="CENTER" focusTraversable="true" stylesheets="@style/loginStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="htl.steyr.uno.LoginController">
 
     <StackPane fx:id="brandingPane" maxWidth="Infinity" styleClass="centerPane" HBox.hgrow="ALWAYS">
         <VBox alignment="CENTER" spacing="20">
@@ -50,6 +54,21 @@
     </StackPane>
 
     <StackPane fx:id="loginPane" alignment="CENTER" maxWidth="Infinity" styleClass="rightPane" HBox.hgrow="ALWAYS">
+      <VBox fx:id="showConnectionScreen" alignment="CENTER" managed="false" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="24" styleClass="loginCard" visible="false">
+         <children>
+            <VBox alignment="CENTER" spacing="6">
+               <children>
+                  <Label styleClass="lWelcomeBack" text="Keine Verbindung zum Server!" textAlignment="CENTER" wrapText="true" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="145.0" prefWidth="286.0" spacing="12">
+               <children>
+                  <ProgressIndicator fx:id="loadingSpinner" prefHeight="94.0" prefWidth="117.0" progress="-1.0" styleClass="spinner" />
+               </children>
+            </VBox>
+            <Label styleClass="errorLabel" text="Bitte warten..." />
+         </children>
+      </VBox>
       <VBox fx:id="show2FA" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="24" styleClass="loginCard" visible="false">
          <VBox alignment="CENTER" spacing="6">
             <Label styleClass="lWelcomeBack" text="2-FA Code Authentifizierung" textAlignment="CENTER" wrapText="true" />
@@ -67,7 +86,7 @@
          </VBox>
          <Label fx:id="errorLabel2FA" styleClass="errorLabel" text="ERROR:" />
       </VBox>
-      <VBox fx:id="showLoginScreen" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard">
+      <VBox fx:id="showLoginScreen" alignment="CENTER" maxWidth="362.0" prefHeight="466.0" prefWidth="362.0" spacing="18" styleClass="loginCard" visible="false">
          <children>
             <Label styleClass="lWelcomeBack" text="Willkommen zurück!" />
             <Label styleClass="Subtitles" text="Melde dich an oder erstelle einen Account" />
@@ -103,29 +122,104 @@
             <Label styleClass="lWelcomeBack" text="Neues Konto erstellen!" />
          <VBox spacing="6">
             <children>
-               <Label styleClass="loginLables" text="Vorname" />
+               <HBox alignment="CENTER_LEFT" styleClass="fieldHeaderRow">
+                  <Label styleClass="loginLables" text="Vorname" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button focusTraversable="false" mnemonicParsing="false" styleClass="infoIcon" text="!">
+                     <tooltip>
+                        <Tooltip styleClass="infoTooltip" text="Erlaubt: nur Buchstaben&#10;Verboten: Zahlen, Sonderzeichen">
+                           <showDelay>
+                              <Duration millis="100.0" />
+                           </showDelay>
+                           <showDuration>
+                              <Duration fx:constant="INDEFINITE" />
+                           </showDuration>
+                        </Tooltip>
+                     </tooltip>
+                  </Button>
+               </HBox>
                <TextField fx:id="newAccFirstName" promptText="Dein Vorname" styleClass="login" />
             </children>
          </VBox>
          <VBox spacing="6">
             <children>
-               <Label styleClass="loginLables" text="Nachname" />
+               <HBox alignment="CENTER_LEFT" styleClass="fieldHeaderRow">
+                  <Label styleClass="loginLables" text="Nachname" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button focusTraversable="false" mnemonicParsing="false" styleClass="infoIcon" text="!">
+                     <tooltip>
+                        <Tooltip styleClass="infoTooltip" text="Erlaubt: nur Buchstaben&#10;Verboten: Zahlen, Sonderzeichen">
+                           <showDelay>
+                              <Duration millis="100.0" />
+                           </showDelay>
+                           <showDuration>
+                              <Duration fx:constant="INDEFINITE" />
+                           </showDuration>
+                        </Tooltip>
+                     </tooltip>
+                  </Button>
+               </HBox>
                <TextField fx:id="newAccLastName" promptText="Dein Nachname" styleClass="login" />
             </children>
          </VBox>
 
             <VBox spacing="6">
-                <Label styleClass="loginLables" text="Benutzername" />
+                <HBox alignment="CENTER_LEFT" styleClass="fieldHeaderRow">
+                    <Label styleClass="loginLables" text="Benutzername" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button focusTraversable="false" mnemonicParsing="false" styleClass="infoIcon" text="!">
+                        <tooltip>
+                            <Tooltip styleClass="infoTooltip" text="Erlaubt: nur Kleinbuchstaben (a-z)&#10;Verboten: Zahlen, Sonderzeichen">
+                                <showDelay>
+                                    <Duration millis="100.0" />
+                                </showDelay>
+                                <showDuration>
+                                    <Duration fx:constant="INDEFINITE" />
+                                </showDuration>
+                            </Tooltip>
+                        </tooltip>
+                    </Button>
+                </HBox>
                 <TextField fx:id="newAccUserName" promptText="Dein Benutzername" styleClass="login" />
             </VBox>
 
             <VBox spacing="6">
-                <Label styleClass="loginLables" text="Passwort" />
+                <HBox alignment="CENTER_LEFT" styleClass="fieldHeaderRow">
+                    <Label styleClass="loginLables" text="Passwort" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button focusTraversable="false" mnemonicParsing="false" styleClass="infoIcon" text="!">
+                        <tooltip>
+                            <Tooltip styleClass="infoTooltip" text="Pflichtfeld: darf nicht leer sein">
+                                <showDelay>
+                                    <Duration millis="100.0" />
+                                </showDelay>
+                                <showDuration>
+                                    <Duration fx:constant="INDEFINITE" />
+                                </showDuration>
+                            </Tooltip>
+                        </tooltip>
+                    </Button>
+                </HBox>
                 <PasswordField fx:id="newAccPassword" promptText="Dein Passwort" styleClass="login" />
             </VBox>
             <VBox spacing="6">
                 <children>
-                    <Label styleClass="loginLables" text="E-Mail" />
+                    <HBox alignment="CENTER_LEFT" styleClass="fieldHeaderRow">
+                        <Label styleClass="loginLables" text="E-Mail" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button focusTraversable="false" mnemonicParsing="false" styleClass="infoIcon" text="!">
+                            <tooltip>
+                                <Tooltip styleClass="infoTooltip" text="Muss ein @ und einen Punkt enthalten&#10;Beispiel: name@mail.com">
+                                    <showDelay>
+                                        <Duration millis="100.0" />
+                                    </showDelay>
+                                    <showDuration>
+                                        <Duration fx:constant="INDEFINITE" />
+                                    </showDuration>
+                                </Tooltip>
+                            </tooltip>
+                        </Button>
+                    </HBox>
                     <TextField fx:id="newAccEmail" promptText="Deine E-Mail" styleClass="login" />
                 </children>
             </VBox>
@@ -224,6 +318,7 @@
             <Label fx:id="errorLabelVerifyAccount" styleClass="errorLabel" text="ERROR:" visible="false" />
          </children>
       </VBox>
+
     </StackPane>
 
 </HBox>

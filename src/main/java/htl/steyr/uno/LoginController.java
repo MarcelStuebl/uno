@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -45,8 +46,10 @@ public class LoginController implements Initializable {
     @FXML private Button showLogin;
     @FXML private VBox showNewAccScreen;
     @FXML private Button createAcc;
+    @FXML private VBox showConnectionScreen;
     @FXML private VBox showLoginScreen;
     @FXML private StackPane loginPane;
+    @FXML private ProgressIndicator loadingSpinner;
     @FXML private StackPane brandingPane;
     @FXML private PasswordField newAccPassword;
     @FXML private TextField newAccUserName;
@@ -66,6 +69,8 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        setConnectionLoading(true);
+
         client = new Client(this);
         Thread clientThread = new Thread(() -> {
             client.start();
@@ -82,19 +87,43 @@ public class LoginController implements Initializable {
 
 
     public void readyToLogin() {
-        //@ToDo: Show login screen
-        Platform.runLater(() -> {
-            showLoginScreen.setVisible(true);
-        });
+        Platform.runLater(() -> setConnectionLoading(false));
     }
 
 
     public void cantLogin() {
-        //@TODO: set visible of login screen to false and show loading screen
+        Platform.runLater(() -> setConnectionLoading(true));
+    }
 
-        Platform.runLater(() -> {
+    private void setConnectionLoading(boolean loading) {
+        if (loading) {
+            hideAllLoginSubScreens();
+            showConnectionScreen.setVisible(true);
+            showConnectionScreen.setManaged(true);
+            showConnectionScreen.toFront();
             showLoginScreen.setVisible(false);
-        });
+            showLoginScreen.setManaged(false);
+        } else {
+            showConnectionScreen.setVisible(false);
+            showConnectionScreen.setManaged(false);
+            showLoginScreen.setVisible(true);
+            showLoginScreen.setManaged(true);
+            showLoginScreen.toFront();
+        }
+
+        if (loadingSpinner != null) {
+            loadingSpinner.setVisible(loading);
+            loadingSpinner.setManaged(loading);
+        }
+    }
+
+    private void hideAllLoginSubScreens() {
+        show2FA.setVisible(false);
+        showNewAccScreen.setVisible(false);
+        showForgotPassword.setVisible(false);
+        showResetPassword2FA.setVisible(false);
+        showNewPasswordScreen.setVisible(false);
+        showAccountVerificationScreen.setVisible(false);
     }
 
 
