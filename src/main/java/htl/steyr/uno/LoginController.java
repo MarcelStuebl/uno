@@ -16,8 +16,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -310,8 +312,18 @@ public class LoginController implements Initializable {
     }
 
     public void logInFailed(LoginFailedResponse msg) {
+        System.out.println("Login failed with error code: " + msg.getErrorCode());
+        String errorMessage;
+        if (msg.getErrorCode() == 1) {
+            errorMessage = "Invalid username or password!";
+        } else if (msg.getErrorCode() == 2) {
+            errorMessage = "User already logged in from another device!";
+        } else {
+            errorMessage = "Unknown error!";
+        }
+
         Platform.runLater(() -> {
-            errorLabel.setText("Username or Password wrong!");
+            errorLabel.setText(errorMessage);
             errorLabel.setVisible(true);
         });
     }

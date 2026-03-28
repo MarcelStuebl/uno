@@ -11,9 +11,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerSocketConnection {
 
@@ -34,6 +36,7 @@ public class ServerSocketConnection {
      * It takes a Socket object representing the client's connection and a reference to the Server instance as parameters.
      * The constructor creates an ObjectOutputStream for sending messages to the client and an ObjectInputStream for receiving messages from the client.
      * If an IOException occurs during the setup of the streams, it throws a RuntimeException.
+     *
      * @param socket
      * @param server
      */
@@ -56,6 +59,7 @@ public class ServerSocketConnection {
      * It takes an Object as a parameter, which represents the message to be sent.
      * The method first resets the output stream to ensure that any previous messages are cleared, then it writes the message object to the stream and flushes it to ensure that the message is sent immediately
      * If an IOException occurs during the process of sending the message, it throws a RuntimeException.
+     *
      * @param message
      */
     public void sendMessage(Object message) {
@@ -75,6 +79,7 @@ public class ServerSocketConnection {
      * It takes an Object as a parameter, which represents the message to be logged.
      * The method constructs a log message by combining the client's remote socket address with the provided message, and then it calls the server's setLogMessage method to update the log.
      * This allows for tracking client interactions and activities on the server side.
+     *
      * @param msg
      */
     private void sendLogMessage(Object msg) {
@@ -111,6 +116,7 @@ public class ServerSocketConnection {
                         case CardPlayedRequest msg -> cardPlayedRequest(msg);
                         case ReadyInGameTableRequest msg -> readyInGameTableRequest(msg);
                         case RequestCardRequest msg -> requestCardRequest(msg);
+                        case SetProfileImageRequest msg -> setProfileImageRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
 
@@ -133,25 +139,31 @@ public class ServerSocketConnection {
      */
 
 
-
-
-
     /**
      * The loginRequest method handles the login process for a client by validating the provided username and password against the database.
      * It takes a LoginRequest object as a parameter, which contains the username and password submitted by the client.
-     * The method creates an instance of the DatabaseUser class to interact with the user database and retrieves the user information based on the provided credentials.
-     * If the user is found (i.e., the credentials are valid), it sends a LoginSuccessResponse back to the client with the user information.
-     * If the user is not found (i.e., the credentials are invalid), it sends a LoginFailedResponse back to the client.
-     * The method also logs the outcome of the login attempt using the sendLogMessage method to provide feedback on the server side.
+     * The method first checks if there is already an active connection with the same username to prevent multiple logins from different devices.
+     * If such a connection exists, it sends a LoginFailedResponse back to the client with an appropriate error code and logs the event.
+     * If there is no active connection with the same username, it retrieves the user information from the database using the DatabaseUser class and checks if the credentials are valid.
+     * If the credentials are valid, it sends a LoginSuccessResponse back to the client with the user information.
+     * If the credentials are invalid, it sends a LoginFailedResponse back to the client with an appropriate error code.
+     *
      * @param request
      * @throws SQLException
      */
     private void loginRequest(LoginRequest request) throws SQLException {
+        if (server.getConnections().stream().filter(c -> c.getUser() != null).anyMatch(c -> c.getUser().getUsername().equals(request.getUsername()))) {
+            LoginFailedResponse msg = new LoginFailedResponse(2);
+            sendMessage(msg);
+            sendLogMessage(msg);
+            return;
+        }
+
         DatabaseUser db = new DatabaseUser();
         user = db.getUserPerUserName(request.getUsername(), request.getPassword());
         Object msg;
         if (user == null) {
-            msg = new LoginFailedResponse();
+            msg = new LoginFailedResponse(1);
         } else {
             msg = new LoginSuccessResponse(user);
         }
@@ -168,6 +180,7 @@ public class ServerSocketConnection {
      * If a user with the same username exists, it sends a CreateAccountFailedResponse back to the client indicating that the username is already taken.
      * If the username is available, it adds the new user to the database and sends a CreateAccountSuccessResponse back to the client with the created user information.
      * The method also logs the outcome of the account creation attempt using the sendLogMessage method to provide feedback on the server side.
+     *
      * @param request
      * @throws SQLException
      */
@@ -205,6 +218,7 @@ public class ServerSocketConnection {
      * The method creates a new instance of the Lobby class, passing the server reference to it.
      * It then adds the current connection (this) to the newly created lobby and sends a CreateLobbySuccessResponse back to the client to indicate that the lobby has been successfully created.
      * The method also logs the creation of the lobby using the sendLogMessage method and updates the lobby information for all connected clients by calling the updateJoined method on the lobby instance.
+     *
      * @param obj
      */
     private void createLobbyRequest(CreateLobbyRequest obj) {
@@ -221,6 +235,7 @@ public class ServerSocketConnection {
      * If the lobby is found but cannot be joined (i.e., it is full), it sends a LobbyJoinRefusedResponse back to the client, including the lobby information in the response.
      * If the lobby is not found, it sends a LobbyNotFoundResponse back to the client.
      * The method also logs the outcome of the join attempt using the sendLogMessage method to provide feedback on the server side.
+     *
      * @param obj
      */
     private void joinLobbyRequest(JoinLobbyRequest obj) {
@@ -246,6 +261,7 @@ public class ServerSocketConnection {
      * The method first retrieves the lobby that the current connection (this) is part of by searching through the server's list of lobbies and checking if the connection is included in any of them.
      * If the lobby is found, it calls the sendChatMessage method on the lobby instance, passing the SendChatMessageRequest object to it. This allows the lobby to broadcast the chat message to all connected clients in that lobby.
      * If the lobby is not found (i.e., the connection is not part of any lobby), the method does nothing.
+     *
      * @param obj
      */
     private void sendChatMessageRequest(SendChatMessageRequest obj) {
@@ -265,6 +281,7 @@ public class ServerSocketConnection {
      * If no user with the specified email exists, it sends a ForgotPasswordResponse back to the client indicating that the email is not associated with any account.
      * If there is an existing valid password reset request, it sends a ForgotPasswordResponse back to the client indicating that a request has already been made and is still valid.
      * The method also logs the outcome of the password reset request using the sendLogMessage method to provide feedback on the server side.
+     *
      * @param msg
      * @throws SQLException
      */
@@ -297,6 +314,7 @@ public class ServerSocketConnection {
      * If the code is correct, it sends a ForgotPasswordResponse back to the client indicating that the code is valid and allowing the user to proceed with entering a new password.
      * If the code is incorrect, it sends a ForgotPasswordResponse back to the client indicating that the code is invalid.
      * The method also logs the outcome of the code verification using the sendLogMessage method to provide feedback on the server side.
+     *
      * @param msg
      */
     private void forgotPasswordSendCodeRequest(ForgotPasswordSendCodeRequest msg) {
@@ -317,6 +335,7 @@ public class ServerSocketConnection {
      * It then sends a ForgotPasswordResponse back to the client indicating that the password has been successfully changed.
      * If the code is incorrect, it sends a ForgotPasswordResponse back to the client indicating that the code is invalid and that the password change request cannot be processed.
      * The method also logs the outcome of the password change request using the sendLogMessage method to provide feedback on the server side.
+     *
      * @param msg
      * @throws SQLException
      */
@@ -345,6 +364,7 @@ public class ServerSocketConnection {
      * results of the checks, allowing the client to provide feedback to the user about the availability of the username and email address for account creation.
      * The method also logs the outcome of the availability checks using the sendLogMessage method to
      * provide feedback on the server side.
+     *
      * @param msg
      * @throws SQLException
      */
@@ -403,16 +423,26 @@ public class ServerSocketConnection {
         }
     }
 
+
+    private void setProfileImageRequest(SetProfileImageRequest msg) {
+        System.out.println("Received SetProfileImageRequest for user: " + getUser().getUsername());
+        DatabaseUser db = new DatabaseUser();
+        try {
+            db.updateProfileImage(getUser(), msg.getImageData());
+        } catch (SQLException e) {
+            System.out.println("Error updating profile image for user " + getUser().getUsername() + ": " + e.getMessage());
+        }
+    }
+
+
     /**
      * End of the request handling methods.
      */
 
 
-
-
-
     public User getUser() {
-        return new User(user.getUsername(), user.getLastName(), user.getFirstName());
+        if (user == null) return null;
+        return new User(user.getUsername(), user.getLastName(), user.getFirstName(), user.getProfileImageData());
     }
 
 

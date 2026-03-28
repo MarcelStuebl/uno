@@ -18,6 +18,7 @@ public class User implements Serializable {
     private Timestamp lastLogin;
     private String passwordHash;
     private String passwordSalt;
+    private byte[] profileImage;
 
 
     /**
@@ -36,8 +37,9 @@ public class User implements Serializable {
      * @param lastLogin
      * @param passwordHash
      * @param passwordSalt
+     * @param profileImage
      */
-    public User(int id, String username, String lastName, String firstName, String email, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin, String passwordHash, String passwordSalt) {
+    public User(int id, String username, String lastName, String firstName, String email, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin, String passwordHash, String passwordSalt, byte[] profileImage) {
         setId(id);
         setUsername(username);
         setLastName(lastName);
@@ -49,6 +51,7 @@ public class User implements Serializable {
         setLastLogin(lastLogin);
         setPasswordHash(passwordHash);
         setPasswordSalt(passwordSalt);
+        setProfileImageData(profileImage);
     }
 
 
@@ -67,8 +70,9 @@ public class User implements Serializable {
      * @param gamesLost
      * @param createdAt
      * @param lastLogin
+     * @param profileImage
      */
-    public User(int id, String username, String lastName, String firstName, String email, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin) {
+    public User(int id, String username, String lastName, String firstName, String email, int gamesWon, int gamesLost, Timestamp createdAt, Timestamp lastLogin, byte[] profileImage) {
         setId(id);
         setUsername(username);
         setLastName(lastName);
@@ -78,6 +82,7 @@ public class User implements Serializable {
         setGamesLost(gamesLost);
         setCreatedAt(createdAt);
         setLastLogin(lastLogin);
+        setProfileImageData(profileImage);
     }
 
 
@@ -112,10 +117,11 @@ public class User implements Serializable {
      * @param lastName
      * @param firstName
      */
-    public User(String username, String lastName, String firstName) {
+    public User(String username, String lastName, String firstName, byte[] profileImage) {
         setUsername(username);
         setLastName(lastName);
         setFirstName(firstName);
+        setProfileImageData(profileImage);
     }
 
 
@@ -235,6 +241,13 @@ public class User implements Serializable {
     }
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public byte[] getProfileImageData() {
+        return profileImage;
+    }
+    public void setProfileImageData(byte[] profileImage) {
+        this.profileImage = profileImage;
     }
 }
 

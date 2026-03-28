@@ -15,12 +15,13 @@ public class DatabaseUser {
      * @throws SQLException if a database access error occurs.
      */
     public User getUserPerUserName(String username) throws SQLException {
-        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, password_hash, password_salt FROM user WHERE username = ?";
+        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, password_hash, password_salt, profile_image FROM user WHERE username = ?";
 
         User user = new User();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, username);
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     user = new User(
@@ -34,7 +35,8 @@ public class DatabaseUser {
                             rs.getTimestamp("created_at"),
                             rs.getTimestamp("last_login"),
                             rs.getString("password_hash"),
-                            rs.getString("password_salt")
+                            rs.getString("password_salt"),
+                            rs.getBytes("profile_image")
                     );
                 }
             }
@@ -54,7 +56,7 @@ public class DatabaseUser {
         User user = getUserPerUserName(username);
             if (verifyPassword(password, user.getPasswordHash(), user.getPasswordSalt())) {
                 updateLastLogin(user.getId());
-                return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getEmail(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin());
+                return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getEmail(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin(), user.getProfileImageData());
             } else {
                 return null;
             }
@@ -68,7 +70,7 @@ public class DatabaseUser {
      * @throws SQLException if a database access error occurs.
      */
     public User getUserPerEmail(String email) throws SQLException {
-        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login FROM user WHERE email = ?";
+        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, profile_image FROM user WHERE email = ?";
 
         User user = new User();
         try (Connection conn = DatabaseConnection.getConnection();
@@ -85,7 +87,8 @@ public class DatabaseUser {
                             rs.getInt("games_won"),
                             rs.getInt("games_lost"),
                             rs.getTimestamp("created_at"),
-                            rs.getTimestamp("last_login")
+                            rs.getTimestamp("last_login"),
+                            rs.getBytes("profile_image")
                     );
                 }
             }
@@ -202,6 +205,20 @@ public class DatabaseUser {
             pstmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
             pstmt.setInt(2, userId);
             pstmt.executeUpdate();
+        }
+    }
+
+
+    public void updateProfileImage(User user, byte[] imageData) throws SQLException {
+        String query = "UPDATE user SET profile_image = ? WHERE username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setBytes(1, imageData);
+            pstmt.setString(2, user.getUsername());
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            throw new SQLException("Failed to update profile image: " + e.getMessage());
         }
     }
 

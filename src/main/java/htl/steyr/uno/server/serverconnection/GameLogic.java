@@ -47,7 +47,7 @@ public class GameLogic {
                 hand.add(generateCard());
             }
 
-            players.add(new Player(user.getUsername(), false, hand, new ArrayList<>(), playerIndex));
+            players.add(new Player(user.getUsername(), false, hand, new ArrayList<>(), playerIndex, user.getProfileImageData()));
             playerIndex++;
         }
     }

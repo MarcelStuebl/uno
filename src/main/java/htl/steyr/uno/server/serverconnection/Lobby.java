@@ -75,7 +75,7 @@ public class Lobby {
 
 
     private void checkStatus() {
-        if (connections.size() >= 8) {
+        if (connections.size() >= 4) {
             setStatus(1);
         } else {
             setStatus(0);

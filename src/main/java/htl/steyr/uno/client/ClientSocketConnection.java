@@ -230,6 +230,11 @@ public class ClientSocketConnection implements Closeable {
         sendMessage(msg);
     }
 
+    public void setProfileImageRequest(byte[] imageBytes) {
+        SetProfileImageRequest msg = new SetProfileImageRequest(getUser(), imageBytes);
+        sendMessage(msg);
+    }
+
 
 
 
