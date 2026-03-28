@@ -151,7 +151,7 @@ public class ServerSocketConnection {
      * @throws SQLException
      */
     private void loginRequest(LoginRequest request) throws SQLException {
-        if (server.getConnections().stream().filter(c -> c.getUser() != null).anyMatch(c -> c.getUser().getUsername().equals(request.getUsername()))) {
+        if (server.getConnections().stream().filter(c -> c.getUser() != null).anyMatch(c -> c.getUser().getUsername().equals(request.username()))) {
             LoginFailedResponse msg = new LoginFailedResponse(2);
             sendMessage(msg);
             sendLogMessage(msg);
@@ -159,15 +159,15 @@ public class ServerSocketConnection {
         }
 
         DatabaseUser db = new DatabaseUser();
-        user = db.getUserPerUserName(request.getUsername(), request.getPassword());
+        user = db.getUserPerUserName(request.username(), request.password());
         Object msg;
         DatabaseLog dbLog = new DatabaseLog();
         if (user == null) {
             msg = new LoginFailedResponse(1);
-            dbLog.logUserLogin(null, request.getUsername(), socket.getRemoteSocketAddress().toString(), false);
+            dbLog.logUserLogin(null, request.username(), socket.getRemoteSocketAddress().toString(), false);
         } else {
             msg = new LoginSuccessResponse(user);
-            dbLog.logUserLogin(user.getId(), request.getUsername(), socket.getRemoteSocketAddress().toString(), true);
+            dbLog.logUserLogin(user.getId(), request.username(), socket.getRemoteSocketAddress().toString(), true);
         }
         sendMessage(msg);
         sendLogMessage(msg);
@@ -187,17 +187,17 @@ public class ServerSocketConnection {
      * @throws SQLException
      */
     private void createAccountRequest(CreateAccountRequest request) throws SQLException {
-        if (request.getCode() == null || createAccountCode == null) {
+        if (request.code() == null || createAccountCode == null) {
             createAccountCode = SECURE_RANDOM.nextInt(900000) + 100000; // Generate a random 6-digit code
             MailSender ms = new MailSender();
-            ms.sendAuthenticationCode(request.getEmail(), createAccountCode.toString());
+            ms.sendAuthenticationCode(request.email(), createAccountCode.toString());
         } else {
-            User user = new User(request.getUsername(), request.getLastName(), request.getFirstName(), request.getEmail(), request.getPassword());
+            User user = new User(request.username(), request.lastName(), request.firstName(), request.email(), request.password());
             DatabaseUser db1 = new DatabaseUser();
             if (db1.userExists(user)) {
                 sendMessage(new CreateAccountFailedResponse(1));
             } else {
-                if (!request.getCode().equals(createAccountCode)) {
+                if (!request.code().equals(createAccountCode)) {
                     sendMessage(new CreateAccountFailedResponse(2));
                 } else {
                     DatabaseUser db = new DatabaseUser();
@@ -206,7 +206,7 @@ public class ServerSocketConnection {
                     } catch (UserAlreadyExistsException e) {
                         sendMessage(new CreateAccountFailedResponse(1));
                     }
-                    User createdUser = db.getUserPerUserName(request.getUsername(), request.getPassword());
+                    User createdUser = db.getUserPerUserName(request.username(), request.password());
                     sendMessage(new CreateAccountSuccessResponse(createdUser));
                 }
             }
@@ -241,7 +241,7 @@ public class ServerSocketConnection {
      * @param obj
      */
     private void joinLobbyRequest(JoinLobbyRequest obj) {
-        Lobby lobby = server.getLobbies().stream().filter(l -> l.getLobbyId() == obj.getLobbyId()).findFirst().orElse(null);
+        Lobby lobby = server.getLobbies().stream().filter(l -> l.getLobbyId() == obj.lobbyId()).findFirst().orElse(null);
         if (lobby != null && lobby.canJoin()) {
             lobby.addConnection(this);
             lobby.updateJoined();
@@ -291,12 +291,12 @@ public class ServerSocketConnection {
         // Check if there is an existing password reset request for the provided email and if it is still valid (within 1 minute)
         if (passwordForgotten == null || passwordForgotten.getRequestTime().getTime() + 60000 < System.currentTimeMillis()) {
 
-            User user = new DatabaseUser().getUserPerEmail(msg.getEmail());
+            User user = new DatabaseUser().getUserPerEmail(msg.email());
             if (user.getUsername() != null) {
                 Integer code = Integer.parseInt(String.format("%06d", new java.util.Random().nextInt(1000000)));
                 passwordForgotten = new PasswordForgotten(code, new Timestamp(System.currentTimeMillis()));
                 MailSender ms = new MailSender();
-                ms.sendAuthenticationCode(msg.getEmail(), passwordForgotten.getCode().toString());
+                ms.sendAuthenticationCode(msg.email(), passwordForgotten.getCode().toString());
                 sendMessage(new ForgotPasswordResponse(0));
             } else {
                 sendMessage(new ForgotPasswordResponse(6));
@@ -319,7 +319,7 @@ public class ServerSocketConnection {
      * @param msg
      */
     private void forgotPasswordSendCodeRequest(ForgotPasswordSendCodeRequest msg) {
-        if (passwordForgotten != null && passwordForgotten.getCode().equals(msg.getCode())) {
+        if (passwordForgotten != null && passwordForgotten.getCode().equals(msg.code())) {
             // Code is correct, allow the user to enter a new password
             sendMessage(new ForgotPasswordResponse(3));
         } else {
@@ -341,11 +341,11 @@ public class ServerSocketConnection {
      * @throws SQLException
      */
     private void changePasswordRequest(ChangePasswordRequest msg) throws SQLException {
-        if (passwordForgotten.getCode().equals(msg.getCode())) {
+        if (passwordForgotten.getCode().equals(msg.code())) {
             DatabaseUser db = new DatabaseUser();
 
-            User user = db.getUserPerEmail(msg.getEmail());
-            db.updatePassword(user.getUsername(), msg.getNewPassword());
+            User user = db.getUserPerEmail(msg.email());
+            db.updatePassword(user.getUsername(), msg.newPassword());
 
             ForgotPasswordResponse response = new ForgotPasswordResponse(4);
             sendMessage(response);
@@ -371,8 +371,8 @@ public class ServerSocketConnection {
      */
     private void checkIfUserAlreadyExistsRequest(CheckIfUserAlreadyExistsRequest msg) throws SQLException {
         DatabaseUser db = new DatabaseUser();
-        String username = msg.getUsername();
-        String email = msg.getEmail();
+        String username = msg.username();
+        String email = msg.email();
 
         boolean userAlreadyExists = false;
         boolean emailAlreadyExists = false;
@@ -429,7 +429,7 @@ public class ServerSocketConnection {
         System.out.println("Received SetProfileImageRequest for user: " + getUser().getUsername());
         DatabaseUser db = new DatabaseUser();
         try {
-            db.updateProfileImage(getUser(), msg.getImageData());
+            db.updateProfileImage(getUser(), msg.imageData());
         } catch (SQLException e) {
             System.out.println("Error updating profile image for user " + getUser().getUsername() + ": " + e.getMessage());
         }

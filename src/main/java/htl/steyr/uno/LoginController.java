@@ -213,13 +213,13 @@ public class LoginController implements Initializable {
     }
 
     public void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
-        if (msg.isUserAlreadyExists()) {
+        if (msg.userAlreadyExists()) {
             System.out.println("User already exists.");
             Platform.runLater(() -> {
                 errorLabelCreateAcc.setText("Username already exists!");
                 errorLabelCreateAcc.setVisible(true);
             });
-        } else if (msg.isEmailAlreadyExists()) {
+        } else if (msg.emailAlreadyExists()) {
             System.out.println("Email already exists.");
             Platform.runLater(() -> {
                 errorLabelCreateAcc.setText("Email already exists!");
@@ -286,12 +286,12 @@ public class LoginController implements Initializable {
     }
 
     public void createAccountFailedResponse(CreateAccountFailedResponse msg) {
-        if (msg.getStatus() == 1) {
+        if (msg.status() == 1) {
             Platform.runLater(() -> {
                 errorLabelCreateAcc.setText("Username already exists!");
                 errorLabelCreateAcc.setVisible(true);
             });
-        } else if (msg.getStatus() == 2) {
+        } else if (msg.status() == 2) {
             Platform.runLater(() -> {
                 errorLabelCreateAcc.setText("Verification code is incorrect!");
                 errorLabelCreateAcc.setVisible(true);
@@ -312,11 +312,11 @@ public class LoginController implements Initializable {
     }
 
     public void logInFailed(LoginFailedResponse msg) {
-        System.out.println("Login failed with error code: " + msg.getErrorCode());
+        System.out.println("Login failed with error code: " + msg.errorCode());
         String errorMessage;
-        if (msg.getErrorCode() == 1) {
+        if (msg.errorCode() == 1) {
             errorMessage = "Invalid username or password!";
-        } else if (msg.getErrorCode() == 2) {
+        } else if (msg.errorCode() == 2) {
             errorMessage = "User already logged in from another device!";
         } else {
             errorMessage = "Unknown error!";
@@ -364,23 +364,23 @@ public class LoginController implements Initializable {
     }
 
     public void forgotPasswordResponse(ForgotPasswordResponse msg) {
-        if (msg.getStatus() == 0) {
+        if (msg.status() == 0) {
             showForgotPassword.setVisible(false);
             showResetPassword2FA.setVisible(true);
             resetPassword2FACode.clear();
             errorLabelReset2FA.setVisible(false);
 
-        } else if (msg.getStatus() == 1) {
+        } else if (msg.status() == 1) {
             Platform.runLater(() -> {
                 errorLabelForgotPassword.setText("To fast! Try again later.");
                 errorLabelForgotPassword.setVisible(true);
             });
-        } else if (msg.getStatus() == 2) {
+        } else if (msg.status() == 2) {
             System.out.println("Wrong code. Please try again.");
 
 
             // @TODO: Show error message.
-        } else if (msg.getStatus() == 3) {
+        } else if (msg.status() == 3) {
             Platform.runLater(() -> {
                 showResetPassword2FA.setVisible(false);
                 showNewPasswordScreen.setVisible(true);
@@ -388,7 +388,7 @@ public class LoginController implements Initializable {
                 confirmNewPassword.clear();
                 errorLabelNewPassword.setVisible(false);
             });
-        } else if (msg.getStatus() == 4) {
+        } else if (msg.status() == 4) {
             Platform.runLater(() -> {
                 errorLabelNewPassword.setText("Passwort erfolgreich geändert!");
                 errorLabelNewPassword.setStyle("-fx-text-fill: #90EE90;");
@@ -403,11 +403,11 @@ public class LoginController implements Initializable {
                     e.printStackTrace();
                 }
             }).start();
-        } else if (msg.getStatus() == 5) {
+        } else if (msg.status() == 5) {
             System.out.println("Something went wrong. Please try again later.");
 
             // @TODO: Show error message.
-        } else if (msg.getStatus() == 6) {
+        } else if (msg.status() == 6) {
             Platform.runLater(() -> {
                 errorLabelForgotPassword.setText("Email address not found!");
                 errorLabelForgotPassword.setVisible(true);

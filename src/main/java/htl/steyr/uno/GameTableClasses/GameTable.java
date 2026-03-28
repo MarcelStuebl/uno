@@ -41,7 +41,7 @@ public class GameTable implements Initializable {
     }
 
     private void updatePlayerFromStartGameResponse() {
-        for (Enemy enemy : startGameResponse.getEnemies()) {
+        for (Enemy enemy : startGameResponse.enemies()) {
             if (!Objects.equals(enemy.getUsername(), player.getUsername())) {
                 player.getEnemies().add(enemy);
                 break;

@@ -124,9 +124,9 @@ public class LobbyController implements Initializable {
     }
 
     public void joinPartyFailed(LobbyJoinRefusedResponse msg) {
-        if (msg.getLobbyInfo().getStatus() == 1) {
+        if (msg.lobbyInfo().status() == 1) {
             System.out.println("Lobby is full. Please try again.");
-        } else if (msg.getLobbyInfo().getStatus() == 2) {
+        } else if (msg.lobbyInfo().status() == 2) {
             System.out.println("Game already started. Please try again.");
         } else {
             System.out.println("Unknown error. Please try again.");
@@ -243,8 +243,8 @@ public class LobbyController implements Initializable {
     }
 
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {
-        String sender = msg.getUser().getUsername();
-        String message = msg.getMessage();
+        String sender = msg.user().getUsername();
+        String message = msg.message();
         System.out.println("Received chat message from " + sender + ": " + message);
     }
 }

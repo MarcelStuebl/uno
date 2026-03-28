@@ -112,7 +112,7 @@ public class ClientSocketConnection implements Closeable {
 
 
     private void logInSuccessResponse(LoginSuccessResponse msg) {
-        this.user = msg.getUser();
+        this.user = msg.user();
         client.getLoginController().logInSuccess(user);
     }
 
@@ -123,7 +123,7 @@ public class ClientSocketConnection implements Closeable {
     private void lobbyInfoResponse(LobbyInfoResponse msg) {
         this.lobby = msg;
 
-        if (msg.getUsers() != null) {
+        if (msg.users() != null) {
             if (client.getLobbyWaitController() != null) {
                 client.getLobbyWaitController().setLobby(msg);
             } else if (client.getLobbyController() != null) {

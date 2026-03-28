@@ -64,7 +64,7 @@ public class LobbyWaitController implements Initializable {
             }
         });
 
-        String lobbyCode = lobby.getLobbyId().toString();
+        String lobbyCode = lobby.lobbyId().toString();
         lobbyCodeLabel.setText("Lobby Code: " + lobbyCode);
 
         AccNameDisplayLabel.setText("Account: " + client.getConn().getUser().getUsername());
@@ -158,20 +158,20 @@ public class LobbyWaitController implements Initializable {
 
         playerListView.getItems().clear();
 
-        if (lobby.getUsers().getFirst().getUsername().equals(currentUsername)) {
+        if (lobby.users().getFirst().getUsername().equals(currentUsername)) {
             playButton.setVisible(true);
 
-            playerListView.getItems().add(lobby.getUsers().getFirst().getUsername());
+            playerListView.getItems().add(lobby.users().getFirst().getUsername());
 
-            if (lobby.getUsers().size() > 1) {
-                playerListView.getItems().add(lobby.getUsers().getLast().getUsername());
+            if (lobby.users().size() > 1) {
+                playerListView.getItems().add(lobby.users().getLast().getUsername());
             } else {
                 playerListView.getItems().add("Wartet auf Spieler...");
             }
         } else {
             playButton.setVisible(false);
 
-            playerListView.getItems().add(lobby.getUsers().getFirst().getUsername());
+            playerListView.getItems().add(lobby.users().getFirst().getUsername());
             playerListView.getItems().add(currentUsername);
         }
     }
@@ -283,8 +283,8 @@ public class LobbyWaitController implements Initializable {
     }
 
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {
-        String sender = msg.getUser().getUsername();
-        String text = msg.getMessage();
+        String sender = msg.user().getUsername();
+        String text = msg.message();
         System.out.println("Received chat message from " + sender + ": " + text);
 
         Platform.runLater(() -> gameChatListView.getItems().add(new ChatMessage(sender, text)));

@@ -2,30 +2,12 @@ package htl.steyr.uno.requests.client;
 
 import java.io.Serializable;
 
-public class JoinLobbyRequest implements Serializable {
-
-    private int lobbyId;
-
-
-    /**
-     * Create a new JoinLobbyRequest for the given lobby ID.
-     *
-     * @param lobbyId the ID of the lobby to join
-     */
-    public JoinLobbyRequest(int lobbyId) {
-        this.lobbyId = lobbyId;
-    }
+public record JoinLobbyRequest(int lobbyId) implements Serializable {
 
     @Override
     public String toString() {
         return "JoinLobbyRequest{" +
-                "lobbyId=" + lobbyId +
+                "lobbyId=" + lobbyId() +
                 '}';
     }
-
-    public int getLobbyId() {
-        return lobbyId;
-    }
-
-
 }

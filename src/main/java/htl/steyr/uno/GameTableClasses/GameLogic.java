@@ -1,14 +1,8 @@
 package htl.steyr.uno.GameTableClasses;
 
-import htl.steyr.uno.requests.client.CardPlayedRequest;
-import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
-import htl.steyr.uno.requests.client.RequestCardRequest;
-import htl.steyr.uno.requests.server.CardAddResponse;
-import htl.steyr.uno.requests.server.CardPlayedResponse;
-import htl.steyr.uno.requests.server.PlayerGetResponse;
+import htl.steyr.uno.requests.client.*;
+import htl.steyr.uno.requests.server.*;
 import javafx.application.Platform;
-
-import java.util.ArrayList;
 
 public class GameLogic {
 
@@ -35,7 +29,7 @@ public class GameLogic {
      * @param msg The PlayerGetResponse message containing information about the player's hand.
      */
     public void playerGetResponse(PlayerGetResponse msg) {
-        getGameTable().setPlayer(msg.getPlayer());
+        getGameTable().setPlayer(msg.player());
         Platform.runLater(() -> {
             getGameTable().setEnemies();
             getGameTable().open();
@@ -80,7 +74,7 @@ public class GameLogic {
      * @param msg The CardPlayedResponse message containing information about the card that was played and the player who played it.
      */
     public void cardPlayedResponse(CardPlayedResponse msg) {
-        Enemy enemy = msg.getEnemy();
+        Enemy enemy = msg.enemy();
 
         if (!enemy.getUsername().equals(getGameTable().getPlayer().getUsername())) {
             for (Enemy e : getGameTable().getPlayer().getEnemies()) {
@@ -93,8 +87,8 @@ public class GameLogic {
             getGameTable().getPlayer().setPassive(enemy.isPassive());
         }
 
-        Card card = msg.getCard();
-        Integer nextPlayerIndex = msg.getNextPlayerIndex();
+        Card card = msg.card();
+        Integer nextPlayerIndex = msg.nextPlayerIndex();
         // @TODO: Update the UI to reflect the card that was played and any changes to the game state (e.g., next player's turn)
     }
 

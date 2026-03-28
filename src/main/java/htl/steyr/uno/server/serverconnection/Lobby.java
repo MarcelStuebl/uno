@@ -1,6 +1,7 @@
 package htl.steyr.uno.server.serverconnection;
 
 import htl.steyr.uno.GameTableClasses.Player;
+import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
 import htl.steyr.uno.requests.client.SendChatMessageRequest;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
@@ -18,7 +19,6 @@ public class Lobby {
     private final Server server;
     private Integer lobbyId;
     private Integer status = 0; // 0 = waiting for players, 1 = full, 2 = in game
-    private final LobbyInfoResponse lobbyInfoResponse = new LobbyInfoResponse(lobbyId, status);
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
     private final GameLogic gameLogic = new GameLogic(this);
 
@@ -40,27 +40,27 @@ public class Lobby {
         } while (server.getLobbies().stream().anyMatch(lobby -> Objects.equals(lobby.getLobbyId(), lobbyId)));
 
         System.out.println("Created lobby with ID: " + lobbyId);
-        lobbyInfoResponse.setLobbyId(lobbyId);
         server.getLobbies().add(this);
     }
 
-    public void updateJoined() {
-        checkLobbyInfoResponse();
-        for (var c : connections) c.sendMessage(lobbyInfoResponse);
-    }
-
-    private void checkLobbyInfoResponse() {
-        lobbyInfoResponse.setStatus(status);
+    public LobbyInfoResponse getLobbyInfoResponse() {
         synchronized (connections) {
-            lobbyInfoResponse.clearUsers();
-            for (var c : connections) lobbyInfoResponse.addUser(c.getUser());
-            if (getStatus() != 2) checkStatus();
-            lobbyInfoResponse.setStatus(getStatus());
+            List<User> users = connections.stream()
+                    .map(ServerSocketConnection::getUser)
+                    .toList();
+            return new LobbyInfoResponse(lobbyId, status, users);
         }
     }
 
+    public void updateJoined() {
+        checkStatus();
+        LobbyInfoResponse response = getLobbyInfoResponse();
+        for (var c : connections) c.sendMessage(response);
+    }
+
+
     public void sendChatMessage(SendChatMessageRequest obj) {
-        ReceiveChatMessageResponse response = new ReceiveChatMessageResponse(obj.getMessage(), obj.getUser());
+        ReceiveChatMessageResponse response = new ReceiveChatMessageResponse(obj.message(), obj.user());
         synchronized (connections) {
             for (var c : connections) c.sendMessage(response);
         }
@@ -82,18 +82,16 @@ public class Lobby {
         }
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
-        lobbyInfoResponse.setStatus(status);
+    public void startGame() {
+        setStatus(2);
+        LobbyInfoResponse response = getLobbyInfoResponse();
+        getGameLogic().createGame(response.users());
+        for (ServerSocketConnection c : connections) {
+            c.sendMessage(new StartGameResponse(gameLogic.getPlayersAsEnemies()));
+        }
+        updateJoined();
     }
 
-    public Integer getStatus() {
-        return status;
-    }
-
-    public boolean canJoin() {
-        return status == 0;
-    }
 
 
     @Override
@@ -105,33 +103,6 @@ public class Lobby {
     }
 
 
-    public void startGame() {
-        setStatus(2);
-        checkLobbyInfoResponse();
-        getGameLogic().createGame(getLobbyInfoResponse().getUsers());
-        for (ServerSocketConnection c : connections) {
-            c.sendMessage(new StartGameResponse(gameLogic.getPlayersAsEnemies()));
-        }
-        updateJoined();
-    }
-
-
-    public void addConnection(ServerSocketConnection connection) {
-        connections.add(connection);
-    }
-
-    public void removeConnection(ServerSocketConnection connection) {
-        connections.remove(connection);
-    }
-
-    public List<ServerSocketConnection> getConnections() {
-        return connections;
-    }
-
-    public Integer getLobbyId() {
-        return lobbyId;
-    }
-
     public String getConnectedPlayers() {
         StringBuilder sb = new StringBuilder();
         for (ServerSocketConnection conn : connections) {
@@ -141,13 +112,33 @@ public class Lobby {
         return sb.toString();
     }
 
-    public LobbyInfoResponse getLobbyInfoResponse() {
-        return lobbyInfoResponse;
+    public Integer getStatus() {
+        return status;
+    }
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public boolean canJoin() {
+        return status == 0;
+    }
+
+    public List<ServerSocketConnection> getConnections() {
+        return connections;
+    }
+    public void addConnection(ServerSocketConnection connection) {
+        connections.add(connection);
+    }
+    public void removeConnection(ServerSocketConnection connection) {
+        connections.remove(connection);
+    }
+
+    public Integer getLobbyId() {
+        return lobbyId;
     }
 
     public GameLogic getGameLogic() {
         return gameLogic;
     }
-
 }
 

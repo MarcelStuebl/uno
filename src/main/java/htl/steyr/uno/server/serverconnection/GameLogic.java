@@ -61,7 +61,7 @@ public class GameLogic {
      */
     public void readyInGameTable(ReadyInGameTableRequest msg) {
         for (Player player : players) {
-            if (player.getUsername().equals(msg.getPlayer().getUsername())) {
+            if (player.getUsername().equals(msg.player().getUsername())) {
                 player.setReady(true);
                 checkReadyInGameTable();
                 break;
@@ -158,8 +158,8 @@ public class GameLogic {
 
 
     public void cardPlayed(CardPlayedRequest msg) {
-        Card card = msg.getCard();
-        Player player = msg.getPlayer();
+        Card card = msg.card();
+        Player player = msg.player();
 
         player.removeCardFromHand(card);
 
@@ -220,8 +220,8 @@ public class GameLogic {
 
 
     public void requestCard(RequestCardRequest msg) {
-        Player player = msg.getPlayer();
-        int amount = msg.getAmount();
+        Player player = msg.player();
+        int amount = msg.amount();
 
         for (int i = 0; i < amount; i++) {
             addCardsToPlayer(player, generateCard());

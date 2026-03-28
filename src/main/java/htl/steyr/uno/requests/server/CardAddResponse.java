@@ -4,28 +4,12 @@ import htl.steyr.uno.GameTableClasses.Card;
 
 import java.io.Serializable;
 
-public class CardAddResponse implements Serializable {
-
-    private Card card;
-
-    public CardAddResponse(Card card) {
-        setCard(card);
-    }
+public record CardAddResponse(Card card) implements Serializable {
 
     @Override
-    public String toString(){
+    public String toString() {
         return "AddCardResponse{" +
-                "card='" + card +
+                "card='" + card() +
                 "'}";
     }
-
-    public void setCard(Card card) {
-        this.card = card;
-    }
-
-    public Card getCard() {
-        return card;
-    }
-
-
 }

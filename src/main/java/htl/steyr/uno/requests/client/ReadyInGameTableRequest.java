@@ -4,26 +4,12 @@ import htl.steyr.uno.GameTableClasses.Player;
 
 import java.io.Serializable;
 
-public class ReadyInGameTableRequest implements Serializable {
-
-    private Player player;
-
-    public ReadyInGameTableRequest(Player player) {
-        setPlayer(player);
-    }
+public record ReadyInGameTableRequest(Player player) implements Serializable {
 
     @Override
     public String toString() {
         return "ReadyInGameTableRequest{" +
-                "player=" + getPlayer().getUsername() +
+                "player=" + player().getUsername() +
                 '}';
     }
-
-    public Player getPlayer() {
-        return player;
-    }
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
 }

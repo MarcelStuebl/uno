@@ -4,37 +4,12 @@ import htl.steyr.uno.User;
 
 import java.io.Serializable;
 
-public class LobbyNotFoundResponse implements Serializable {
-
-    private User user;
-
-
-    /**
-     * Create a new LobbyNotFoundResponse for the given user.
-     *
-     * @param user
-     */
-    public LobbyNotFoundResponse(User user) {
-        setUser(user);
-    }
-
+public record LobbyNotFoundResponse(User user) implements Serializable {
 
     @Override
     public String toString() {
         return "LobbyNotFoundResponse{" +
-                "username='" + getUser().getUsername() +
+                "username='" + user().getUsername() +
                 "'}";
     }
-
-
-    public User getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-
-
-
 }

@@ -4,27 +4,12 @@ import htl.steyr.uno.User;
 
 import java.io.Serializable;
 
-public class StartGameRequest implements Serializable {
-
-    private User user;
-
-    public StartGameRequest(User user) {
-        setUser(user);
-    }
+public record StartGameRequest(User user) implements Serializable {
 
     @Override
     public String toString() {
         return "StartGameRequest{" +
-                "user='" + getUser().getUsername() +
+                "user='" + user().getUsername() +
                 "'}";
     }
-
-    public User getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-
 }
