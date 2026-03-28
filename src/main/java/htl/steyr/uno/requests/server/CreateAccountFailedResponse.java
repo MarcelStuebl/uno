@@ -12,6 +12,7 @@ public class CreateAccountFailedResponse implements Serializable {
      */
 
 
+
     /**
      * Create a new CreateAccountFailedResponse.
      */
