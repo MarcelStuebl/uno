@@ -25,25 +25,14 @@ public class EnemyDisplayController {
     @FXML
     private void initialize() {
         loadCardImageIfNeeded();
-        setCardCount(5);
     }
 
     public void setUsername(String username) {
         usernameLabel.setText(username);
     }
 
-    public void setProfileImage(String resourcePath) {
-        try {
-            var stream = EnemyDisplayController.class.getResourceAsStream(resourcePath);
-            if (stream == null) {
-                System.err.println("Profilbild nicht gefunden: " + resourcePath);
-                return;
-            }
-            Image img = new Image(stream, 60, 60, true, true);
-            profileImageView.setImage(img);
-        } catch (Exception e) {
-            System.err.println("Fehler beim Laden des Profilbilds: " + e.getMessage());
-        }
+    public void setProfileImage(Image image) {
+        profileImageView.setImage(image);
     }
 
 

@@ -11,12 +11,21 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javafx.scene.input.MouseEvent;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 
@@ -25,6 +34,7 @@ public class LobbyController implements Initializable {
     @FXML private Button createPartyButton;
     @FXML private Button joinPartyButton;
     @FXML private TextField partyCodeField;
+    @FXML private ImageView profileImageView;
 
     private Client client;
     private LobbyInfoResponse lobby;
@@ -47,9 +57,61 @@ public class LobbyController implements Initializable {
                 onSceneClose();
             });
         });
+        setProfileImage();
 
         getClient().setLobbyController(this);
     }
+
+
+    private void setProfileImage() {
+        byte[] imageData = getClient().getConn().getUser().getProfileImageData();
+        Image profileImage;
+        if (imageData == null || imageData.length == 0) {
+            profileImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")), 50, 50, true, true);
+        } else {
+            profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
+        }
+        profileImageView.setImage(profileImage);
+    }
+
+    @FXML
+    public void onProfileImageClicked(MouseEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Profilbild auswählen");
+
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Bilddateien", "*.png", "*.jpg", "*.jpeg"));
+
+        Stage stage = (Stage) profileImageView.getScene().getWindow();
+        File file = fileChooser.showOpenDialog(stage);
+
+        if (file != null) {
+            int maxFileSize = 10 * 1024 * 1024;
+            if (file.length() > maxFileSize) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Datei zu groß");
+                alert.setHeaderText(null);
+                alert.setContentText("Das Profilbild darf maximal 10 MB groß sein.");
+                alert.showAndWait();
+                return;
+            }
+
+            try {
+                Image image = new Image(file.toURI().toString(), 60, 60, true, true);
+                profileImageView.setImage(image);
+                byte[] imageBytes = Files.readAllBytes(file.toPath());
+                getClient().getConn().getUser().setProfileImageData(imageBytes);
+                setProfileImage();
+                getClient().getConn().setProfileImageRequest(imageBytes);
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Fehler beim Laden des Bildes");
+                alert.setHeaderText(null);
+                alert.setContentText("Das ausgewählte Bild konnte nicht geladen werden. Bitte versuchen Sie es erneut.");
+                alert.showAndWait();
+            }
+        }
+    }
+
 
 
     /**

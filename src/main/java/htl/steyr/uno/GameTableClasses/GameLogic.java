@@ -36,10 +36,11 @@ public class GameLogic {
      */
     public void playerGetResponse(PlayerGetResponse msg) {
         getGameTable().setPlayer(msg.getPlayer());
-        System.out.println(gameTable.getPlayer());
         Platform.runLater(() -> {
-            gameTable.setEnemies();
+            getGameTable().setEnemies();
+            getGameTable().open();
         });
+
 
         /*
         @TODO: Update the UI to reflect the player's hand of cards.

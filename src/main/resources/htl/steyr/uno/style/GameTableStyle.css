@@ -46,11 +46,12 @@
     -fx-margin: 0 0 0 0;
 }
 
-/* Optional: wenn du Hover willst */
 .button:hover {
     -fx-background-color: #2ecc71;
     -fx-cursor: hand;
 }
+
+
 
 .player-panel {
     -fx-background-color: rgba(0, 0, 0, 0.55);
@@ -66,10 +67,6 @@
     -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-font-family: "Segoe UI";
-}
-
-.card-pane {
-    /* bleibt leer, Karten werden programmatisch gesetzt */
 }
 
 .uno-card-back {

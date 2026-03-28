@@ -23,9 +23,10 @@ public class Player implements Serializable {
     private Integer playerIndex;
     private boolean isReady = false;
     private boolean isPassive;
+    private byte[] imageBytes;
 
 
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, boolean isPassive) {
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, boolean isPassive, byte[] imageBytes) {
         setUsername(username);
         setCurrentTurn(isCurrentTurn);
         getHand().addAll(hand);
@@ -33,16 +34,16 @@ public class Player implements Serializable {
         setPlayerIndex(playerIndex);
         setPassive(isPassive);
         sortHand();
+        setImageBytes(imageBytes);
     }
 
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex){
-        this(username, isCurrentTurn, hand, enemies, playerIndex, false);
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, byte[] imageBytes) {
+        this(username, isCurrentTurn, hand, enemies, playerIndex, false, imageBytes);
     }
 
     public Player(User user) {
-        this(user.getUsername(), false, new ArrayList<>(), new ArrayList<>(), -1, false);
+        this(user.getUsername(), false, new ArrayList<>(), new ArrayList<>(), -1, false, user.getProfileImageData());
     }
-
 
 
     private void sortHand() {
@@ -88,7 +89,7 @@ public class Player implements Serializable {
             cardPane.setPrefSize(137, 192);
             cardPane.setStyle(
                     "-fx-background-color: transparent;" +
-                    "-fx-border-color: green;" +
+                            "-fx-border-color: green;" +
                             "-fx-border-width: 6;" +
                             "-fx-border-radius: 6;" +
                             "-fx-background-radius: 6;"
@@ -141,7 +142,6 @@ public class Player implements Serializable {
     }
 
 
-
     @Override
     public String toString() {
         return "Player{" +
@@ -159,6 +159,7 @@ public class Player implements Serializable {
     public String getUsername() {
         return this.username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -166,6 +167,7 @@ public class Player implements Serializable {
     public Integer getPlayerIndex() {
         return playerIndex;
     }
+
     public void setPlayerIndex(Integer playerIndex) {
         this.playerIndex = playerIndex;
     }
@@ -173,6 +175,7 @@ public class Player implements Serializable {
     public boolean isReady() {
         return isReady;
     }
+
     public void setReady(boolean ready) {
         isReady = ready;
     }
@@ -180,6 +183,7 @@ public class Player implements Serializable {
     public boolean isPassive() {
         return isPassive;
     }
+
     public void setPassive(boolean passive) {
         isPassive = passive;
     }
@@ -187,6 +191,7 @@ public class Player implements Serializable {
     public boolean isCurrentTurn() {
         return isCurrentTurn;
     }
+
     public void setCurrentTurn(boolean currentTurn) {
         this.isCurrentTurn = currentTurn;
     }
@@ -194,6 +199,7 @@ public class Player implements Serializable {
     public ArrayList<Enemy> getEnemies() {
         return this.enemies;
     }
+
     public void setEnemies(ArrayList<Enemy> enemies) {
         this.enemies.clear();
         this.enemies.addAll(enemies);
@@ -216,8 +222,16 @@ public class Player implements Serializable {
         this.hand.add(card);
         sortHand();
     }
+
     public void removeCardFromHand(Card card) {
         this.hand.remove(card);
+    }
+
+    public byte[] getImageBytes() {
+        return imageBytes;
+    }
+    public void setImageBytes(byte[] imageBytes) {
+        this.imageBytes = imageBytes;
     }
 
 }

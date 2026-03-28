@@ -17,66 +17,31 @@ public class Enemy implements Serializable {
     private int handSize;
     private Integer playerIndex;
     private boolean isPassive = false;
+    private byte[] imageBytes;
 
 
-    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex, boolean isPassive) {
-        this.username = username;
-        this.isCurrentTurn = isCurrentTurn;
-        this.handSize = cardCount;
-        this.playerIndex = playerIndex;
-        this.isPassive = isPassive;
+    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex, boolean isPassive, byte[] imageBytes) {
+        setUsername(username);
+        setCurrentTurn(isCurrentTurn);
+        setHandSize(cardCount);
+        setPlayerIndex(playerIndex);
+        setPassive(isPassive);
+        setImageBytes(imageBytes);
+    }
+
+    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex, byte[] imageBytes) {
+        this(username, isCurrentTurn, cardCount, playerIndex, false, imageBytes);
     }
 
     public Enemy(Player player) {
-        this(player.getUsername(), player.isCurrentTurn(), player.getHand().size(), player.getPlayerIndex(), player.isPassive());
+        this(player.getUsername(), player.isCurrentTurn(), player.getHand().size(), player.getPlayerIndex(), player.isPassive(), player.getImageBytes());
     }
 
-    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex) {
-        this(username, isCurrentTurn, cardCount, playerIndex, false);
-    }
 
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
-    public boolean isCurrentTurn() {
-        return isCurrentTurn;
-    }
-    public void setCurrentTurn(boolean currentTurn) {
-        isCurrentTurn = currentTurn;
-    }
 
-    public int getHandSize() {
-        return handSize;
-    }
-    public void setHandSize(int handSize) {
-        this.handSize = handSize;
-    }
-    public void incrementCardCount(int count) {
-        this.handSize += count;
-    }
-    public void decrementCardCount(int count) {
-        this.handSize -= count;
-    }
 
-    public Integer getPlayerIndex() {
-        return playerIndex;
-    }
 
-    public boolean isPassive() {
-        return isPassive;
-    }
-
-    public void setEnemy(Enemy enemy) {
-        this.username = enemy.getUsername();
-        this.isCurrentTurn = enemy.isCurrentTurn();
-        this.handSize = enemy.getHandSize();
-        this.playerIndex = enemy.getPlayerIndex();
-        this.isPassive = enemy.isPassive();
-    }
 
 
 
@@ -172,6 +137,63 @@ public class Enemy implements Serializable {
                 ", playerIndex=" + playerIndex +
                 ", isPassive=" + isPassive +
                 '}';
+    }
+
+    public void setEnemy(Enemy enemy) {
+        setUsername(enemy.getUsername());
+        setCurrentTurn(enemy.isCurrentTurn());
+        setHandSize(enemy.getHandSize());
+        setPlayerIndex(enemy.getPlayerIndex());
+        setPassive(enemy.isPassive());
+        setImageBytes(enemy.getImageBytes());
+    }
+
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public boolean isCurrentTurn() {
+        return isCurrentTurn;
+    }
+    public void setCurrentTurn(boolean currentTurn) {
+        isCurrentTurn = currentTurn;
+    }
+
+    public int getHandSize() {
+        return handSize;
+    }
+    public void setHandSize(int handSize) {
+        this.handSize = handSize;
+    }
+    public void incrementCardCount(int count) {
+        this.handSize += count;
+    }
+    public void decrementCardCount(int count) {
+        this.handSize -= count;
+    }
+
+    public Integer getPlayerIndex() {
+        return playerIndex;
+    }
+    public void setPlayerIndex(Integer playerIndex) {
+        this.playerIndex = playerIndex;
+    }
+
+    public boolean isPassive() {
+        return isPassive;
+    }
+    public void setPassive(boolean passive) {
+        isPassive = passive;
+    }
+
+    public byte[] getImageBytes() {
+        return imageBytes;
+    }
+    public void setImageBytes(byte[] imageBytes) {
+        this.imageBytes = imageBytes;
     }
 
 }

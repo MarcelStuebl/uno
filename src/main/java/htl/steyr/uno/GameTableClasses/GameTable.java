@@ -1,28 +1,22 @@
 package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
-import htl.steyr.uno.GameTableClasses.exceptions.InvalidHandException;
-import htl.steyr.uno.GameTableClasses.exceptions.InvalidPlayerException;
-import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
-import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
 import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class GameTable implements Initializable {
 
@@ -71,12 +65,6 @@ public class GameTable implements Initializable {
 
             setupCentralStack();
             addCloseButton(root, stage);
-
-            try {
-                open(stage);
-            } catch (InvalidCardException e) {
-                throw new RuntimeException(e);
-            }
         });
     }
 
@@ -109,7 +97,7 @@ public class GameTable implements Initializable {
         for (int i = 0; i < slotIndices.length && i < sorted.size(); i++) {
             Enemy enemy = sorted.get(i);
             StackPane slot = slotOrder[slotIndices[i]];
-            EnemyDisplayController ctrl = addPlayer(slot, enemy.getUsername(), "/htl/steyr/uno/img/profile.png", enemy.getHandSize());
+            EnemyDisplayController ctrl = addPlayer(slot, enemy.getUsername(), enemy.getImageBytes(), enemy.getHandSize());
             if (ctrl != null) {
                 enemyControllers.add(ctrl);
             }
@@ -117,7 +105,18 @@ public class GameTable implements Initializable {
     }
 
 
-    private EnemyDisplayController addPlayer(StackPane slot, String name, String imagePath, int cardCount) {
+    private EnemyDisplayController addPlayer(StackPane slot, String name, byte[] imageData, int cardCount) {
+        Image profileImage;
+        if (imageData != null && imageData.length > 0) {
+            profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
+        } else {
+            profileImage = new Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
+                    50, 50, true, true
+            );
+        }
+
+
         URL url = GameTable.class.getResource("/htl/steyr/uno/enemy.fxml");
         try {
             FXMLLoader loader = new FXMLLoader(url);
@@ -125,9 +124,7 @@ public class GameTable implements Initializable {
             EnemyDisplayController ctrl = loader.getController();
             ctrl.setUsername(name);
             ctrl.setCardCount(cardCount);
-            if (imagePath != null) {
-                ctrl.setProfileImage(imagePath);
-            }
+            ctrl.setProfileImage(profileImage);
             slot.getChildren().setAll(panel);
             return ctrl;
         } catch (IOException e) {
@@ -146,17 +143,17 @@ public class GameTable implements Initializable {
     }
 
 
-    private void open(Stage stage) throws InvalidCardException {
-        ArrayList<Card> myHand = new ArrayList<>();
-        myHand.add(new Card(5, "red"));
-        myHand.add(new Card(9, "blue"));
-        myHand.add(new Card(2, "green"));
-        myHand.add(new Card(8, "yellow"));
-        myHand.add(new Card(12, "red"));
-        myHand.add(new Card(13, "black"));
-        myHand.add(new Card(14, "black"));
-
-        Player player = new Player("Max", true, myHand, getPlayer().getEnemies(), 0);
+    public void open(){
+//        ArrayList<Card> myHand = new ArrayList<>();
+//        myHand.add(new Card(5, "red"));
+//        myHand.add(new Card(9, "blue"));
+//        myHand.add(new Card(2, "green"));
+//        myHand.add(new Card(8, "yellow"));
+//        myHand.add(new Card(12, "red"));
+//        myHand.add(new Card(13, "black"));
+//        myHand.add(new Card(14, "black"));
+//
+//        Player player = new Player("Max", true, myHand, getPlayer().getEnemies(), 0, null);
 
 
         player.displayPlayerHand(root, player, centralStack);

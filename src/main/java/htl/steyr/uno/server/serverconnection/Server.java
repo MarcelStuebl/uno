@@ -122,6 +122,10 @@ public class Server {
         return null;
     }
 
+    public List<ServerSocketConnection> getConnections() {
+        return connections;
+    }
+
 
 }
 
