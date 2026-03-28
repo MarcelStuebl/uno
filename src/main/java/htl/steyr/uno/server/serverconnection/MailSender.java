@@ -1,4 +1,4 @@
-package htl.steyr.uno.server;
+package htl.steyr.uno.server.serverconnection;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.mail.*;
@@ -15,9 +15,9 @@ public class MailSender {
         return dotenv.get(key);
     }
 
-    final String username = getEnv("MAIL_USERNAME");
-    final String password = getEnv("MAIL_PASSWORD");
-    Properties props = new Properties();
+    private final String username = getEnv("MAIL_USERNAME");
+    private final String password = getEnv("MAIL_PASSWORD");
+    private final Properties props = new Properties();
 
 
     /**
@@ -25,7 +25,7 @@ public class MailSender {
      * It retrieves the SMTP host and port from environment variables and configures the properties for authentication and TLS encryption.
      * This setup allows the MailSender to send emails securely using the specified SMTP server.
      */
-    public MailSender() {
+    MailSender() {
         props.put("mail.smtp.host", getEnv("MAIL_HOST"));
         props.put("mail.smtp.port", getEnv("MAIL_PORT"));
         props.put("mail.smtp.auth", "true");
@@ -39,7 +39,7 @@ public class MailSender {
      * It constructs a MIME message with a subject and plain text content, then sends the email to the support email address.
      * Any exceptions that occur during the process are caught and printed to the console for debugging purposes.
      */
-    public void sendServerStartetNotification() {
+    void sendServerStartetNotification() {
         String eMail = getEnv("MAIL_SUPPORTMAIL");
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
@@ -70,7 +70,7 @@ public class MailSender {
      * @param eMail
      * @param authCode
      */
-    public void sendAuthenticationCode(String eMail, String authCode) {
+    void sendAuthenticationCode(String eMail, String authCode) {
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             public PasswordAuthentication getPasswordAuthentication() {

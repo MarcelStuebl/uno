@@ -31,7 +31,7 @@ public class DatabaseConnection {
      * @return Connection object to the database
      * @throws SQLException if a database access error occurs
      */
-    public static Connection getConnection() throws SQLException {
+    static Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");

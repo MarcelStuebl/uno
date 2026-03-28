@@ -1,7 +1,5 @@
 package htl.steyr.uno.server.serverconnection;
 
-import htl.steyr.uno.server.MailSender;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -37,7 +35,7 @@ public class Server {
      * The server runs in a separate thread to allow for concurrent handling of multiple clients.
      * @throws IOException
      */
-    public void start() throws IOException {
+    private void start() throws IOException {
         running = true;
         serverSocket = new ServerSocket(port);
 
@@ -64,12 +62,12 @@ public class Server {
     }
 
 
-    public void removeConnection(ServerSocketConnection connection) {
+    void removeConnection(ServerSocketConnection connection) {
         connections.remove(connection);
         leaveLobby(connection);
     }
 
-    public void leaveLobby(ServerSocketConnection serverSocketConnection) {
+    void leaveLobby(ServerSocketConnection serverSocketConnection) {
         for (Lobby lobby : lobbies) {
             if (lobby.getConnections().contains(serverSocketConnection)) {
                 lobby.playerLeft(serverSocketConnection);
@@ -88,7 +86,7 @@ public class Server {
      * This method is used by ServerSocketConnection instances to log messages related to their respective clients.
      * @param message The message to be logged, which can be of any type (e.g., String, Object).
      */
-    public void sendLogMessage(Object message) {
+    void sendLogMessage(Object message) {
         System.out.println(message);
     }
 
@@ -98,7 +96,7 @@ public class Server {
      * This method is used to gracefully shut down the server and release any resources associated with it.
      * @throws IOException If an I/O error occurs when closing the server socket.
      */
-    public void stop() throws IOException {
+    void stop() throws IOException {
         System.out.println("Server stopped");
         running = false;
         acceptThread.interrupt();
@@ -106,12 +104,12 @@ public class Server {
     }
 
 
-    public List<Lobby> getLobbies() {
+    List<Lobby> getLobbies() {
         return lobbies;
     }
 
 
-    public Lobby getLobbyByConnection(ServerSocketConnection connection) {
+    Lobby getLobbyByConnection(ServerSocketConnection connection) {
         for (Lobby lobby : lobbies) {
             if (lobby.getConnections().contains(connection)) {
                 return lobby;
@@ -120,7 +118,7 @@ public class Server {
         return null;
     }
 
-    public List<ServerSocketConnection> getConnections() {
+    List<ServerSocketConnection> getConnections() {
         return connections;
     }
 

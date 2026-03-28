@@ -3,7 +3,6 @@ package htl.steyr.uno.server.serverconnection;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
-import htl.steyr.uno.server.MailSender;
 import htl.steyr.uno.server.database.DatabaseLog;
 import htl.steyr.uno.server.database.DatabaseUser;
 import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;

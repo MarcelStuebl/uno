@@ -13,12 +13,12 @@ public class GameLogic {
      * It processes incoming messages related to card additions and removals, and updates the game state accordingly.
      * This class interacts with the GameTable to reflect changes in the game state visually and logically.
      */
-    public GameLogic(GameTable gameTable) {
+    GameLogic(GameTable gameTable) {
         setGameTable(gameTable);
     }
 
 
-    public void sendReadyToStart() {
+    void sendReadyToStart() {
         getGameTable().getClient().getConn().sendMessage(new ReadyInGameTableRequest(getGameTable().getPlayer()));
     }
 
@@ -61,7 +61,7 @@ public class GameLogic {
      *
      * @param card The card that the player is attempting to play.
      */
-    public void playCard(Card card) {
+    void playCard(Card card) {
         CardPlayedRequest msg = new CardPlayedRequest(card, getGameTable().getPlayer());
         getGameTable().getClient().getConn().sendMessage(msg);
     }
@@ -99,7 +99,7 @@ public class GameLogic {
      *
      * @param amount The number of cards the player is requesting to draw.
      */
-    public void requestCard(int amount) {
+    void requestCard(int amount) {
         getGameTable().getClient().getConn().sendMessage(new RequestCardRequest(gameTable.getPlayer(), amount));
     }
 
@@ -110,10 +110,10 @@ public class GameLogic {
 
 
 
-    public GameTable getGameTable() {
+    GameTable getGameTable() {
         return gameTable;
     }
-    public void setGameTable(GameTable gameTable) {
+    void setGameTable(GameTable gameTable) {
         this.gameTable = gameTable;
     }
 

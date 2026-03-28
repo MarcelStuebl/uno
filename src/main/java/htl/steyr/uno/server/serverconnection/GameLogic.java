@@ -1,5 +1,6 @@
 package htl.steyr.uno.server.serverconnection;
 
+import htl.steyr.uno.GameTableClasses.Card;
 import htl.steyr.uno.GameTableClasses.*;
 import htl.steyr.uno.GameTableClasses.exceptions.*;
 import htl.steyr.uno.User;
@@ -19,7 +20,7 @@ public class GameLogic {
     private final Random random = new Random();
 
 
-    public GameLogic(Lobby lobby) {
+    GameLogic(Lobby lobby) {
         setLobby(lobby);
     }
     
@@ -31,7 +32,7 @@ public class GameLogic {
      * The GameLogic class is responsible for setting up the game state based on the players in the lobby and ensuring that each player receives their initial hand of cards.
      * The methods in this class should interact with the Lobby and Player classes to manage the game state and communicate with the clients as needed.
      */
-    public void createGame(List<User> users) {
+    void createGame(List<User> users) {
         players.clear();
         currentPlayerIndex = 0;
         directionClockwise = true;
@@ -59,7 +60,7 @@ public class GameLogic {
      *
      * @param msg The ReadyInGameTableRequest message containing information about the player who is ready.
      */
-    public void readyInGameTable(ReadyInGameTableRequest msg) {
+    void readyInGameTable(ReadyInGameTableRequest msg) {
         for (Player player : players) {
             if (player.getUsername().equals(msg.player().getUsername())) {
                 player.setReady(true);
@@ -89,7 +90,7 @@ public class GameLogic {
      * Starts the game by sending the initial game state to all players in the lobby.
      * This method should send a PlayerGetResponse to each player with their initial hand of cards and any relevant game information.
      */
-    public void startGame(){
+    private void startGame(){
         if (lobby == null || lobby.getConnections() == null || players.isEmpty()) {
             return;
         }
@@ -157,7 +158,7 @@ public class GameLogic {
 
 
 
-    public void cardPlayed(CardPlayedRequest msg) {
+    void cardPlayed(CardPlayedRequest msg) {
         Card card = msg.card();
         Player player = msg.player();
 
@@ -181,6 +182,8 @@ public class GameLogic {
         }
 
     }
+
+
 
     private void updatePlayer(Player player) {
         if (player == null || player.getUsername() == null || lobby == null || lobby.getConnections() == null) {
@@ -219,7 +222,7 @@ public class GameLogic {
 
 
 
-    public void requestCard(RequestCardRequest msg) {
+    void requestCard(RequestCardRequest msg) {
         Player player = msg.player();
         int amount = msg.amount();
 
@@ -247,38 +250,38 @@ public class GameLogic {
 
 
 
-    public Lobby getLobby() {
+    Lobby getLobby() {
         return lobby;
     }
-    public void setLobby(Lobby lobby) {
+    void setLobby(Lobby lobby) {
         this.lobby = lobby;
     }
 
-    public ArrayList<Player> getPlayers() {
+    ArrayList<Player> getPlayers() {
         return players;
     }
-    public Player getPlayer(int i) {
+    Player getPlayer(int i) {
         return getPlayers().get(i);
     }
-    public void setPlayers(ArrayList<Player> players) {
+    void setPlayers(ArrayList<Player> players) {
         this.players = players;
     }
 
-    public Integer getCurrentPlayer() {
+    Integer getCurrentPlayer() {
         return currentPlayerIndex;
     }
-    public void setCurrentPlayer(Integer currentPlayerIndex) {
+    void setCurrentPlayer(Integer currentPlayerIndex) {
         this.currentPlayerIndex = currentPlayerIndex;
     }
 
-    public boolean isDirectionClockwise() {
+    boolean isDirectionClockwise() {
         return directionClockwise;
     }
-    public void setDirectionClockwise(boolean directionClockwise) {
+    void setDirectionClockwise(boolean directionClockwise) {
         this.directionClockwise = directionClockwise;
     }
 
-    public ArrayList<Enemy> getPlayersAsEnemies() {
+    ArrayList<Enemy> getPlayersAsEnemies() {
         ArrayList<Enemy> enemies = new ArrayList<>();
         for (Player player : players) {
             enemies.add(new Enemy(player));

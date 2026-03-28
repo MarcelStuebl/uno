@@ -1,12 +1,8 @@
 package htl.steyr.uno.server.serverconnection;
 
-import htl.steyr.uno.GameTableClasses.Player;
 import htl.steyr.uno.User;
-import htl.steyr.uno.requests.client.ReadyInGameTableRequest;
 import htl.steyr.uno.requests.client.SendChatMessageRequest;
-import htl.steyr.uno.requests.server.LobbyInfoResponse;
-import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
-import htl.steyr.uno.requests.server.StartGameResponse;
+import htl.steyr.uno.requests.server.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +28,7 @@ public class Lobby {
      *
      * @param server
      */
-    public Lobby(Server server) {
+    Lobby(Server server) {
         this.server = server;
 
         do {
@@ -43,7 +39,7 @@ public class Lobby {
         server.getLobbies().add(this);
     }
 
-    public LobbyInfoResponse getLobbyInfoResponse() {
+    LobbyInfoResponse getLobbyInfoResponse() {
         synchronized (connections) {
             List<User> users = connections.stream()
                     .map(ServerSocketConnection::getUser)
@@ -52,14 +48,14 @@ public class Lobby {
         }
     }
 
-    public void updateJoined() {
+    void updateJoined() {
         checkStatus();
         LobbyInfoResponse response = getLobbyInfoResponse();
         for (var c : connections) c.sendMessage(response);
     }
 
 
-    public void sendChatMessage(SendChatMessageRequest obj) {
+    void sendChatMessage(SendChatMessageRequest obj) {
         ReceiveChatMessageResponse response = new ReceiveChatMessageResponse(obj.message(), obj.user());
         synchronized (connections) {
             for (var c : connections) c.sendMessage(response);
@@ -67,7 +63,7 @@ public class Lobby {
     }
 
 
-    public void playerLeft(ServerSocketConnection connection) {
+    void playerLeft(ServerSocketConnection connection) {
         connections.remove(connection);
         getGameLogic().getPlayers().removeIf(player -> player.getUsername().equals(connection.getUser().getUsername()));
         updateJoined();
@@ -82,7 +78,7 @@ public class Lobby {
         }
     }
 
-    public void startGame() {
+    void startGame() {
         setStatus(2);
         LobbyInfoResponse response = getLobbyInfoResponse();
         getGameLogic().createGame(response.users());
@@ -103,41 +99,32 @@ public class Lobby {
     }
 
 
-    public String getConnectedPlayers() {
-        StringBuilder sb = new StringBuilder();
-        for (ServerSocketConnection conn : connections) {
-            sb.append(conn.getUser().getUsername()).append(", ");
-        }
-        if (sb.length() > 0) sb.setLength(sb.length() - 2);
-        return sb.toString();
-    }
-
-    public Integer getStatus() {
+    Integer getStatus() {
         return status;
     }
-    public void setStatus(Integer status) {
+    void setStatus(Integer status) {
         this.status = status;
     }
 
-    public boolean canJoin() {
+    boolean canJoin() {
         return status == 0;
     }
 
-    public List<ServerSocketConnection> getConnections() {
+    List<ServerSocketConnection> getConnections() {
         return connections;
     }
-    public void addConnection(ServerSocketConnection connection) {
+    void addConnection(ServerSocketConnection connection) {
         connections.add(connection);
     }
-    public void removeConnection(ServerSocketConnection connection) {
+    void removeConnection(ServerSocketConnection connection) {
         connections.remove(connection);
     }
 
-    public Integer getLobbyId() {
+    Integer getLobbyId() {
         return lobbyId;
     }
 
-    public GameLogic getGameLogic() {
+    GameLogic getGameLogic() {
         return gameLogic;
     }
 }
