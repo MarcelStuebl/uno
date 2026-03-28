@@ -174,6 +174,11 @@ public class GameLogic {
 
         currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
 
+        // überspringe passive Spieler
+        while (players.get(currentPlayerIndex).isPassive()) {
+            currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+        }
+
         checkForWinner(player);
 
         CardPlayedResponse response = new CardPlayedResponse(card, player, currentPlayerIndex);
