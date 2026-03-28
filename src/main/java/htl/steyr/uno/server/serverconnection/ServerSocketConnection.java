@@ -425,7 +425,6 @@ public class ServerSocketConnection {
 
 
     private void setProfileImageRequest(SetProfileImageRequest msg) {
-        System.out.println("Received SetProfileImageRequest for user: " + getUser().getUsername());
         DatabaseUser db = new DatabaseUser();
         try {
             db.updateProfileImage(getUser(), msg.imageData());

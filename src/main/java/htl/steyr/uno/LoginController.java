@@ -16,10 +16,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -214,19 +212,16 @@ public class LoginController implements Initializable {
 
     public void checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse msg) {
         if (msg.userAlreadyExists()) {
-            System.out.println("User already exists.");
             Platform.runLater(() -> {
                 errorLabelCreateAcc.setText("Username already exists!");
                 errorLabelCreateAcc.setVisible(true);
             });
         } else if (msg.emailAlreadyExists()) {
-            System.out.println("Email already exists.");
             Platform.runLater(() -> {
                 errorLabelCreateAcc.setText("Email already exists!");
                 errorLabelCreateAcc.setVisible(true);
             });
         } else {
-            System.out.println("User does not exist.");
             client.createAccount(username, lastName, firstName, email, password);
             Platform.runLater(() -> {
                 errorLabelCreateAcc.setVisible(false);
@@ -312,7 +307,6 @@ public class LoginController implements Initializable {
     }
 
     public void logInFailed(LoginFailedResponse msg) {
-        System.out.println("Login failed with error code: " + msg.errorCode());
         String errorMessage;
         if (msg.errorCode() == 1) {
             errorMessage = "Invalid username or password!";
