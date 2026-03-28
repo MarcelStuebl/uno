@@ -1,7 +1,5 @@
 package htl.steyr.uno.server.serverconnection;
 
-import htl.steyr.uno.LobbyController;
-import htl.steyr.uno.requests.client.StartGameRequest;
 import htl.steyr.uno.server.MailSender;
 
 import java.io.IOException;
@@ -90,7 +88,7 @@ public class Server {
      * This method is used by ServerSocketConnection instances to log messages related to their respective clients.
      * @param message The message to be logged, which can be of any type (e.g., String, Object).
      */
-    public void setLogMessage(Object message) {
+    public void sendLogMessage(Object message) {
         System.out.println(message);
     }
 

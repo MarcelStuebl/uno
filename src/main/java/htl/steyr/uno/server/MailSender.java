@@ -7,9 +7,7 @@ import java.util.Properties;
 
 public class MailSender {
 
-    private static final Dotenv dotenv = Dotenv.configure()
-            .ignoreIfMissing()
-            .load();
+    private static final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
     private static String getEnv(String key) {
         String value = System.getenv(key);
@@ -21,6 +19,12 @@ public class MailSender {
     final String password = getEnv("MAIL_PASSWORD");
     Properties props = new Properties();
 
+
+    /**
+     * The constructor initializes the MailSender by setting up the necessary properties for connecting to the SMTP server.
+     * It retrieves the SMTP host and port from environment variables and configures the properties for authentication and TLS encryption.
+     * This setup allows the MailSender to send emails securely using the specified SMTP server.
+     */
     public MailSender() {
         props.put("mail.smtp.host", getEnv("MAIL_HOST"));
         props.put("mail.smtp.port", getEnv("MAIL_PORT"));
@@ -28,43 +32,18 @@ public class MailSender {
         props.put("mail.smtp.starttls.enable", "true");
     }
 
-    public void sendAuthenticationCode(String eMail, String authCode) {
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
-            }
-        });
 
-        try {
-            MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("noreply@uno.clouddb.at", "UNO HTL Steyr"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(eMail));
-            message.setSubject("Dein Authentifizierungscode – UNO HTL Steyr");
-
-            MimeMultipart multipart = new MimeMultipart("alternative");
-
-            MimeBodyPart textPart = new MimeBodyPart();
-            textPart.setText("Dein Authentifizierungscode: " + authCode + "\n\nGültig für 10 Minuten.\n\nFalls du diese Anfrage nicht gestellt hast, ignoriere diese E-Mail.", "utf-8");
-
-            MimeBodyPart htmlPart = new MimeBodyPart();
-            htmlPart.setContent(buildHtmlAuthenticationCode(authCode), "text/html; charset=utf-8");
-
-            multipart.addBodyPart(textPart);
-            multipart.addBodyPart(htmlPart);
-
-            message.setContent(multipart);
-            Transport.send(message);
-
-        } catch (Exception e) {}
-
-    }
-
+    /**
+     * Sends a notification email to the support email address indicating that the UNO server has started successfully.
+     * The method creates a new email session using the configured properties and authenticates with the provided username and password.
+     * It constructs a MIME message with a subject and plain text content, then sends the email to the support email address.
+     * Any exceptions that occur during the process are caught and printed to the console for debugging purposes.
+     */
     public void sendServerStartetNotification() {
         String eMail = getEnv("MAIL_SUPPORTMAIL");
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
+            public PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
             }
         });
@@ -81,6 +60,56 @@ public class MailSender {
         }
     }
 
+
+    /**
+     * Sends an authentication code to the specified email address.
+     * The method creates a new email session using the configured properties and authenticates with the provided username and password.
+     * It then constructs a MIME message with both plain text and HTML content, including the authentication code.
+     * The email is sent to the recipient's email address, and any exceptions that occur during the process are caught
+     * and ignored to prevent the server from crashing due to email sending issues.
+     * @param eMail
+     * @param authCode
+     */
+    public void sendAuthenticationCode(String eMail, String authCode) {
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            public PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        try {
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("noreply@uno.clouddb.at", "UNO HTL Steyr"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(eMail));
+            message.setSubject("Dein Authentifizierungscode – UNO HTL Steyr");
+
+            MimeMultipart multipart = new MimeMultipart("alternative");
+
+            MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setText("Dein Authentifizierungscode: " + authCode + "\n\nFalls du diese Anfrage nicht gestellt hast, ignoriere diese E-Mail.", "utf-8");
+
+            MimeBodyPart htmlPart = new MimeBodyPart();
+            htmlPart.setContent(buildHtmlAuthenticationCode(authCode), "text/html; charset=utf-8");
+
+            multipart.addBodyPart(textPart);
+            multipart.addBodyPart(htmlPart);
+
+            message.setContent(multipart);
+            Transport.send(message);
+
+        } catch (Exception e) {}
+
+    }
+
+
+    /**
+     * Builds an HTML email content string that visually represents the provided authentication code in a styled format.
+     * The method takes a 6-digit authentication code as input, splits it into individual digits, and constructs an HTML table where each digit is displayed in a styled box.
+     * The resulting HTML string includes a header, body text, and footer, all styled to create a visually appealing email for the recipient.
+     * @param authCode The 6-digit authentication code to be included in the email content.
+     * @return A string containing the complete HTML content for the authentication email.
+     */
     private String buildHtmlAuthenticationCode(String authCode) {
         String[] digits = authCode.split("");
         StringBuilder digitBoxes = new StringBuilder();

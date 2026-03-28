@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class CreateAccountFailedResponse implements Serializable {
 
     private Integer status;
-    /**
+    /*
      * Status codes:
      * 1: Username already exists
      * 2: Verification code is incorrect

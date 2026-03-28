@@ -4,6 +4,7 @@ import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
 import htl.steyr.uno.server.MailSender;
+import htl.steyr.uno.server.database.DatabaseLog;
 import htl.steyr.uno.server.database.DatabaseUser;
 import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
 
@@ -14,8 +15,6 @@ import java.net.Socket;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ServerSocketConnection {
 
@@ -83,7 +82,7 @@ public class ServerSocketConnection {
      * @param msg
      */
     private void sendLogMessage(Object msg) {
-        server.setLogMessage("[" + socket.getRemoteSocketAddress() + "] " + msg);
+        server.sendLogMessage("[" + socket.getRemoteSocketAddress() + "] " + msg);
     }
 
 
@@ -162,10 +161,13 @@ public class ServerSocketConnection {
         DatabaseUser db = new DatabaseUser();
         user = db.getUserPerUserName(request.getUsername(), request.getPassword());
         Object msg;
+        DatabaseLog dbLog = new DatabaseLog();
         if (user == null) {
             msg = new LoginFailedResponse(1);
+            dbLog.logUserLogin(null, request.getUsername(), socket.getRemoteSocketAddress().toString(), false);
         } else {
             msg = new LoginSuccessResponse(user);
+            dbLog.logUserLogin(user.getId(), request.getUsername(), socket.getRemoteSocketAddress().toString(), true);
         }
         sendMessage(msg);
         sendLogMessage(msg);
@@ -299,7 +301,6 @@ public class ServerSocketConnection {
             } else {
                 sendMessage(new ForgotPasswordResponse(6));
             }
-
         } else {
             sendMessage(new ForgotPasswordResponse(1));
         }
