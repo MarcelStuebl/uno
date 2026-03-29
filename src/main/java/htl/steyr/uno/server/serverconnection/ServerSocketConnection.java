@@ -119,7 +119,6 @@ public class ServerSocketConnection {
                         case SetProfileImageRequest msg -> setProfileImageRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
-
                 }
             } catch (EOFException | SocketException e) {
                 System.out.println("Client disconnected: " + e.getMessage());
@@ -128,6 +127,10 @@ public class ServerSocketConnection {
             } finally {
                 running = false;
                 server.removeConnection(this);
+                try {
+                    socket.close();
+                    System.out.println("Connection closed: " + socket.getRemoteSocketAddress());
+                } catch (IOException ignored) {}
             }
         });
         receivethread.start();
