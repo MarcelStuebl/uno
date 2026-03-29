@@ -45,8 +45,10 @@ public class GameLogic {
      * @param msg The CardAddResponse message containing information about the card that was added.
      */
     public void cardAddResponse(CardAddResponse msg) {
-        System.out.println(msg);
-        Platform.runLater(() -> getGameTable().getPlayer().addCardToHand(msg.card()));
+        Platform.runLater(() -> {
+            getGameTable().getPlayer().addCardToHand(msg.card());
+            getGameTable().addCardToUI(msg.card());
+        });
     }
 
 
@@ -69,7 +71,6 @@ public class GameLogic {
      * @param amount The number of cards the player is requesting to draw.
      */
     void requestCard(int amount) {
-        System.out.println("Requesting " + amount + " card(s) from the stack.");
         getGameTable().getClient().getConn().sendMessage(new RequestCardRequest(gameTable.getPlayer(), amount));
     }
 
@@ -143,12 +144,6 @@ public class GameLogic {
             }
         }
     }
-
-
-
-
-
-
 
 
     GameTable getGameTable() {

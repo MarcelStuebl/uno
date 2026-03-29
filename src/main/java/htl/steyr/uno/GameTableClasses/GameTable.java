@@ -1,6 +1,6 @@
 package htl.steyr.uno.GameTableClasses;
 
-import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
+import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.animation.ScaleTransition;
@@ -12,9 +12,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -37,6 +40,9 @@ public class GameTable implements Initializable {
     @FXML private StackPane enemy3;
 
     ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
+
+    // HBox wird als Instanzvariable gespeichert, damit addCardToUI darauf zugreifen kann
+    private HBox handBox;
 
 
     public GameTable(Client client, StartGameResponse msg) {
@@ -94,9 +100,9 @@ public class GameTable implements Initializable {
         StackPane[] slotOrder = { enemy3, enemy1, enemy2 };
 
         int[] slotIndices = switch (sorted.size()) {
-            case 1 -> new int[]{ 1 };           // nur enemy1
-            case 2 -> new int[]{ 0, 2 };        // enemy3, enemy2
-            case 3 -> new int[]{ 0, 1, 2 };     // enemy3, enemy1, enemy2
+            case 1 -> new int[]{ 1 };
+            case 2 -> new int[]{ 0, 2 };
+            case 3 -> new int[]{ 0, 1, 2 };
             default -> new int[]{};
         };
 
@@ -121,7 +127,6 @@ public class GameTable implements Initializable {
                     50, 50, true, true
             );
         }
-
 
         URL url = GameTable.class.getResource("/htl/steyr/uno/enemy.fxml");
         try {
@@ -149,46 +154,121 @@ public class GameTable implements Initializable {
     }
 
 
-    public void open(){
-//        ArrayList<Card> myHand = new ArrayList<>();
-//        myHand.add(new Card(5, "red"));
-//        myHand.add(new Card(9, "blue"));
-//        myHand.add(new Card(2, "green"));
-//        myHand.add(new Card(8, "yellow"));
-//        myHand.add(new Card(12, "red"));
-//        myHand.add(new Card(13, "black"));
-//        myHand.add(new Card(14, "black"));
-//
-//        Player player = new Player("Max", true, myHand, getPlayer().getEnemies(), 0, null);
+    public void open() {
+        // HBox erstellen und als Instanzvariable speichern
+        handBox = new HBox();
+        handBox.setAlignment(Pos.BOTTOM_CENTER);
+        handBox.setSpacing(-100);
+        handBox.setMouseTransparent(false);
 
+        for (Card c : player.getHand()) {
+            handBox.getChildren().add(createCardButton(c));
+        }
 
-        player.displayPlayerHand(root, player, centralStack);
+        StackPane.setAlignment(handBox, Pos.BOTTOM_CENTER);
+        StackPane.setMargin(handBox, new Insets(40));
+        root.getChildren().add(handBox);
+    }
+
+    /**
+     * Fügt eine einzelne Karte zur bestehenden HBox hinzu, ohne alles neu zu rendern.
+     * Wird von GameLogic.cardAddResponse aufgerufen.
+     *
+     * @param card Die neu gezogene Karte
+     */
+    public void addCardToUI(Card card) {
+        if (handBox == null) return;
+
+        // Die Hand wurde bereits in addCardToHand() sortiert —
+        // wir bauen die HBox neu auf, damit die Sortierung sichtbar wird
+        handBox.getChildren().clear();
+        for (Card c : player.getHand()) {
+            handBox.getChildren().add(createCardButton(c));
+        }
+    }
+
+    /**
+     * Erstellt einen Button für eine einzelne Karte.
+     * Extrahiert aus open() damit es auch in addCardToUI() verwendet werden kann.
+     */
+    private Button createCardButton(Card c) {
+        String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
+        ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+        iv.setFitWidth(137);
+        iv.setFitHeight(192);
+        iv.setPreserveRatio(true);
+        UiStyleUtil.applyRoundedCardClip(iv, 137, 192, 18);
+
+        StackPane cardPane = new StackPane(iv);
+        cardPane.setPrefSize(137, 192);
+        cardPane.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-border-color: green;" +
+                        "-fx-border-width: 6;" +
+                        "-fx-border-radius: 6;" +
+                        "-fx-background-radius: 6;"
+        );
+
+        Button cardBtn = new Button();
+        cardBtn.setGraphic(cardPane);
+        cardBtn.setPadding(javafx.geometry.Insets.EMPTY);
+        cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+
+        cardBtn.setOnAction(e -> {
+            centralStack.layCard(c, cardBtn, player);
+            if (centralStack.getTopCard() == c) {
+                player.getHand().remove(c);
+                handBox.getChildren().remove(cardBtn);
+            }
+        });
+
+        ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), cardPane);
+        ScaleTransition stExit = new ScaleTransition(Duration.millis(200), cardPane);
+
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(15);
+        shadow.setOffsetX(0);
+        shadow.setOffsetY(0);
+        shadow.setColor(Color.BLACK);
+
+        cardBtn.setOnMouseEntered(e -> {
+            stExit.stop();
+            stEnter.setToX(1.1);
+            stEnter.setToY(1.1);
+            stEnter.playFromStart();
+            cardPane.setEffect(shadow);
+        });
+
+        cardBtn.setOnMouseExited(e -> {
+            stEnter.stop();
+            stExit.setToX(1.0);
+            stExit.setToY(1.0);
+            stExit.playFromStart();
+            cardPane.setEffect(null);
+        });
+
+        return cardBtn;
     }
 
 
-
     public void addCloseButton(StackPane root, Stage stage) {
-
-        Button closeBtn = new Button("X"); // X to make it look like a Close Button
-        closeBtn.setPrefSize(40, 40);    //make it smaller
+        Button closeBtn = new Button("X");
+        closeBtn.setPrefSize(40, 40);
         closeBtn.setPadding(javafx.geometry.Insets.EMPTY);
-        closeBtn.setAlignment(javafx.geometry.Pos.CENTER);
+        closeBtn.setAlignment(Pos.CENTER);
 
-        // red/white style for easy visability
         closeBtn.setStyle(
                 "-fx-background-color: #d32f2f;" +
                         "-fx-text-fill: white;" +
                         "-fx-font-size: 18;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 20;"  //make it appear round
+                        "-fx-background-radius: 20;"
         );
 
         closeBtn.setOnAction(e -> stage.close());
-        // only call onSceneClose when the window is actually closed by the user
         stage.setOnCloseRequest(ev -> onSceneClose());
 
-        //align top right on the stackpane
-        StackPane.setAlignment(closeBtn, javafx.geometry.Pos.TOP_RIGHT);
+        StackPane.setAlignment(closeBtn, Pos.TOP_RIGHT);
         StackPane.setMargin(closeBtn, new javafx.geometry.Insets(10));
 
         root.getChildren().add(closeBtn);
@@ -205,13 +285,12 @@ public class GameTable implements Initializable {
         iv.setFitWidth(137);
         iv.setFitHeight(192);
         iv.setPreserveRatio(true);
-        iv.setMouseTransparent(true); // wichtig
+        iv.setMouseTransparent(true);
         withdrawalButton.setGraphic(iv);
 
         StackPane.setAlignment(withdrawalButton, Pos.CENTER_LEFT);
         StackPane.setMargin(withdrawalButton, new Insets(0, 0, 0, 400));
 
-        // Hover Animation
         ScaleTransition hoverIn = new ScaleTransition(Duration.millis(150), withdrawalButton);
         hoverIn.setToX(1.1);
         hoverIn.setToY(1.1);
@@ -229,28 +308,11 @@ public class GameTable implements Initializable {
             hoverOut.playFromStart();
         });
 
-        // Button Action
         withdrawalButton.setOnAction(e -> {
-            System.out.println("Draw Button clicked!");
-            if(getPlayer().isCurrentTurn()){
-                int i = 0;
-                for(Card c : player.getHand()){
-                    if(Objects.equals(c.getCardColour(), getCardStack().getTopCard().getCardColour())
-                            || c.getCardValue() == getCardStack().getTopCard().getCardValue()
-                            || c.getCardValue() == 13
-                            || c.getCardValue() == 14){
-                        i++;
-                    }
-                }
-                if(i > 0){
-                    getGameLogic().requestCard(1);
-                }
-            }
+            getGameLogic().requestCard(1);
         });
 
         root.getChildren().add(withdrawalButton);
-
-        // Wichtig: nach allen Nodes -> Button nach vorne bringen
         Platform.runLater(withdrawalButton::toFront);
     }
 
