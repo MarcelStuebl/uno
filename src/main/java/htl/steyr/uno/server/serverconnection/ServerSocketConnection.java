@@ -7,10 +7,12 @@ import htl.steyr.uno.server.database.DatabaseLog;
 import htl.steyr.uno.server.database.DatabaseUser;
 import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -119,7 +121,10 @@ public class ServerSocketConnection {
                     }
 
                 }
-            } catch (Exception ignored) {
+            } catch (EOFException | SocketException e) {
+                System.out.println("Client disconnected: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Error receiving message: " + e.getMessage());
             } finally {
                 running = false;
                 server.removeConnection(this);
