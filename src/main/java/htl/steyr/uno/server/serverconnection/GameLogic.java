@@ -190,19 +190,26 @@ public class GameLogic {
 
 
     private void addCardsToPlayer(Player player, Card card) {
+        System.out.println("addCardsToPlayer: " + player.getUsername() + " bekommt Karte " + card);
         checkForEmptyStack();
 
         if (player == null || player.getUsername() == null || card == null || lobby == null || lobby.getConnections() == null) {
+            System.out.println("addCardsToPlayer: Ungültige Eingabe - Spieler oder Karte ist null");
             return;
         }
 
+        System.out.println("1");
         player.addCardToHand(card);
+        System.out.println("2");
         for (ServerSocketConnection c : lobby.getConnections()) {
             if (c == null || c.getUser() == null || c.getUser().getUsername() == null) {
                 continue;
             }
+            System.out.println("Vergleiche " + c.getUser().getUsername() + " mit " + player.getUsername());
             if (c.getUser().getUsername().equals(player.getUsername())) {
-                c.sendMessage(new CardAddResponse(card));
+                CardAddResponse msg = new CardAddResponse(card);
+                System.out.println(msg);
+                c.sendMessage(msg);
                 break;
             }
         }
@@ -211,11 +218,13 @@ public class GameLogic {
 
 
     void requestCard(RequestCardRequest msg) {
+        System.out.println("requestCard: " + msg);
         Player player = msg.player();
         int amount = msg.amount();
 
         for (int i = 0; i < amount; i++) {
-            addCardsToPlayer(player, getCardDeck().getCardFromStack());
+            Card card = getCardDeck().getCardFromStack();
+            addCardsToPlayer(player, card);
         }
     }
 

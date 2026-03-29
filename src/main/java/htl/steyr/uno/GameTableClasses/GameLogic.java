@@ -46,7 +46,7 @@ public class GameLogic {
      */
     public void cardAddResponse(CardAddResponse msg) {
         System.out.println(msg);
-        getGameTable().getPlayer().addCardToHand(msg.card());
+        Platform.runLater(() -> getGameTable().getPlayer().addCardToHand(msg.card()));
     }
 
 
@@ -69,7 +69,7 @@ public class GameLogic {
      * @param amount The number of cards the player is requesting to draw.
      */
     void requestCard(int amount) {
-        System.out.println("Requesting " + amount + " card");
+        System.out.println("Requesting " + amount + " card(s) from the stack.");
         getGameTable().getClient().getConn().sendMessage(new RequestCardRequest(gameTable.getPlayer(), amount));
     }
 
@@ -110,11 +110,13 @@ public class GameLogic {
 
 
     public void gameTurnResponse(GameTurnResponse msg) {
+        System.out.println(msg);
         if (msg.enemyIndex() == null) {
             Card initialCard = msg.card();
             Platform.runLater(() -> {
                 getGameTable().getCardStack().addToStack(initialCard);
             });
+            getGameTable().getPlayer().setCurrentTurn(getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex()));
         } else {
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
                 getGameTable().getPlayer().getHand().removeIf(card -> card.equals(msg.card()));

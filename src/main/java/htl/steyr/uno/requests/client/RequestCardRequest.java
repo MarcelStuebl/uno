@@ -2,7 +2,9 @@ package htl.steyr.uno.requests.client;
 
 import htl.steyr.uno.GameTableClasses.Player;
 
-public record RequestCardRequest(Player player, int amount) {
+import java.io.Serializable;
+
+public record RequestCardRequest(Player player, int amount) implements Serializable {
 
     @Override
     public String toString() {
