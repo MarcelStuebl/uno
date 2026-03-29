@@ -25,7 +25,6 @@ public class Player implements Serializable {
     private boolean isPassive;
     private byte[] imageBytes;
 
-
     public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, boolean isPassive, byte[] imageBytes) {
         setUsername(username);
         setCurrentTurn(isCurrentTurn);
@@ -76,6 +75,7 @@ public class Player implements Serializable {
         HBox handBox = new HBox();
         handBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
         handBox.setSpacing(-100);
+        handBox.setMouseTransparent(true);
 
         for (Card c : player.getHand()) {
             String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";

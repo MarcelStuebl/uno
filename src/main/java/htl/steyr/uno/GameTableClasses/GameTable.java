@@ -3,15 +3,20 @@ package htl.steyr.uno.GameTableClasses;
 import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.StartGameResponse;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -65,6 +70,7 @@ public class GameTable implements Initializable {
 
             setupCentralStack();
             addCloseButton(root, stage);
+            createWithdrawalStack(root);
         });
     }
 
@@ -188,23 +194,78 @@ public class GameTable implements Initializable {
         root.getChildren().add(closeBtn);
     }
 
+    public void createWithdrawalStack(StackPane root) {
+        Button withdrawalButton = new Button();
+        withdrawalButton.setPrefSize(137, 192);
+        withdrawalButton.setPadding(Insets.EMPTY);
+        withdrawalButton.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
 
+        String path = "/htl/steyr/uno/Uno_Cards/backside.png";
+        ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+        iv.setFitWidth(137);
+        iv.setFitHeight(192);
+        iv.setPreserveRatio(true);
+        iv.setMouseTransparent(true); // wichtig
+        withdrawalButton.setGraphic(iv);
 
+        StackPane.setAlignment(withdrawalButton, Pos.CENTER_LEFT);
+        StackPane.setMargin(withdrawalButton, new Insets(0, 0, 0, 400));
 
+        // Hover Animation
+        ScaleTransition hoverIn = new ScaleTransition(Duration.millis(150), withdrawalButton);
+        hoverIn.setToX(1.1);
+        hoverIn.setToY(1.1);
 
+        ScaleTransition hoverOut = new ScaleTransition(Duration.millis(150), withdrawalButton);
+        hoverOut.setToX(1.0);
+        hoverOut.setToY(1.0);
 
+        withdrawalButton.setOnMouseEntered(e -> {
+            hoverOut.stop();
+            hoverIn.playFromStart();
+        });
+        withdrawalButton.setOnMouseExited(e -> {
+            hoverIn.stop();
+            hoverOut.playFromStart();
+        });
+
+        // Button Action
+        withdrawalButton.setOnAction(e -> {
+            System.out.println("Draw Button clicked!");
+            if(getPlayer().isCurrentTurn()){
+                int i = 0;
+                for(Card c : player.getHand()){
+                    if(Objects.equals(c.getCardColour(), getCardStack().getTopCard().getCardColour())
+                            || c.getCardValue() == getCardStack().getTopCard().getCardValue()
+                            || c.getCardValue() == 13
+                            || c.getCardValue() == 14){
+                        i++;
+                    }
+                }
+                if(i > 0){
+                    getGameLogic().requestCard(1);
+                }
+            }
+        });
+
+        root.getChildren().add(withdrawalButton);
+
+        // Wichtig: nach allen Nodes -> Button nach vorne bringen
+        Platform.runLater(withdrawalButton::toFront);
+    }
 
 
     public GameLogic getGameLogic() {
         return gameLogic;
     }
-
     public Client getClient() {
         return client;
     }
-
     public Player getPlayer() {
         return player;
+    }
+    public CardStack getCardStack() {
+        return centralStack;
     }
     public void setPlayer(Player player) {
         this.player = player;
