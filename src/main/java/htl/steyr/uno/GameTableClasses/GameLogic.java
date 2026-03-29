@@ -104,6 +104,72 @@ public class GameLogic {
     }
 
 
+    /**
+     * Handels the logic for when the player receives a response to their request to draw a card from the central stack.
+     * This method should update the player's hand and the UI to reflect the new cards, or show a message if the stack is empty.
+     *
+     * @param msg
+     */
+    public void stackInfoResponse(StackInfoResponse msg) {
+        if (msg.statusCode() == 0) {
+            // @TODO: Stack is not empty, the player can draw cards from the stack
+        } else if (msg.statusCode() == 1) {
+            // @TODO: Stack is empty, stop the player from drawing cards and show a message that the stack is empty
+        }
+    }
+
+
+    /**
+     * Handels the logic, when an Enemy's information is updated (e.g., after playing a card or drawing a card).
+     * Especially when the Enemy is updated to passive.
+     * This method should update the enemy's information in the game state and UI to reflect the changes.
+     *
+     * @param msg
+     */
+    public void updateEnemyResponse(UpdateEnemyResponse msg) {
+        for (Enemy e : getGameTable().getPlayer().getEnemies()) {
+            if (e.getUsername().equals(msg.enemy().getUsername())) {
+                getGameTable().getPlayer().getEnemyByUsername(msg.enemy().getUsername()).setEnemy(msg.enemy());
+                break;
+            }
+        }
+    }
+
+
+
+    public void gameTurnResponse(GameTurnResponse msg) {
+        if (msg.enemyIndex() == null) {
+            Card initialCard = msg.card();
+            // @TODO: Show initial Card on the table.
+        } else {
+            // @TODO: Check this logic
+            if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
+                getGameTable().getPlayer().getHand().removeIf(card -> card.equals(msg.card()));
+                getGameTable().getPlayer().setCurrentTurn(false);
+            } else {
+                for (Enemy e : getGameTable().getPlayer().getEnemies()) {
+                    if (e.getPlayerIndex().equals(msg.enemyIndex())) {
+                        e.setHandSize(e.getHandSize() - 1);
+                        e.setCurrentTurn(false);
+                        break;
+                    }
+                }
+            }
+
+            if (getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex())) {
+                gameTable.getPlayer().setCurrentTurn(true);
+            } else {
+                for (Enemy e : getGameTable().getPlayer().getEnemies()) {
+                    if (e.getPlayerIndex().equals(msg.nextPlayerIndex())) {
+                        e.setCurrentTurn(true);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
 

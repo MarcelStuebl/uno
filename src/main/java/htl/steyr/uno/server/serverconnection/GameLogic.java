@@ -2,7 +2,6 @@ package htl.steyr.uno.server.serverconnection;
 
 import htl.steyr.uno.GameTableClasses.Card;
 import htl.steyr.uno.GameTableClasses.*;
-import htl.steyr.uno.GameTableClasses.exceptions.*;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
@@ -17,7 +16,9 @@ public class GameLogic {
     private ArrayList<Player> players = new ArrayList<>();
     private Integer currentPlayerIndex = 0;
     private boolean directionClockwise = true;
-    private final Random random = new Random();
+    private final CardDeck cardDeck = new CardDeck();
+    private Integer lastStackInfo = 0;
+    private Card currentCard;
 
 
     GameLogic(Lobby lobby) {
@@ -37,6 +38,8 @@ public class GameLogic {
         currentPlayerIndex = 0;
         directionClockwise = true;
 
+        setCurrentCard(getCardDeck().getCardFromStack());
+
         int playerIndex = 0;
         for (User user : users) {
             if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
@@ -45,7 +48,7 @@ public class GameLogic {
 
             ArrayList<Card> hand = new ArrayList<>();
             for (int i = 0; i < 7; i++) {
-                hand.add(generateCard());
+                hand.add(getCardDeck().getCardFromStack());
             }
 
             players.add(new Player(user.getUsername(), false, hand, new ArrayList<>(), playerIndex, user.getProfileImageData()));
@@ -111,38 +114,15 @@ public class GameLogic {
                     }
                     PlayerGetResponse msg = new  PlayerGetResponse(player);
                     c.sendMessage(msg);
+
+                    GameTurnResponse gtr = new GameTurnResponse(null, getCurrentCard(), getCurrentPlayer(), isDirectionClockwise());
+                    c.sendMessage(gtr);
                     break;
                 }
             }
         }
     }
 
-
-    /**
-     * Generates a random card for the game.
-     * The card's value is randomly determined to be between 0 and 14, and the color is randomly selected from the four possible colors (yellow, green, blue, red).
-     * The method ensures that the generated card is valid according to the game rules and returns a new Card object with the generated value and color.
-     * @return A randomly generated Card object for use in the game.
-     */
-    private Card generateCard() {
-        int value = random.nextInt(15); // 0–14
-        String colour;
-
-        if (value == 13 || value == 14) {
-            // Spezialkarten sind immer schwarz
-            colour = "black";
-        } else {
-            // Normale Farben
-            String[] colors = {"yellow", "green", "blue", "red"};
-            colour = colors[random.nextInt(colors.length)];
-        }
-
-        try {
-            return new Card(value, colour);
-        } catch (InvalidCardException e) {
-            throw new RuntimeException("Error generating valid card", e);
-        }
-    }
 
 
 
@@ -163,6 +143,7 @@ public class GameLogic {
         Player player = msg.player();
 
         player.removeCardFromHand(card);
+        getCardDeck().returnCardToDiscordPile(card);
 
         if (card.getCardValue() == 10) {
             // Skip Player
@@ -190,8 +171,8 @@ public class GameLogic {
 
 
 
-    private void updatePlayer(Player player) {
-        if (player == null || player.getUsername() == null || lobby == null || lobby.getConnections() == null) {
+    private void updateEnemy(Enemy enemy) {
+        if (enemy == null || enemy.getUsername() == null || lobby == null || lobby.getConnections() == null) {
             return;
         }
 
@@ -199,8 +180,8 @@ public class GameLogic {
             if (c == null || c.getUser() == null || c.getUser().getUsername() == null) {
                 continue;
             }
-            if (c.getUser().getUsername().equals(player.getUsername())) {
-                c.sendMessage(new PlayerGetResponse(player));
+            if (c.getUser().getUsername().equals(enemy.getUsername())) {
+                c.sendMessage(new UpdateEnemyResponse(enemy));
                 break;
             }
         }
@@ -209,6 +190,8 @@ public class GameLogic {
 
 
     private void addCardsToPlayer(Player player, Card card) {
+        checkForEmptyStack();
+
         if (player == null || player.getUsername() == null || card == null || lobby == null || lobby.getConnections() == null) {
             return;
         }
@@ -232,7 +215,7 @@ public class GameLogic {
         int amount = msg.amount();
 
         for (int i = 0; i < amount; i++) {
-            addCardsToPlayer(player, generateCard());
+            addCardsToPlayer(player, getCardDeck().getCardFromStack());
         }
     }
 
@@ -240,7 +223,18 @@ public class GameLogic {
     private void checkForWinner(Player player) {
         if (player.getHand().isEmpty()) {
             player.setPassive(true);
-            updatePlayer(player);
+            updateEnemy(new Enemy(player));
+        }
+    }
+
+
+    private void checkForEmptyStack() {
+        if (getCardDeck().isStackEmpty() && lastStackInfo == 0) {
+            getLobby().sendInfoToAll(new StackInfoResponse(1));
+            lastStackInfo = 1;
+        } else if (!getCardDeck().isStackEmpty() && lastStackInfo == 1) {
+            getLobby().sendInfoToAll(new StackInfoResponse(0));
+            lastStackInfo = 0;
         }
     }
 
@@ -253,7 +247,13 @@ public class GameLogic {
 
 
 
-
+    ArrayList<Enemy> getPlayersAsEnemies() {
+        ArrayList<Enemy> enemies = new ArrayList<>();
+        for (Player player : players) {
+            enemies.add(new Enemy(player));
+        }
+        return enemies;
+    }
 
     Lobby getLobby() {
         return lobby;
@@ -286,11 +286,14 @@ public class GameLogic {
         this.directionClockwise = directionClockwise;
     }
 
-    ArrayList<Enemy> getPlayersAsEnemies() {
-        ArrayList<Enemy> enemies = new ArrayList<>();
-        for (Player player : players) {
-            enemies.add(new Enemy(player));
-        }
-        return enemies;
+    private CardDeck getCardDeck() {
+        return cardDeck;
+    }
+
+    private Card getCurrentCard() {
+        return currentCard;
+    }
+    private void setCurrentCard(Card currentCard) {
+        this.currentCard = currentCard;
     }
 }

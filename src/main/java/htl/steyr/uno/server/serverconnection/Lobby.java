@@ -50,16 +50,12 @@ public class Lobby {
 
     void updateJoined() {
         checkStatus();
-        LobbyInfoResponse response = getLobbyInfoResponse();
-        for (var c : connections) c.sendMessage(response);
+        sendInfoToAll(getLobbyInfoResponse());
     }
 
 
     void sendChatMessage(SendChatMessageRequest obj) {
-        ReceiveChatMessageResponse response = new ReceiveChatMessageResponse(obj.message(), obj.user());
-        synchronized (connections) {
-            for (var c : connections) c.sendMessage(response);
-        }
+        sendInfoToAll(new ReceiveChatMessageResponse(obj.message(), obj.user()));
     }
 
 
@@ -82,12 +78,16 @@ public class Lobby {
         setStatus(2);
         LobbyInfoResponse response = getLobbyInfoResponse();
         getGameLogic().createGame(response.users());
-        for (ServerSocketConnection c : connections) {
-            c.sendMessage(new StartGameResponse(gameLogic.getPlayersAsEnemies()));
-        }
+        sendInfoToAll(new StartGameResponse(gameLogic.getPlayersAsEnemies()));
         updateJoined();
     }
 
+
+    void sendInfoToAll(Object message) {
+        synchronized (connections) {
+            for (var c : connections) c.sendMessage(message);
+        }
+    }
 
 
     @Override
