@@ -34,16 +34,14 @@ public class GameTable implements Initializable {
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
     private Player player;
+    private HBox handBox;
+
 
     @FXML private StackPane enemy1;
     @FXML private StackPane enemy2;
     @FXML private StackPane enemy3;
 
     ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
-
-    // HBox wird als Instanzvariable gespeichert, damit addCardToUI darauf zugreifen kann
-    private HBox handBox;
-
 
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
@@ -155,7 +153,6 @@ public class GameTable implements Initializable {
 
 
     public void open() {
-        // HBox erstellen und als Instanzvariable speichern
         handBox = new HBox();
         handBox.setAlignment(Pos.BOTTOM_CENTER);
         handBox.setSpacing(-100);
@@ -179,8 +176,6 @@ public class GameTable implements Initializable {
     public void addCardToUI(Card card) {
         if (handBox == null) return;
 
-        // Die Hand wurde bereits in addCardToHand() sortiert —
-        // wir bauen die HBox neu auf, damit die Sortierung sichtbar wird
         handBox.getChildren().clear();
         for (Card c : player.getHand()) {
             handBox.getChildren().add(createCardButton(c));
