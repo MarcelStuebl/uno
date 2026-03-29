@@ -9,8 +9,6 @@ import java.util.Random;
 
 public class CardDeck {
 
-    private final Random random = new Random();
-    private final int MAX_CARDS = 108;
     private final ArrayList<Card> stack = new ArrayList<>();
     private final ArrayList<Card> discardPile = new ArrayList<>();
 
@@ -18,20 +16,59 @@ public class CardDeck {
 
     public CardDeck() {
         generateDeck();
+        shuffle();
     }
 
+
+    /**
+     * Generates a standard UNO deck with 108 cards, including number cards, action cards, and wild cards.
+     */
     private void generateDeck() {
         stack.clear();
-        while (stack.size() < MAX_CARDS) {
-            stack.add(generateCard());
+
+        String[] colours = {"yellow", "green", "blue", "red"};
+
+        for (String colour : colours) {
+            // 1× Karte „0" pro Farbe
+            addCard(0, colour);
+
+            // 2× Karten 1–9 pro Farbe
+            for (int value = 1; value <= 9; value++) {
+                addCard(value, colour);
+                addCard(value, colour);
+            }
+
+            // 2× Aussetzen pro Farbe
+            addCard(10, colour);
+            addCard(10, colour);
+
+            // 2× Richtungswechsel pro Farbe
+            addCard(11, colour);
+            addCard(11, colour);
+
+            // 2× +2 pro Farbe
+            addCard(12, colour);
+            addCard(12, colour);
+        }
+
+        // 4× Farbwahl
+        for (int i = 0; i < 4; i++) {
+            addCard(13, "black");
+        }
+
+        // 4× +4 Farbwahl
+        for (int i = 0; i < 4; i++) {
+            addCard(14, "black");
         }
     }
 
-    public void shuffle() {
+
+
+    private void shuffle() {
         Collections.shuffle(stack);
     }
 
-    public Card getCardFromStack() {
+    Card getCardFromStack() {
         if (stack.isEmpty()) {
             refill();
         }
@@ -41,33 +78,10 @@ public class CardDeck {
         return stack.removeLast();
     }
 
-    public void returnCardToDiscordPile(Card card) {
+    void returnCardToDiscordPile(Card card) {
         discardPile.add(card);
         if (stack.isEmpty()) {
             refill();
-        }
-    }
-
-
-
-
-
-
-    private Card generateCard() {
-        int value = random.nextInt(15);
-        String colour;
-
-        if (value == 13 || value == 14) {
-            colour = "black";
-        } else {
-            String[] colors = {"yellow", "green", "blue", "red"};
-            colour = colors[random.nextInt(colors.length)];
-        }
-
-        try {
-            return new Card(value, colour);
-        } catch (InvalidCardException e) {
-            throw new RuntimeException("Error generating valid card", e);
         }
     }
 
@@ -77,15 +91,15 @@ public class CardDeck {
         shuffle();
     }
 
-    public boolean isStackEmpty() {
+    private void addCard(int value, String colour) {
+        stack.add(new Card(value, colour));
+    }
+
+    boolean isStackEmpty() {
         return stack.isEmpty();
     }
 
-    public int size() {
-        return stack.size();
-    }
-
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return stack.isEmpty();
     }
 }
