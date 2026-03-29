@@ -35,12 +35,6 @@ public class GameLogic {
             getGameTable().open();
         });
 
-
-        /*
-        @TODO: Update the UI to reflect the player's hand of cards.
-            After that, the Game is ready to start and the player can start playing cards from their hand if it's his turn.
-            !!!!!NOT BEFORE!!!!!
-         */
     }
 
 
@@ -51,7 +45,7 @@ public class GameLogic {
      * @param msg The CardAddResponse message containing information about the card that was added.
      */
     public void cardAddResponse(CardAddResponse msg) {
-        // @TODO: Implement logic for when a card is added to the players hand (e.g., after drawing a card from the central stack).
+        getGameTable().getPlayer().addCardToHand(msg.card());
     }
 
 
