@@ -43,10 +43,10 @@ Ein ITP-Schulprojekt
       <h3>Jonas FÜRLINGER</h3>
       <img src="https://img.shields.io/badge/Game%20Rules-087F5B?style=for-the-badge&logo=gnometerminal&logoColor=white" alt="Game Rules"/>
       <img src="https://img.shields.io/badge/Backend-007396?style=for-the-badge&logo=java&logoColor=white" alt="Backend"/>
-<img src="https://img.shields.io/badge/Frontend-FF6B6B?style=for-the-badge&logo=css3&logoColor=white" alt="Frontend"/>
+      <img src="https://img.shields.io/badge/Frontend-FF6B6B?style=for-the-badge&logo=css3&logoColor=white" alt="Frontend"/>
       <img src="https://img.shields.io/badge/Docs-7048E8?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Docs"/>
       <br /><br />
-      <a href="mailto:jfuerl@htl-steyr.ac.at">jfuerl@htl-steyr.ac.at</a>
+      <a href="mailto:jfuerlin@htl-steyr.ac.at">jfuerl@htl-steyr.ac.at</a>
     </td>
     <td align="center">
       <a href="https://github.com/BR00TManu">
