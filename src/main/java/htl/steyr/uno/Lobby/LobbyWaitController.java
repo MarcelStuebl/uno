@@ -25,7 +25,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -165,6 +168,52 @@ public class LobbyWaitController implements Initializable {
 
             if (lobby.users().size() > 1) {
                 playerListView.getItems().add(lobby.users().getLast().getUsername());
+            playerListView.setCellFactory(list -> new ListCell<String>() {
+                private final BorderPane rootPane = new BorderPane();
+                private final Label nameLabel = new Label();
+                private final HBox buttonBox = new HBox(10);
+                public final Button kickButton = new Button("Kick");
+                public final Button muteButton = new Button("Mute");
+
+                {
+
+                    nameLabel.setMinWidth(180);
+                    nameLabel.setMaxWidth(180);
+                    nameLabel.setPrefWidth(180);
+
+                    nameLabel.setAlignment(Pos.CENTER_LEFT);
+
+                    buttonBox.getChildren().addAll(kickButton, muteButton);
+                    buttonBox.setAlignment(Pos.CENTER);
+
+                    rootPane.setLeft(nameLabel);
+                    rootPane.setCenter(buttonBox);
+                    rootPane.setPadding(new Insets(4, 8, 4, 8));
+
+                    BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
+                    BorderPane.setAlignment(buttonBox, Pos.CENTER);
+                }
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setGraphic(null);
+                        setText(null);
+                    } else {
+                        nameLabel.setText(item);
+                        setGraphic(rootPane);
+                    }
+                }
+            });
+
+
+
+
+
+            if (lobby.users().size() > 1) {
+                playerListView.getItems().add(lobby.users().getLast().getUsername());
             } else {
                 playerListView.getItems().add("Wartet auf Spieler...");
             }
@@ -175,6 +224,7 @@ public class LobbyWaitController implements Initializable {
             playerListView.getItems().add(currentUsername);
         }
     }
+        }
 
     public void onSendMassage(ActionEvent actionEvent) {
         String text = gameChatTextField.getText();
@@ -204,8 +254,6 @@ public class LobbyWaitController implements Initializable {
     }
 
     private void startGame(StartGameResponse msg) throws IOException {
-        intentionalClose = true;
-
         Stage stage = new Stage();
         Stage thisStage = (Stage) playButton.getScene().getWindow();
 
@@ -222,10 +270,6 @@ public class LobbyWaitController implements Initializable {
 
         stage.setScene(scene);
         stage.show();
-        // prevent the wait-stage close handler from closing the socket while transitioning
-        try {
-            thisStage.setOnCloseRequest(null);
-        } catch (Exception ignored) {}
         thisStage.close();
     }
 
@@ -240,8 +284,6 @@ public class LobbyWaitController implements Initializable {
     }
 
     public void leaveLobbyButtonClicked(ActionEvent actionEvent) throws IOException {
-        intentionalClose = true;
-
         client.getConn().leaveLobby();
 
         Stage stage = new Stage();

@@ -69,19 +69,19 @@
    <bottom>
       <HBox prefHeight="45.0" prefWidth="600.0" spacing="0.0" styleClass="topANDbottom" BorderPane.alignment="CENTER">
          <children>
-   
+
             <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS">
                <children>
                   <Label fx:id="gamesPlayedLabel" styleClass="stats" text="Spiele:" />
                </children>
             </StackPane>
-   
+
             <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS">
                <children>
                   <Label fx:id="gamesWonLabel" styleClass="stats" text="Siege:" />
                </children>
             </StackPane>
-   
+
             <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS">
                <children>
                   <Label fx:id="winRateLabel" styleClass="stats" text="Siegrate:" />
