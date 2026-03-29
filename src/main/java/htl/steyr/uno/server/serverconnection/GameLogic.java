@@ -162,7 +162,7 @@ public class GameLogic {
 
         checkForWinner(player);
 
-        CardPlayedResponse response = new CardPlayedResponse(card, player, currentPlayerIndex);
+        GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), getCurrentCard(), currentPlayerIndex, directionClockwise);
         for (ServerSocketConnection c : lobby.getConnections()) {
             c.sendMessage(response);
         }

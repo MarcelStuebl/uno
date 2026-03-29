@@ -87,7 +87,6 @@ public class ClientSocketConnection implements Closeable {
                         case CreateAccountFailedResponse msg -> createAccountFailedResponse(msg);
                         case CardAddResponse msg -> cardAddResponse(msg);
                         case PlayerGetResponse msg -> playerGetResponse(msg);
-                        case CardPlayedResponse msg -> cardPlayedResponse(msg);
                         case StackInfoResponse msg -> stackInfoResponse(msg);
                         case UpdateEnemyResponse msg -> updateEnemyResponse(msg);
                         case GameTurnResponse msg -> gameTurnResponse(msg);
@@ -179,10 +178,6 @@ public class ClientSocketConnection implements Closeable {
 
     private void playerGetResponse(PlayerGetResponse msg) {
         client.getGameTable().getGameLogic().playerGetResponse(msg);
-    }
-
-    private void cardPlayedResponse(CardPlayedResponse msg) {
-        client.getGameTable().getGameLogic().cardPlayedResponse(msg);
     }
 
     private void stackInfoResponse(StackInfoResponse msg) {

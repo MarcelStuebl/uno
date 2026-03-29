@@ -62,32 +62,6 @@ public class GameLogic {
 
 
     /**
-     * Handles the logic for when a card is played by any player (including the current player).
-     * This method should update the game state and UI to reflect the card that was played and any changes to the game state (e.g., next player's turn).
-     *
-     * @param msg The CardPlayedResponse message containing information about the card that was played and the player who played it.
-     */
-    public void cardPlayedResponse(CardPlayedResponse msg) {
-        Enemy enemy = msg.enemy();
-
-        if (!enemy.getUsername().equals(getGameTable().getPlayer().getUsername())) {
-            for (Enemy e : getGameTable().getPlayer().getEnemies()) {
-                if (e.getUsername().equals(enemy.getUsername())) {
-                    getGameTable().getPlayer().getEnemyByUsername(enemy.getUsername()).setEnemy(enemy);
-                    break;
-                }
-            }
-        } else {
-            getGameTable().getPlayer().setPassive(enemy.isPassive());
-        }
-
-        Card card = msg.card();
-        Integer nextPlayerIndex = msg.nextPlayerIndex();
-        // @TODO: Update the UI to reflect the card that was played and any changes to the game state (e.g., next player's turn)
-    }
-
-
-    /**
      * Handles the logic for when a player requests to draw a card from the central stack.
      * This method should send a RequestCardRequest to the server with the number of cards the player wants to draw.
      *
