@@ -164,10 +164,11 @@ public class LobbyWaitController implements Initializable {
         if (lobby.users().getFirst().getUsername().equals(currentUsername)) {
             playButton.setVisible(true);
 
+
+
+
             playerListView.getItems().add(lobby.users().getFirst().getUsername());
 
-            if (lobby.users().size() > 1) {
-                playerListView.getItems().add(lobby.users().getLast().getUsername());
             playerListView.setCellFactory(list -> new ListCell<String>() {
                 private final BorderPane rootPane = new BorderPane();
                 private final Label nameLabel = new Label();
@@ -224,7 +225,6 @@ public class LobbyWaitController implements Initializable {
             playerListView.getItems().add(currentUsername);
         }
     }
-        }
 
     public void onSendMassage(ActionEvent actionEvent) {
         String text = gameChatTextField.getText();
@@ -254,6 +254,8 @@ public class LobbyWaitController implements Initializable {
     }
 
     private void startGame(StartGameResponse msg) throws IOException {
+        intentionalClose = true;
+
         Stage stage = new Stage();
         Stage thisStage = (Stage) playButton.getScene().getWindow();
 
@@ -270,6 +272,10 @@ public class LobbyWaitController implements Initializable {
 
         stage.setScene(scene);
         stage.show();
+
+        try {
+            thisStage.setOnCloseRequest(null);
+        } catch (Exception ignored) {}
         thisStage.close();
     }
 
@@ -284,6 +290,8 @@ public class LobbyWaitController implements Initializable {
     }
 
     public void leaveLobbyButtonClicked(ActionEvent actionEvent) throws IOException {
+        intentionalClose = true;
+
         client.getConn().leaveLobby();
 
         Stage stage = new Stage();
