@@ -24,7 +24,10 @@ jobs:
 
       - name: Extract version from tag
         id: version
-        run: echo "VERSION=${{ github.ref_name }}" | sed 's/v//' >> $env:GITHUB_OUTPUT
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
 
       - name: Install WiX Toolset
         run: choco install wixtoolset -y
