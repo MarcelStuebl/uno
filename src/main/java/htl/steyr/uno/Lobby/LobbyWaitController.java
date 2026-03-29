@@ -25,7 +25,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -164,15 +167,30 @@ public class LobbyWaitController implements Initializable {
             playerListView.getItems().add(lobby.getUsers().getFirst().getUsername());
 
             playerListView.setCellFactory(list -> new ListCell<String>() {
-                private final HBox hBox = new HBox();
-                public final Button button = new Button("Kick");
+                private final BorderPane rootPane = new BorderPane();
+                private final Label nameLabel = new Label();
+                private final HBox buttonBox = new HBox(10);
+                public final Button kickButton = new Button("Kick");
+                public final Button muteButton = new Button("Mute");
 
                 {
-                    hBox.getChildren().add(button);
-                    hBox.setAlignment(Pos.CENTER);
+
+                    nameLabel.setMinWidth(180);
+                    nameLabel.setMaxWidth(180);
+                    nameLabel.setPrefWidth(180);
+
+                    nameLabel.setAlignment(Pos.CENTER_LEFT);
+
+                    buttonBox.getChildren().addAll(kickButton, muteButton);
+                    buttonBox.setAlignment(Pos.CENTER);
+
+                    rootPane.setLeft(nameLabel);
+                    rootPane.setCenter(buttonBox);
+                    rootPane.setPadding(new Insets(4, 8, 4, 8));
+
+                    BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
+                    BorderPane.setAlignment(buttonBox, Pos.CENTER);
                 }
-
-
 
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -180,14 +198,12 @@ public class LobbyWaitController implements Initializable {
 
                     if (empty || item == null) {
                         setGraphic(null);
+                        setText(null);
                     } else {
-                        //setGraphic(hbox);
+                        nameLabel.setText(item);
+                        setGraphic(rootPane);
                     }
                 }
-
-
-
-
             });
 
 
