@@ -1,9 +1,11 @@
 package htl.steyr.uno.Lobby;
 
+import htl.steyr.uno.GameTableClasses.Enemy;
 import htl.steyr.uno.GameTableClasses.GameTable;
 import htl.steyr.uno.HelloApplication;
 import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.UiStyleUtil;
+import htl.steyr.uno.User;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
@@ -25,6 +27,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -32,8 +36,11 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class LobbyWaitController implements Initializable {
@@ -56,6 +63,7 @@ public class LobbyWaitController implements Initializable {
         this.client = client;
         this.lobby = lobby;
     }
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -157,73 +165,94 @@ public class LobbyWaitController implements Initializable {
     }
 
     public void updateLobbyInfo() {
-        String currentUsername = client.getConn().getUser().getUsername();
-
         playerListView.getItems().clear();
+        String currentUsername = client.getConn().getUser().getUsername();
+        ArrayList<User> users = new ArrayList<>(lobby.users());
 
-        if (lobby.users().getFirst().getUsername().equals(currentUsername)) {
-            playButton.setVisible(true);
+        // Der erste User in der Liste ist der Host
+        String hostUsername = users.isEmpty() ? null : users.getFirst().getUsername();
+        boolean isHost = currentUsername.equals(hostUsername);
 
+        // Play-Button nur für den Host sichtbar
+        playButton.setVisible(isHost);
 
+        // CellFactory einmalig setzen
+        playerListView.setCellFactory(list -> new ListCell<String>() {
+            private final BorderPane rootPane = new BorderPane();
+            private final Label nameLabel = new Label();
+            private final HBox buttonBox = new HBox(10);
+            private final Button kickButton = new Button("Kick");
+            private final Button muteButton = new Button("Mute");
 
+            {
+                nameLabel.setMinWidth(180);
+                nameLabel.setMaxWidth(180);
+                nameLabel.setPrefWidth(180);
+                nameLabel.setAlignment(Pos.CENTER_LEFT);
 
-            playerListView.getItems().add(lobby.users().getFirst().getUsername());
+                buttonBox.getChildren().addAll(kickButton, muteButton);
+                buttonBox.setAlignment(Pos.CENTER);
 
-            playerListView.setCellFactory(list -> new ListCell<String>() {
-                private final BorderPane rootPane = new BorderPane();
-                private final Label nameLabel = new Label();
-                private final HBox buttonBox = new HBox(10);
-                public final Button kickButton = new Button("Kick");
-                public final Button muteButton = new Button("Mute");
-
-                {
-
-                    nameLabel.setMinWidth(180);
-                    nameLabel.setMaxWidth(180);
-                    nameLabel.setPrefWidth(180);
-
-                    nameLabel.setAlignment(Pos.CENTER_LEFT);
-
-                    buttonBox.getChildren().addAll(kickButton, muteButton);
-                    buttonBox.setAlignment(Pos.CENTER);
-
-                    rootPane.setLeft(nameLabel);
-                    rootPane.setCenter(buttonBox);
-                    rootPane.setPadding(new Insets(4, 8, 4, 8));
-
-                    BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
-                    BorderPane.setAlignment(buttonBox, Pos.CENTER);
-                }
-
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-
-                    if (empty || item == null) {
-                        setGraphic(null);
-                        setText(null);
-                    } else {
-                        nameLabel.setText(item);
-                        setGraphic(rootPane);
-                    }
-                }
-            });
-
-
-
-
-
-            if (lobby.users().size() > 1) {
-                playerListView.getItems().add(lobby.users().getLast().getUsername());
-            } else {
-                playerListView.getItems().add("Wartet auf Spieler...");
+                rootPane.setPadding(new Insets(4, 8, 4, 8));
+                BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
             }
-        } else {
-            playButton.setVisible(false);
 
-            playerListView.getItems().add(lobby.users().getFirst().getUsername());
-            playerListView.getItems().add(currentUsername);
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setGraphic(null);
+                    setText(null);
+                    return;
+                }
+
+                User matchedUser = users.stream().filter(u -> u.getUsername().equals(item)).findFirst().orElse(null);
+
+                ImageView profileImageView = new ImageView(matchedUser != null ? getProfileImage(matchedUser) : new Image(Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")), 50, 50, true, true));
+                profileImageView.setFitWidth(56);
+                profileImageView.setFitHeight(56);
+                profileImageView.setPreserveRatio(true);
+                profileImageView.setPickOnBounds(true);
+
+                HBox nameAndImage = new HBox(8, profileImageView, nameLabel);
+                nameAndImage.setAlignment(Pos.CENTER_LEFT);
+                rootPane.setLeft(nameAndImage);
+
+                if (item.equals(currentUsername)) {
+                    rootPane.setRight(null);
+                    nameLabel.setText(item);
+                } else {
+                    if (isHost) {
+                        rootPane.setRight(buttonBox);
+                        BorderPane.setAlignment(buttonBox, Pos.CENTER);
+                    } else {
+                        rootPane.setRight(null);
+                    }
+                    nameLabel.setText(item);
+                }
+
+                setGraphic(rootPane);
+            }
+        });
+
+        for (User u : users) {
+            playerListView.getItems().add(u.getUsername());
         }
+    }
+
+    private Image getProfileImage(User user) {
+        byte[] imageData = user.getProfileImageData();
+        Image profileImage;
+        if (imageData != null && imageData.length > 0) {
+            profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
+        } else {
+            profileImage = new Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
+                    50, 50, true, true
+            );
+        }
+        return profileImage;
     }
 
     public void onSendMassage(ActionEvent actionEvent) {
