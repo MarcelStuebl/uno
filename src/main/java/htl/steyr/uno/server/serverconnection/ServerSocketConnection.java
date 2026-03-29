@@ -121,7 +121,7 @@ public class ServerSocketConnection {
                     }
                 }
             } catch (EOFException | SocketException e) {
-                System.out.println("Client disconnected: " + e.getMessage());
+                System.out.println("Client disconnected: " + socket.getRemoteSocketAddress());
             } catch (Exception e) {
                 System.out.println("Error receiving message: " + e.getMessage());
             } finally {
@@ -129,7 +129,6 @@ public class ServerSocketConnection {
                 server.removeConnection(this);
                 try {
                     socket.close();
-                    System.out.println("Connection closed: " + socket.getRemoteSocketAddress());
                 } catch (IOException ignored) {}
             }
         });
