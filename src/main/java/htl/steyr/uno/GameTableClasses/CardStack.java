@@ -11,12 +11,6 @@ import javafx.util.Duration;
 
 import java.util.Objects;
 
-/**
- * Zentraler Karten-Stack für das UNO-Spiel.
- * Speichert die oberste Karte und zeigt sie visuell an.
- * Nur gültige Karten werden auf den Stack gelegt.
- * Ungültige Karten wackeln auf dem Button der Hand.
- */
 public class CardStack {
     ScaleTransition st;
     private Card topCard;
@@ -36,42 +30,6 @@ public class CardStack {
     public StackPane getVisual() {
         return visual;
     }
-
-    //player lays a card on the stack
-    //stack will update, display a small animation and check if it can be layed down or not
-    //logic for laying down cards will happen in the stack
-    public void addToStack(Card c) {
-        if (c == null) return;
-
-        // save card
-        this.topCard = c;
-
-        // update visually
-        visual.getChildren().clear();
-
-        String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
-        ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
-        iv.setFitWidth(137);
-        iv.setFitHeight(192);
-        iv.setPreserveRatio(true);
-        UiStyleUtil.applyRoundedCardClip(iv, 137, 192, 18);
-        visual.getChildren().add(iv);
-
-
-
-        // small pop animation
-        ScaleTransition st = new ScaleTransition(Duration.millis(200), visual);
-        st.setFromX(0.8);
-        st.setFromY(0.8);
-        st.setToX(1.0);
-        st.setToY(1.0);
-        st.play();
-    }
-
-    public Card getTopCard() {
-        return topCard;
-    }
-
 
     public void layCard(Card c, Button handButton, Player p) {
         if (c == null) return;
@@ -113,6 +71,37 @@ public class CardStack {
         }
     }
 
+    //player lays a card on the stack
+    //stack will update, display a small animation and check if it can be layed down or not
+    //logic for laying down cards will happen in the stack
+    //THIS METHOD CAN BE CALLED FOR THE FIRST CARD OF THE GAME
+    public void addToStack(Card c) {
+
+        // save card
+        this.topCard = c;
+
+        // update visually
+        visual.getChildren().clear();
+
+        String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
+        ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+        iv.setFitWidth(137);
+        iv.setFitHeight(192);
+        iv.setPreserveRatio(true);
+        UiStyleUtil.applyRoundedCardClip(iv, 137, 192, 18);
+        visual.getChildren().add(iv);
+
+
+
+        // small pop animation
+        ScaleTransition st = new ScaleTransition(Duration.millis(200), visual);
+        st.setFromX(0.8);
+        st.setFromY(0.8);
+        st.setToX(1.0);
+        st.setToY(1.0);
+        st.play();
+    }
+
    // makes the button that is currently clicked shake if it is layable
     private void shakeHandButton(Button cardBtn) {
         TranslateTransition tt = new TranslateTransition(Duration.millis(50), cardBtn);
@@ -123,4 +112,8 @@ public class CardStack {
         tt.playFromStart();
     }
 
+
+    public Card getTopCard() {
+        return topCard;
+    }
 }

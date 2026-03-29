@@ -45,6 +45,7 @@ public class GameLogic {
      * @param msg The CardAddResponse message containing information about the card that was added.
      */
     public void cardAddResponse(CardAddResponse msg) {
+        System.out.println(msg);
         getGameTable().getPlayer().addCardToHand(msg.card());
     }
 
@@ -68,6 +69,7 @@ public class GameLogic {
      * @param amount The number of cards the player is requesting to draw.
      */
     void requestCard(int amount) {
+        System.out.println("Requesting " + amount + " card");
         getGameTable().getClient().getConn().sendMessage(new RequestCardRequest(gameTable.getPlayer(), amount));
     }
 
@@ -81,14 +83,16 @@ public class GameLogic {
     public void stackInfoResponse(StackInfoResponse msg) {
         if (msg.statusCode() == 0) {
             // @TODO: Stack is not empty, the player can draw cards from the stack
+
         } else if (msg.statusCode() == 1) {
             // @TODO: Stack is empty, stop the player from drawing cards and show a message that the stack is empty
+
         }
     }
 
 
     /**
-     * Handels the logic, when an Enemy's information is updated (e.g., after playing a card or drawing a card).
+     * Handles the logic, when an Enemy's information is updated (e.g., after playing a card or drawing a card).
      * Especially when the Enemy is updated to passive.
      * This method should update the enemy's information in the game state and UI to reflect the changes.
      *
@@ -108,9 +112,8 @@ public class GameLogic {
     public void gameTurnResponse(GameTurnResponse msg) {
         if (msg.enemyIndex() == null) {
             Card initialCard = msg.card();
-            // @TODO: Show initial Card on the table.
+            gameTable.getCardStack().addToStack(initialCard);
         } else {
-            // @TODO: Check this logic
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
                 getGameTable().getPlayer().getHand().removeIf(card -> card.equals(msg.card()));
                 getGameTable().getPlayer().setCurrentTurn(false);
