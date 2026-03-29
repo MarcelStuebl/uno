@@ -64,19 +64,6 @@ public class LobbyWaitController implements Initializable {
         this.lobby = lobby;
     }
 
-    private Image getProfileImage(Enemy enemy) {
-        byte[] imageData = enemy.getImageBytes();
-        Image profileImage;
-        if (imageData != null && imageData.length > 0) {
-            profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
-        } else {
-            profileImage = new Image(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
-                    50, 50, true, true
-            );
-        }
-        return profileImage;
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -178,68 +165,94 @@ public class LobbyWaitController implements Initializable {
     }
 
     public void updateLobbyInfo() {
-        String currentUsername = client.getConn().getUser().getUsername();
-
         playerListView.getItems().clear();
+        String currentUsername = client.getConn().getUser().getUsername();
+        ArrayList<User> users = new ArrayList<>(lobby.users());
 
-        if (lobby.users().getFirst().getUsername().equals(currentUsername)) {
-            playButton.setVisible(true);
+        // Der erste User in der Liste ist der Host
+        String hostUsername = users.isEmpty() ? null : users.getFirst().getUsername();
+        boolean isHost = currentUsername.equals(hostUsername);
 
+        // Play-Button nur für den Host sichtbar
+        playButton.setVisible(isHost);
 
-            playerListView.getItems().add(lobby.users().getFirst().getUsername());
+        // CellFactory einmalig setzen
+        playerListView.setCellFactory(list -> new ListCell<String>() {
+            private final BorderPane rootPane = new BorderPane();
+            private final Label nameLabel = new Label();
+            private final HBox buttonBox = new HBox(10);
+            private final Button kickButton = new Button("Kick");
+            private final Button muteButton = new Button("Mute");
 
-            playerListView.setCellFactory(list -> new ListCell<String>() {
-                private final BorderPane rootPane = new BorderPane();
-                private final Label nameLabel = new Label();
-                private final Region spacer = new Region();
-                //private final ImageView profielPictureImageView = new ImageView(getProfileImage());
-                private final HBox buttonBox = new HBox(10);
-                public final Button kickButton = new Button("Kick");
-                public final Button muteButton = new Button("Mute");
+            {
+                nameLabel.setMinWidth(180);
+                nameLabel.setMaxWidth(180);
+                nameLabel.setPrefWidth(180);
+                nameLabel.setAlignment(Pos.CENTER_LEFT);
 
-                {
+                buttonBox.getChildren().addAll(kickButton, muteButton);
+                buttonBox.setAlignment(Pos.CENTER);
 
-                    nameLabel.setMinWidth(180);
-                    nameLabel.setMaxWidth(180);
-                    nameLabel.setPrefWidth(180);
-
-                    nameLabel.setAlignment(Pos.CENTER_LEFT);
-
-                    buttonBox.getChildren().addAll(kickButton, muteButton);
-                    buttonBox.setAlignment(Pos.CENTER);
-
-                    rootPane.setLeft(nameLabel);
-                    rootPane.setCenter(buttonBox);
-                    rootPane.setPadding(new Insets(4, 8, 4, 8));
-
-                    BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
-                    BorderPane.setAlignment(buttonBox, Pos.CENTER);
-                }
-
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-
-                    if (empty || item == null) {
-                        setGraphic(null);
-                        setText(null);
-                    } else {
-                        nameLabel.setText(item);
-                        setGraphic(rootPane);
-                    }
-                }
-            });
-
-            if (lobby.users().size() > 1){
-                playerListView.getItems().add(lobby.users().getLast().getUsername());
+                rootPane.setPadding(new Insets(4, 8, 4, 8));
+                BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
             }
 
-        } else {
-            playButton.setVisible(false);
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
 
-            playerListView.getItems().add(lobby.users().getFirst().getUsername());
-            playerListView.getItems().add(currentUsername);
+                if (empty || item == null) {
+                    setGraphic(null);
+                    setText(null);
+                    return;
+                }
+
+                User matchedUser = users.stream().filter(u -> u.getUsername().equals(item)).findFirst().orElse(null);
+
+                ImageView profileImageView = new ImageView(matchedUser != null ? getProfileImage(matchedUser) : new Image(Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")), 50, 50, true, true));
+                profileImageView.setFitWidth(56);
+                profileImageView.setFitHeight(56);
+                profileImageView.setPreserveRatio(true);
+                profileImageView.setPickOnBounds(true);
+
+                HBox nameAndImage = new HBox(8, profileImageView, nameLabel);
+                nameAndImage.setAlignment(Pos.CENTER_LEFT);
+                rootPane.setLeft(nameAndImage);
+
+                if (item.equals(currentUsername)) {
+                    rootPane.setRight(null);
+                    nameLabel.setText(item);
+                } else {
+                    if (isHost) {
+                        rootPane.setRight(buttonBox);
+                        BorderPane.setAlignment(buttonBox, Pos.CENTER);
+                    } else {
+                        rootPane.setRight(null);
+                    }
+                    nameLabel.setText(item);
+                }
+
+                setGraphic(rootPane);
+            }
+        });
+
+        for (User u : users) {
+            playerListView.getItems().add(u.getUsername());
         }
+    }
+
+    private Image getProfileImage(User user) {
+        byte[] imageData = user.getProfileImageData();
+        Image profileImage;
+        if (imageData != null && imageData.length > 0) {
+            profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
+        } else {
+            profileImage = new Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
+                    50, 50, true, true
+            );
+        }
+        return profileImage;
     }
 
     public void onSendMassage(ActionEvent actionEvent) {
