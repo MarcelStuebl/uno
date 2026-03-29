@@ -13,7 +13,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<HBox prefHeight="879.0" prefWidth="1021.0" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<HBox prefHeight="879.0" prefWidth="1021.0" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
 
     <children>
         <HBox prefHeight="879.0" prefWidth="823.0" HBox.hgrow="ALWAYS">

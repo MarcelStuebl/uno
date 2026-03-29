@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.util.Duration?>
 
-<HBox fx:id="rootContainer" alignment="CENTER" focusTraversable="true" stylesheets="@style/loginStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="htl.steyr.uno.LoginController">
+<HBox fx:id="rootContainer" alignment="CENTER" focusTraversable="true" stylesheets="@style/loginStyle.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="htl.steyr.uno.LoginController">
 
     <StackPane fx:id="brandingPane" maxWidth="Infinity" styleClass="centerPane" HBox.hgrow="ALWAYS">
         <VBox alignment="CENTER" spacing="20">

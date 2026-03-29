@@ -78,7 +78,7 @@ public class Player implements Serializable {
         handBox.setSpacing(-100);
 
         for (Card c : player.getHand()) {
-            String path = "../Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
+            String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
             ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
             iv.setFitWidth(137);
             iv.setFitHeight(192);

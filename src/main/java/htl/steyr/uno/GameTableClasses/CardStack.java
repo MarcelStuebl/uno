@@ -49,7 +49,7 @@ public class CardStack {
         // update visually
         visual.getChildren().clear();
 
-        String path = "../Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
+        String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
         ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
         iv.setFitWidth(137);
         iv.setFitHeight(192);
