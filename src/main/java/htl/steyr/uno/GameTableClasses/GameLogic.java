@@ -112,7 +112,9 @@ public class GameLogic {
     public void gameTurnResponse(GameTurnResponse msg) {
         if (msg.enemyIndex() == null) {
             Card initialCard = msg.card();
-            gameTable.getCardStack().addToStack(initialCard);
+            Platform.runLater(() -> {
+                getGameTable().getCardStack().addToStack(initialCard);
+            });
         } else {
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
                 getGameTable().getPlayer().getHand().removeIf(card -> card.equals(msg.card()));
