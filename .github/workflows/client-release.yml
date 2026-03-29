@@ -22,6 +22,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${{ github.ref_name }}" | sed 's/v//' >> $env:GITHUB_OUTPUT
+
       - name: Install WiX Toolset
         run: choco install wixtoolset -y
 
@@ -29,7 +33,7 @@ jobs:
         run: mvn clean package -P client -DskipTests
 
       - name: Build EXE
-        run: mvn jpackage:jpackage -P client
+        run: mvn jpackage:jpackage -P client -Dapp.version=${{ steps.version.outputs.VERSION }}
 
       - name: Upload EXE to Release
         uses: softprops/action-gh-release@v2

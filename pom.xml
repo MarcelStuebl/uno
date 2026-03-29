@@ -13,6 +13,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.12.1</junit.version>
+        <app.version>1.0.0</app.version> <!-- Fallback, wird von CI überschrieben -->
     </properties>
 
     <dependencies>
@@ -128,7 +129,7 @@
                         </configuration>
                     </plugin>
 
-                    <!-- Shade Plugin für Fat-JAR (ohne JavaFX native libs) -->
+                    <!-- Shade Plugin für Fat-JAR -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
@@ -164,10 +165,10 @@
                     <plugin>
                         <groupId>org.panteleyev</groupId>
                         <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.0</version>
+                        <version>1.6.5</version>
                         <configuration>
                             <name>UNO</name>
-                            <appVersion>1.0.0</appVersion>
+                            <appVersion>${app.version}</appVersion> <!-- ← dynamisch -->
                             <vendor>HTBLA Steyr</vendor>
                             <destination>target/dist</destination>
                             <input>target</input>
