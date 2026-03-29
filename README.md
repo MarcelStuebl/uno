@@ -46,7 +46,7 @@ Ein ITP-Schulprojekt
       <img src="https://img.shields.io/badge/Frontend-FF6B6B?style=for-the-badge&logo=css3&logoColor=white" alt="Frontend"/>
       <img src="https://img.shields.io/badge/Docs-7048E8?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Docs"/>
       <br /><br />
-      <a href="mailto:jfuerlin@htl-steyr.ac.at">jfuerl@htl-steyr.ac.at</a>
+      <a href="mailto:jfuerlin@htl-steyr.ac.at">jfuerlin@htl-steyr.ac.at</a>
     </td>
     <td align="center">
       <a href="https://github.com/BR00TManu">
