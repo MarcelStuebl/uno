@@ -2,8 +2,6 @@ name: Build & Release Client
 
 on:
   push:
-    branches:
-      - master
     tags:
       - 'v*'
 
@@ -11,7 +9,6 @@ jobs:
 
   build-client:
     name: 🎮 Client EXE
-    if: startsWith(github.ref, 'refs/tags/v')  # ← geändert
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,8 +28,7 @@ jobs:
       - name: Build EXE
         run: mvn jpackage:jpackage -P client
 
-      - name: Upload EXE as Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload EXE to Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: UNO-Client-EXE
-          path: target/dist/*.exe
+          files: target/dist/*.exe
