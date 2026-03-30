@@ -1,38 +1,31 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
+name: Bug Report
+about: Einen Fehler im UNO-Projekt melden
+title: '[BUG] '
+labels: bug
 assignees: ''
-
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+> **Keine Frage, sondern ein Fehler?** Für allgemeine Fragen bitte eine [Discussion](../../discussions) öffnen statt einem Issue.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Beschreibe den Fehler**
+Eine kurze und klare Beschreibung des Fehlers.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**Schritte zur Reproduktion**
+1. Gehe zu '...'
+2. Klicke auf '...'
+3. Scrolle zu '...'
+4. Fehler erscheint
+
+**Erwartetes Verhalten**
+Eine kurze und klare Beschreibung, was eigentlich passieren sollte.
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem.
+Falls vorhanden, füge Screenshots hinzu um das Problem zu erklären.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Desktop:**
+- Betriebssystem: [z. B. Windows 11, macOS]
+- Version: [z. B. 22]
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+**Zusätzliche Informationen**
+Füge hier weiteren Kontext zum Problem hinzu.
