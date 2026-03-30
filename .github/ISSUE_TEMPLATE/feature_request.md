@@ -1,20 +1,19 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
+name: Feature Request
+about: Neue Idee oder Verbesserung für das UNO-Projekt vorschlagen
+title: '[FEATURE] '
+labels: enhancement
 assignees: ''
-
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Hängt dein Feature Request mit einem Problem zusammen? Bitte beschreibe es.**
+Eine kurze und klare Beschreibung des Problems. z. B. Es stört mich immer, wenn [...]
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Beschreibe die gewünschte Lösung**
+Eine kurze und klare Beschreibung, was passieren soll.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Beschreibe Alternativen, die du in Betracht gezogen hast**
+Eine kurze und klare Beschreibung alternativer Lösungen oder Features, die du überlegt hast.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Zusätzliche Informationen**
+Füge hier weiteren Kontext oder Screenshots zum Feature Request hinzu.
