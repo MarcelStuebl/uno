@@ -1,4 +1,9 @@
-# UNO – Ausführliches Regelwerk (Langfassung)
+# UNO – Regelwerk
+
+
+Dieses Regelwerk basiert auf den offiziellen UNO-Regeln.
+
+---
 
 ## 1. Spielziel
 Ziel des Spiels **UNO** ist es, als erste Spielerin oder erster Spieler alle eigenen Karten abzulegen.  
