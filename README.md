@@ -1,6 +1,174 @@
 # UNO
 
-Ein ITP-Schulprojekt
+Ein ITP-Schulprojekt der **HTBLA Steyr**
+
+---
+
+## Über das Projekt
+
+UNO ist eine digitale Umsetzung des gleichnamigen Kartenspiels, entwickelt von 4 Schülern der HTBLA Steyr im Rahmen des ITP-Unterrichts (Informationstechnische Projekte).
+
+Das Spiel ermöglicht es mehreren Spielern, über das Netzwerk gemeinsam UNO zu spielen. Die Kommunikation zwischen Client und Server erfolgt über eine Socket-Verbindung. Als Server dient ein Docker-Container, der auf einem Raspberry Pi betrieben wird — dadurch ist das Spiel jederzeit erreichbar, ohne dass ein eigener Rechner laufen muss.
+
+Das Projekt wurde innerhalb einer Zeitvorgabe von 2 Monaten gestartet und wird seither laufend weiterentwickelt. Der Fokus liegt auf einer stabilen Serverarchitektur, einer benutzerfreundlichen JavaFX-Oberfläche sowie einer sauberen Umsetzung der UNO-Spielregeln.
+
+---
+
+## Technologien
+
+![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=java&logoColor=white)
+![JavaFX](https://img.shields.io/badge/JavaFX-007396?style=for-the-badge&logo=java&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+
+---
+
+## Installation
+
+1. Gehe zu [Releases](../../releases/latest)
+2. Lade die neueste `.exe` Datei herunter
+3. Führe die `.exe` aus und folge dem Installationsassistenten
+4. Starte das Programm
+
+---
+
+## Ordnerstruktur
+
+<details>
+<summary>Ordnerstruktur anzeigen</summary>
+
+```
+uno/
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.md
+│   │   ├── feature_request.md
+│   │   └── custom.md
+│   ├── workflows/
+│   │   ├── client-release.yml
+│   │   └── push-ghcr.yml
+│   └── PULL_REQUEST_TEMPLATE.md
+│
+├── src/main/java/htl/steyr.uno/
+│   ├── client/
+│   │   ├── Client.java
+│   │   └── ClientSocketConnection.java
+│   │
+│   ├── GameTableClasses/
+│   │   ├── exceptions/
+│   │   ├── Card.java
+│   │   ├── CardStack.java
+│   │   ├── Enemy.java
+│   │   ├── EnemyDisplayController.java
+│   │   ├── GameLogic.java
+│   │   ├── GameTable.java
+│   │   └── Player.java
+│   │
+│   ├── Lobby/
+│   │   ├── LobbyTestApplication.java
+│   │   ├── LobbyTestLauncher.java
+│   │   └── LobbyWaitController.java
+│   │
+│   ├── requests/
+│   │   ├── client/               # Client → Server Requests
+│   │   │   ├── CardPlayedRequest.java
+│   │   │   ├── ChangePasswordRequest.java
+│   │   │   ├── CheckIfUserAlreadyExistsRequest.java
+│   │   │   ├── CreateAccountRequest.java
+│   │   │   ├── CreateLobbyRequest.java
+│   │   │   ├── ForgotPasswordRequest.java
+│   │   │   ├── ForgotPasswordSendCodeRequest.java
+│   │   │   ├── JoinLobbyRequest.java
+│   │   │   ├── LeaveLobbyRequest.java
+│   │   │   ├── LoginRequest.java
+│   │   │   ├── ReadyInGameTableRequest.java
+│   │   │   ├── RequestCardRequest.java
+│   │   │   ├── SendChatMessageRequest.java
+│   │   │   ├── SetProfileImageRequest.java
+│   │   │   └── StartGameRequest.java
+│   │   │
+│   │   └── server/               # Server → Client Responses
+│   │       ├── CardAddResponse.java
+│   │       ├── CheckIfUserAlreadyExistsResponse.java
+│   │       ├── CreateAccountFailedResponse.java
+│   │       ├── CreateAccountSuccessResponse.java
+│   │       ├── ForgotPasswordResponse.java
+│   │       ├── GameTurnResponse.java
+│   │       ├── LobbyInfoResponse.java
+│   │       ├── LobbyJoinRefusedResponse.java
+│   │       ├── LobbyNotFoundResponse.java
+│   │       ├── LoginFailedResponse.java
+│   │       ├── LoginSuccessResponse.java
+│   │       ├── PlayerGetResponse.java
+│   │       ├── ReceiveChatMessageResponse.java
+│   │       ├── StackInfoResponse.java
+│   │       ├── StartGameResponse.java
+│   │       └── UpdateEnemyResponse.java
+│   │
+│   └── server/
+│       ├── database/
+│       │   ├── DatabaseConnection.java
+│       │   ├── DatabaseLog.java
+│       │   └── DatabaseUser.java
+│       ├── exceptions.database/
+│       │   ├── DatabaseException.java
+│       │   ├── UserAlreadyExistsException.java
+│       │   └── UserException.java
+│       ├── serverconnection/
+│       │   ├── CardDeck.java
+│       │   ├── GameLogic.java
+│       │   ├── Lobby.java
+│       │   ├── MailSender.java
+│       │   ├── PasswordForgotten.java
+│       │   ├── Server.java
+│       │   └── ServerSocketConnection.java
+│       ├── HelloApplication.java
+│       ├── Launcher.java
+│       ├── LobbyController.java
+│       ├── LoginController.java
+│       ├── PasswordUtil.java
+│       ├── UiStyleUtil.java
+│       └── User.java
+│
+├── src/main/resources/htl.steyr.uno/
+│   ├── img/
+│   │   └── profile.png
+│   ├── style/
+│   │   ├── enemy.css
+│   │   ├── GameTableStyle.css
+│   │   ├── globalFocus.css
+│   │   ├── lobbyStyle.css
+│   │   ├── lobbyWaitStyle.css
+│   │   └── loginStyle.css
+│   ├── Uno_Cards/
+│   │   ├── black/
+│   │   ├── blue/
+│   │   ├── green/
+│   │   ├── red/
+│   │   ├── yellow/
+│   │   └── backside.png
+│   ├── enemy.fxml
+│   ├── gameTable.fxml
+│   ├── lobby.fxml
+│   ├── lobbyWait.fxml
+│   └── loginScreen.fxml
+│
+├── .env
+├── .gitignore
+├── CODE_OF_CONDUCT.md
+├── CONTRIBUTING.md
+├── Dockerfile
+├── LICENSE
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── Regelwerk.md
+└── SECURITY.md
+```
+
+</details>
 
 ---
 
@@ -63,5 +231,9 @@ Ein ITP-Schulprojekt
     </td>
   </tr>
 </table>
+
+## Lizenz
+
+Dieses Projekt steht unter der [MIT License](LICENSE).
 
 ---
