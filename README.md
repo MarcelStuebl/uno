@@ -14,6 +14,14 @@ Das Projekt wurde innerhalb einer Zeitvorgabe von 2 Monaten gestartet und wird s
 
 ---
 
+## Spielregeln
+
+Das Spiel folgt den offiziellen UNO-Regeln: Jeder Spieler startet mit 7 Karten und muss reihum eine Karte legen, die entweder **Farbe oder Zahl** der obersten Ablagestapelkarte entspricht. Aktionskarten wie **Zieh Zwei**, **Aussetzen** oder **Richtungswechsel** sorgen für Spannung — und mit **+4** oder **Farbwechsel** lässt sich das Blatt schnell wenden. Wer nur noch eine Karte hat, muss laut **„UNO!"** rufen. Wer zuerst alle Karten ablegt, gewinnt die Runde.
+
+Das vollständige Regelwerk findest du hier: [Regelwerk](./REGELWERK.md)
+
+---
+
 ## Technologien
 
 ![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=java&logoColor=white)
