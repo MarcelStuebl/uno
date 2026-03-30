@@ -2,7 +2,7 @@
 
 ## Über dieses Projekt
 
-Dieses Repository ist ein internes Schulprojekt der HTLBLA Steyr. Es wird hauptsächlich vom Projektteam bearbeitet. 
+Dieses Repository ist ein internes Schulprojekt der HTBLA Steyr. Es wird hauptsächlich vom Projektteam bearbeitet. 
 
 ---
 
@@ -34,4 +34,4 @@ Wir verpflichten uns zu einem respektvollen und konstruktiven Miteinander. Das g
 
 ---
 
-*HTLBLA Steyr – @2026*
+*HTBLA Steyr – @2026*
