@@ -1,6 +1,5 @@
 package htl.steyr.uno.Lobby;
 
-import htl.steyr.uno.GameTableClasses.Enemy;
 import htl.steyr.uno.GameTableClasses.GameTable;
 import htl.steyr.uno.HelloApplication;
 import htl.steyr.uno.LobbyController;
@@ -31,8 +30,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -52,8 +50,8 @@ public class LobbyWaitController implements Initializable {
     public ListView<String> playerListView = new ListView<>();
     public ListView<ChatMessage> gameChatListView = new ListView<>();
     public TextField gameChatTextField;
-    private boolean intentionalClose = false;
 
+    private boolean intentionalClose = false;
     private final BooleanProperty chatExpanded = new SimpleBooleanProperty(false);
 
     private final Client client;
@@ -63,7 +61,6 @@ public class LobbyWaitController implements Initializable {
         this.client = client;
         this.lobby = lobby;
     }
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -81,6 +78,7 @@ public class LobbyWaitController implements Initializable {
         AccNameDisplayLabel.setText("Account: " + client.getConn().getUser().getUsername());
 
         final String currentUsername = client.getConn().getUser().getUsername();
+
         gameChatListView.setCellFactory(list -> new ListCell<ChatMessage>() {
             @Override
             protected void updateItem(ChatMessage item, boolean empty) {
@@ -94,26 +92,20 @@ public class LobbyWaitController implements Initializable {
 
                 boolean myMessage = currentUsername.equals(item.sender());
 
-                //Label or displaying the Autor oft the Message
                 Label nameLabel = new Label(item.sender());
-                nameLabel.setStyle("-fx-text-fill: #c12424; -fx-font-size: 12;");
+                nameLabel.getStyleClass().add("chatSenderLabel");
 
                 Label bubble = new Label(item.text());
                 bubble.setWrapText(true);
-                bubble.setPadding(new Insets(8));
-                bubble.setMaxWidth(320);
+                bubble.setMaxWidth(260);
+                bubble.getStyleClass().add(myMessage ? "chatBubbleMine" : "chatBubbleOther");
 
-                if (myMessage) {
-                    bubble.setStyle("-fx-background-color: #91ec4e; -fx-background-radius: 12;");
-                } else {
-                    bubble.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 12; " +
-                            "-fx-border-color: #E0E0E0; -fx-border-radius: 12; -fx-background-radius: 12;");
-                }
-
-                javafx.scene.layout.VBox messageBox = new javafx.scene.layout.VBox(2, nameLabel, bubble);
+                VBox messageBox = new VBox(3, nameLabel, bubble);
+                messageBox.setFillWidth(false);
+                messageBox.setAlignment(myMessage ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
                 HBox row = new HBox(messageBox);
-                row.setPadding(new Insets(4, 8, 4, 8));
+                row.setPadding(new Insets(6, 10, 6, 10));
                 row.setAlignment(myMessage ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
                 setText(null);
@@ -121,19 +113,18 @@ public class LobbyWaitController implements Initializable {
             }
         });
 
-        // Chat-ListView initial eingeklappt (nicht sichtbar und nimmt keinen Platz weg)
         gameChatListView.setPrefHeight(0);
         gameChatListView.setMinHeight(0);
         gameChatListView.setVisible(false);
         gameChatListView.setManaged(false);
 
         Timeline expand = new Timeline(
-                new KeyFrame(Duration.millis(200),
+                new KeyFrame(Duration.millis(220),
                         new KeyValue(gameChatListView.prefHeightProperty(), 300))
         );
 
         Timeline collapse = new Timeline(
-                new KeyFrame(Duration.millis(200),
+                new KeyFrame(Duration.millis(220),
                         new KeyValue(gameChatListView.prefHeightProperty(), 0))
         );
 
@@ -158,7 +149,6 @@ public class LobbyWaitController implements Initializable {
             if (!focused) chatExpanded.set(false);
         });
 
-        // beim Klick aufs TextField auf-/zuklappen
         gameChatTextField.setOnMouseClicked(e -> chatExpanded.set(!chatExpanded.get()));
 
         updateLobbyInfo();
@@ -166,17 +156,15 @@ public class LobbyWaitController implements Initializable {
 
     public void updateLobbyInfo() {
         playerListView.getItems().clear();
+
         String currentUsername = client.getConn().getUser().getUsername();
         ArrayList<User> users = new ArrayList<>(lobby.users());
 
-        // Der erste User in der Liste ist der Host
         String hostUsername = users.isEmpty() ? null : users.getFirst().getUsername();
         boolean isHost = currentUsername.equals(hostUsername);
 
-        // Play-Button nur für den Host sichtbar
         playButton.setVisible(isHost);
 
-        // CellFactory einmalig setzen
         playerListView.setCellFactory(list -> new ListCell<String>() {
             private final BorderPane rootPane = new BorderPane();
             private final Label nameLabel = new Label();
@@ -193,8 +181,11 @@ public class LobbyWaitController implements Initializable {
                 buttonBox.getChildren().addAll(kickButton, muteButton);
                 buttonBox.setAlignment(Pos.CENTER);
 
-                rootPane.setPadding(new Insets(4, 8, 4, 8));
+                rootPane.setPadding(new Insets(6, 10, 6, 10));
                 BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
+                rootPane.getStyleClass().add("playerCellRoot");
+
+                setPrefHeight(85);
             }
 
             @Override
@@ -207,15 +198,25 @@ public class LobbyWaitController implements Initializable {
                     return;
                 }
 
-                User matchedUser = users.stream().filter(u -> u.getUsername().equals(item)).findFirst().orElse(null);
+                User matchedUser = users.stream()
+                        .filter(u -> u.getUsername().equals(item))
+                        .findFirst()
+                        .orElse(null);
 
-                ImageView profileImageView = new ImageView(matchedUser != null ? getProfileImage(matchedUser) : new Image(Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")), 50, 50, true, true));
-                profileImageView.setFitWidth(56);
-                profileImageView.setFitHeight(56);
+                ImageView profileImageView = new ImageView(
+                        matchedUser != null
+                                ? getProfileImage(matchedUser)
+                                : new Image(Objects.requireNonNull(
+                                getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")
+                        ), 50, 50, true, true)
+                );
+
+                profileImageView.setFitWidth(70); //44
+                profileImageView.setFitHeight(70); //44
                 profileImageView.setPreserveRatio(true);
                 profileImageView.setPickOnBounds(true);
 
-                HBox nameAndImage = new HBox(8, profileImageView, nameLabel);
+                HBox nameAndImage = new HBox(10, profileImageView, nameLabel);
                 nameAndImage.setAlignment(Pos.CENTER_LEFT);
                 rootPane.setLeft(nameAndImage);
 
@@ -243,32 +244,30 @@ public class LobbyWaitController implements Initializable {
 
     private Image getProfileImage(User user) {
         byte[] imageData = user.getProfileImageData();
-        Image profileImage;
         if (imageData != null && imageData.length > 0) {
-            profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
-        } else {
-            profileImage = new Image(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
-                    50, 50, true, true
-            );
+            return new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
         }
-        return profileImage;
+
+        return new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
+                50, 50, true, true
+        );
     }
 
     public void onSendMassage(ActionEvent actionEvent) {
         String text = gameChatTextField.getText();
 
         if (text != null && !text.isBlank()) {
+            String trimmed = text.trim();
             gameChatTextField.clear();
-            sendChatMessage(text.trim());
-            System.out.println("Sent chat message: " + text.trim());
+            sendChatMessage(trimmed);
+            System.out.println("Sent chat message: " + trimmed);
 
-            if (text.startsWith("@")){
+            if (trimmed.startsWith("@")) {
                 gameChatTextField.clear();
-                sendPrivateMessage(text.trim());
-                System.out.println("Sent private message: " + text.trim());
+                sendPrivateMessage(trimmed);
+                System.out.println("Sent private message: " + trimmed);
             }
-
         }
     }
 
@@ -357,8 +356,8 @@ public class LobbyWaitController implements Initializable {
         client.sendChatMessage(message);
     }
 
-    private void sendPrivateMessage(String message){
-        //client.sendPrivateMesssage(message);
+    private void sendPrivateMessage(String message) {
+        // client.sendPrivateMesssage(message);
     }
 
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {
