@@ -58,8 +58,8 @@ public class GameLogic {
      *
      * @param card The card that the player is attempting to play.
      */
-    void playCard(Card card) {
-        CardPlayedRequest msg = new CardPlayedRequest(card, getGameTable().getPlayer());
+    void playCard(Card card, Integer drawPenaltyValue) {
+        CardPlayedRequest msg = new CardPlayedRequest(card, drawPenaltyValue, getGameTable().getPlayer());
         getGameTable().getClient().getConn().sendMessage(msg);
     }
 

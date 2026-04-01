@@ -85,7 +85,7 @@ public class CardDeck {
         }
     }
 
-    private void refill() {
+    void refill() {
         stack.addAll(discardPile);
         discardPile.clear();
         shuffle();

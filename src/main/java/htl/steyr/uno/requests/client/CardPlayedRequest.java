@@ -5,12 +5,13 @@ import htl.steyr.uno.GameTableClasses.Player;
 
 import java.io.Serializable;
 
-public record CardPlayedRequest(Card card, Player player) implements Serializable {
+public record CardPlayedRequest(Card card, Integer drawPenaltyValue, Player player) implements Serializable {
 
     @Override
     public String toString() {
         return "CardPlayedRequest{" +
                 "card='" + card +
+                ", drawPenaltyValue=" + drawPenaltyValue +
                 "'}";
     }
 }

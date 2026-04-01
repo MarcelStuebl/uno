@@ -38,7 +38,10 @@ public class GameLogic {
         currentPlayerIndex = 0;
         directionClockwise = true;
 
-        setCurrentCard(getCardDeck().getCardFromStack());
+        while (getCurrentCard() == null || getCurrentCard().getCardValue() >= 10) {
+            setCurrentCard(getCardDeck().getCardFromStack());
+        }
+        getCardDeck().refill();
 
         int playerIndex = 0;
         for (User user : users) {
@@ -115,7 +118,7 @@ public class GameLogic {
                     PlayerGetResponse msg = new  PlayerGetResponse(player);
                     c.sendMessage(msg);
 
-                    GameTurnResponse gtr = new GameTurnResponse(null, getCurrentCard(), getCurrentPlayer(), isDirectionClockwise());
+                    GameTurnResponse gtr = new GameTurnResponse(null, getCurrentCard(), 0, getCurrentPlayer(), isDirectionClockwise());
                     c.sendMessage(gtr);
                     break;
                 }
@@ -141,6 +144,7 @@ public class GameLogic {
     void cardPlayed(CardPlayedRequest msg) {
         Card card = msg.card();
         Player player = msg.player();
+        Integer drawPenaltyValue = msg.drawPenaltyValue();
 
         player.removeCardFromHand(card);
         getCardDeck().returnCardToDiscordPile(card);
@@ -151,6 +155,10 @@ public class GameLogic {
         } else if (card.getCardValue() == 11) {
             // Change Direction
             directionClockwise = !directionClockwise;
+        } else if (card.getCardValue() == 12) {
+            drawPenaltyValue += 2;
+        } else if (card.getCardValue() == 14) {
+            drawPenaltyValue += 4;
         }
 
         currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
@@ -162,7 +170,7 @@ public class GameLogic {
 
         checkForWinner(player);
 
-        GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), getCurrentCard(), currentPlayerIndex, directionClockwise);
+        GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), getCurrentCard(), drawPenaltyValue, currentPlayerIndex, directionClockwise);
         for (ServerSocketConnection c : lobby.getConnections()) {
             c.sendMessage(response);
         }
