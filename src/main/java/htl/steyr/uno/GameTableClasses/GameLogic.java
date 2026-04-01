@@ -135,6 +135,9 @@ public class GameLogic {
         
         if (msg.enemyIndex() == null) {
             Card initialCard = msg.card();
+            if (initialCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
+                initialCard.setChosenColour(msg.currentColor());
+            }
             Platform.runLater(() -> {
                 getGameTable().getCardStack().addToStack(initialCard);
             });
@@ -151,6 +154,15 @@ public class GameLogic {
                 Platform.runLater(() -> {
                     getGameTable().getCardStack().addToStack(playedCard);
                 });
+            } else {
+                if (playedCard.getCardColour().equals("black") && playedCard.getChosenColour() != null && !playedCard.getChosenColour().isBlank()) {
+                    if (currentTopCard.getChosenColour() == null || currentTopCard.getChosenColour().isBlank()) {
+                        currentTopCard.setChosenColour(playedCard.getChosenColour());
+                        Platform.runLater(() -> {
+                            getGameTable().getCardStack().addToStack(currentTopCard);
+                        });
+                    }
+                }
             }
             
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
@@ -181,6 +193,7 @@ public class GameLogic {
     /**
      * Vergleicht zwei Karten nach Farbe und Wert.
      * Verwendet dies, um zu unterscheiden, ob eine neue Karte gelegt wurde oder nur abgehoben wurde.
+     * Für schwarze Karten: ignoriert die chosenColour beim Vergleich, da sie später vom Server gesetzt wird.
      *
      * @param c1 Erste Karte
      * @param c2 Zweite Karte
@@ -188,20 +201,7 @@ public class GameLogic {
      */
     private boolean isSameCard(Card c1, Card c2) {
         if (c1 == null || c2 == null) return false;
-        
-        boolean baseEqual = c1.getCardColour().equals(c2.getCardColour()) && c1.getCardValue() == c2.getCardValue();
-
-        if (baseEqual && c1.getCardColour().equals("black")) {
-            String c1Color = c1.getChosenColour();
-            String c2Color = c2.getChosenColour();
-
-            if (c1Color == null || c1Color.isBlank()) {
-                return c2Color == null || c2Color.isBlank();
-            }
-            return c1Color.equals(c2Color);
-        }
-        
-        return baseEqual;
+        return c1.getCardColour().equals(c2.getCardColour()) && c1.getCardValue() == c2.getCardValue();
     }
 
 
