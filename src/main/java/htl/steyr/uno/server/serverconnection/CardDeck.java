@@ -99,7 +99,10 @@ public class CardDeck {
         return stack.isEmpty();
     }
 
-    boolean isEmpty() {
-        return stack.isEmpty();
+    Card getTopDiscardCard() {
+        if (discardPile.isEmpty()) {
+            return null;
+        }
+        return discardPile.get(discardPile.size() - 1);
     }
 }

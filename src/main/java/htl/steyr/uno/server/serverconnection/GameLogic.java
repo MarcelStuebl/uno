@@ -8,7 +8,6 @@ import htl.steyr.uno.requests.server.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class GameLogic {
 
@@ -19,6 +18,8 @@ public class GameLogic {
     private final CardDeck cardDeck = new CardDeck();
     private Integer lastStackInfo = 0;
     private Card currentCard;
+    private Integer drawPenaltyValue = 0;
+    private String currentColor = null;  // Aktuelle Spielfarbe (von schwarzen Karten)
 
 
     GameLogic(Lobby lobby) {
@@ -37,6 +38,7 @@ public class GameLogic {
         players.clear();
         currentPlayerIndex = 0;
         directionClockwise = true;
+        drawPenaltyValue = 0;
 
         while (getCurrentCard() == null || getCurrentCard().getCardValue() >= 10) {
             setCurrentCard(getCardDeck().getCardFromStack());
@@ -100,25 +102,29 @@ public class GameLogic {
         if (lobby == null || lobby.getConnections() == null || players.isEmpty()) {
             return;
         }
-
+        
         for (Player player : players) {
             if (player == null || player.getUsername() == null) {
                 continue;
             }
+            
             for (ServerSocketConnection c : lobby.getConnections()) {
                 if (c == null || c.getUser() == null || c.getUser().getUsername() == null) {
                     continue;
                 }
                 if (c.getUser().getUsername().equals(player.getUsername())) {
+                    player.getEnemies().clear();
+                    
                     for (Player enemy : players) {
                         if (!enemy.getUsername().equals(c.getUser().getUsername())) {
-                            player.getEnemies().add(new Enemy(enemy));
+                            Enemy newEnemy = new Enemy(enemy);
+                            player.getEnemies().add(newEnemy);
                         }
                     }
                     PlayerGetResponse msg = new  PlayerGetResponse(player);
                     c.sendMessage(msg);
 
-                    GameTurnResponse gtr = new GameTurnResponse(null, getCurrentCard(), 0, getCurrentPlayer(), isDirectionClockwise());
+                    GameTurnResponse gtr = new GameTurnResponse(null, getCurrentCard(), 0, getCurrentPlayer(), isDirectionClockwise(), currentColor);
                     c.sendMessage(gtr);
                     break;
                 }
@@ -143,38 +149,95 @@ public class GameLogic {
 
     void cardPlayed(CardPlayedRequest msg) {
         Card card = msg.card();
-        Player player = msg.player();
-        Integer drawPenaltyValue = msg.drawPenaltyValue();
+        Player msgPlayer = msg.player();
+        Integer receivedDrawPenaltyValue = msg.drawPenaltyValue();
+
+        // Finde den aktuellen Player aus der Server-Liste
+        Player player = null;
+        for (Player p : players) {
+            if (p.getUsername().equals(msgPlayer.getUsername())) {
+                player = p;
+                break;
+            }
+        }
+        
+        if (player == null) {
+            return;
+        }
 
         player.removeCardFromHand(card);
         getCardDeck().returnCardToDiscordPile(card);
 
-        if (card.getCardValue() == 10) {
-            // Skip Player
+        boolean isSkip = card.getCardValue() == 10;
+        boolean isReverse = card.getCardValue() == 11;
+
+        if (isSkip) {
+            // Skip Player: Übernächsten Spieler überspringen (2x wechseln)
             currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
-        } else if (card.getCardValue() == 11) {
-            // Change Direction
+            currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+        } else if (isReverse) {
+            // Change Direction - Spieler bleibt dran
             directionClockwise = !directionClockwise;
         } else if (card.getCardValue() == 12) {
-            drawPenaltyValue += 2;
+            // +2 Karte
+            drawPenaltyValue = (receivedDrawPenaltyValue != null) ? receivedDrawPenaltyValue : drawPenaltyValue + 2;
+        } else if (card.getCardValue() == 13) {
+            // Farbwahl (13)
+            if (receivedDrawPenaltyValue != null) {
+                drawPenaltyValue = receivedDrawPenaltyValue;
+            }
         } else if (card.getCardValue() == 14) {
-            drawPenaltyValue += 4;
+            // +4 mit Farbwahl
+            drawPenaltyValue = (receivedDrawPenaltyValue != null) ? receivedDrawPenaltyValue : drawPenaltyValue + 4;
         }
 
-        currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+        if (card.getCardColour().equals("black") && card.getChosenColour() != null && !card.getChosenColour().isBlank()) {
+            currentColor = card.getChosenColour();
+        } else if (!card.getCardColour().equals("black")) {
+            currentColor = null;
+        }
 
-        // überspringe passive Spieler
-        while (players.get(currentPlayerIndex).isPassive()) {
-            currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+        if (!isReverse) {
+            if (!isSkip) {
+                currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+            }
+
+            // überspringe passive Spieler
+            while (players.get(currentPlayerIndex).isPassive()) {
+                currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+            }
+        } else {
+            // Bei Reverse: Spieler bleibt dran, aber überspringe passive Spieler
+            if (players.get(currentPlayerIndex).isPassive()) {
+                currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+                while (players.get(currentPlayerIndex).isPassive()) {
+                    currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+                }
+            }
         }
 
         checkForWinner(player);
 
-        GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), getCurrentCard(), drawPenaltyValue, currentPlayerIndex, directionClockwise);
+        GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), card, drawPenaltyValue, currentPlayerIndex, directionClockwise, currentColor);
         for (ServerSocketConnection c : lobby.getConnections()) {
             c.sendMessage(response);
         }
 
+        for (Player p : players) {
+            for (Player lobbyPlayer : players) {
+                for (Enemy e : lobbyPlayer.getEnemies()) {
+                    if (e.getUsername().equals(p.getUsername())) {
+                        e.setEnemy(new Enemy(p));
+                        break;
+                    }
+                }
+            }
+            
+            Enemy updatedEnemy = new Enemy(p);
+            for (ServerSocketConnection c : lobby.getConnections()) {
+                c.sendMessage(new UpdateEnemyResponse(updatedEnemy));
+            }
+        }
     }
 
 
@@ -185,12 +248,8 @@ public class GameLogic {
         }
 
         for (ServerSocketConnection c : lobby.getConnections()) {
-            if (c == null || c.getUser() == null || c.getUser().getUsername() == null) {
-                continue;
-            }
-            if (c.getUser().getUsername().equals(enemy.getUsername())) {
+            if (c != null && c.getUser() != null && c.getUser().getUsername() != null) {
                 c.sendMessage(new UpdateEnemyResponse(enemy));
-                break;
             }
         }
     }
@@ -220,12 +279,64 @@ public class GameLogic {
 
 
     void requestCard(RequestCardRequest msg) {
-        Player player = msg.player();
+        Player requestingPlayer = msg.player();
+
+        Player player = null;
+        for (Player p : players) {
+            if (p.getUsername().equals(requestingPlayer.getUsername())) {
+                player = p;
+                break;
+            }
+        }
+        
+        if (player == null) {
+            return;
+        }
+        
         int amount = msg.amount();
 
         for (int i = 0; i < amount; i++) {
             Card card = getCardDeck().getCardFromStack();
             addCardsToPlayer(player, card);
+        }
+        drawPenaltyValue = 0;
+        
+        // Wechsle zum nächsten Spieler nach dem Abheben
+        currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+        
+        // überspringe passive Spieler
+        while (players.get(currentPlayerIndex).isPassive()) {
+            currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+        }
+
+        Card cardToSend = getCardDeck().getTopDiscardCard();
+        if (cardToSend == null) {
+            cardToSend = getCurrentCard();
+        }
+
+        if (cardToSend != null && !cardToSend.getCardColour().equals("black")) {
+            currentColor = null;
+        }
+        
+        GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), cardToSend, 0, currentPlayerIndex, directionClockwise, currentColor);
+        for (ServerSocketConnection c : lobby.getConnections()) {
+            c.sendMessage(response);
+        }
+
+        for (Player p : players) {
+            for (Player lobbyPlayer : players) {
+                for (Enemy e : lobbyPlayer.getEnemies()) {
+                    if (e.getUsername().equals(p.getUsername())) {
+                        e.setEnemy(new Enemy(p));
+                        break;
+                    }
+                }
+            }
+            
+            Enemy updatedEnemy = new Enemy(p);
+            for (ServerSocketConnection c : lobby.getConnections()) {
+                c.sendMessage(new UpdateEnemyResponse(updatedEnemy));
+            }
         }
     }
 
@@ -305,5 +416,12 @@ public class GameLogic {
     }
     private void setCurrentCard(Card currentCard) {
         this.currentCard = currentCard;
+    }
+
+    Integer getDrawPenaltyValue() {
+        return drawPenaltyValue;
+    }
+    void setDrawPenaltyValue(Integer drawPenaltyValue) {
+        this.drawPenaltyValue = drawPenaltyValue;
     }
 }

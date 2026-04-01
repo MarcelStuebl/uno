@@ -61,6 +61,32 @@ public class Card implements Serializable {
         return getCardColour() + getCardValue() + "";
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Card card = (Card) obj;
+        
+        // Vergleiche CardValue und CardColour
+        if (this.CardValue != card.CardValue) return false;
+        if (!this.CardColour.equals(card.CardColour)) return false;
+        
+        // Vergleiche chosenColour (kann null sein)
+        if (this.chosenColour == null) {
+            return card.chosenColour == null;
+        }
+        return this.chosenColour.equals(card.chosenColour);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = CardValue;
+        result = 31 * result + CardColour.hashCode();
+        result = 31 * result + (chosenColour != null ? chosenColour.hashCode() : 0);
+        return result;
+    }
+
 
     public int getCardValue() {
         return this.CardValue;

@@ -2,6 +2,7 @@ package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.server.GameTurnResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
@@ -30,11 +31,12 @@ public class GameTable implements Initializable {
 
     private final Client client;
     @FXML private StackPane root;
-    private final CardStack centralStack = new CardStack();
+    private final CardStack centralStack = new CardStack(this);
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
     private Player player;
     private HBox handBox;
+    private GameTurnResponse gameTurnResponse;
 
     @FXML private StackPane enemy1;
     @FXML private StackPane enemy2;
@@ -149,7 +151,7 @@ public class GameTable implements Initializable {
         handBox.setSpacing(-100);
         handBox.setMouseTransparent(false);
 
-        for (Card c : player.getHand()) {
+        for (Card c : new ArrayList<>(player.getHand())) {
             handBox.getChildren().add(createCardButton(c));
         }
 
@@ -158,11 +160,11 @@ public class GameTable implements Initializable {
         root.getChildren().add(handBox);
     }
 
-    public void addCardToUI(Card card) {
+    public void updatePlayerHandUI() {
         if (handBox == null) return;
 
         handBox.getChildren().clear();
-        for (Card c : player.getHand()) {
+        for (Card c : new ArrayList<>(player.getHand())) {
             handBox.getChildren().add(createCardButton(c));
         }
     }
@@ -287,7 +289,12 @@ public class GameTable implements Initializable {
         });
 
         withdrawalButton.setOnAction(e -> {
-            getGameLogic().requestCard(1);
+            if (gameTurnResponse != null && gameTurnResponse.drawPenaltyValue() > 0) {
+                int penaltyValue = gameTurnResponse.drawPenaltyValue();
+                getGameLogic().requestCard(penaltyValue);
+            } else {
+                getGameLogic().requestCard(1);
+            }
         });
 
         root.getChildren().add(withdrawalButton);
@@ -310,7 +317,22 @@ public class GameTable implements Initializable {
         return centralStack;
     }
 
+    public StackPane getRoot() {
+        return root;
+    }
+
+    public ArrayList<EnemyDisplayController> getEnemyControllers() {
+        return enemyControllers;
+    }
     public void setPlayer(Player player) {
         this.player = player;
     }
+
+    public GameTurnResponse getGameTurnResponse() {
+        return gameTurnResponse;
+    }
+    public void setGameTurnResponse(GameTurnResponse gameTurnResponse) {
+        this.gameTurnResponse = gameTurnResponse;
+    }
 }
+

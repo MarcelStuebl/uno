@@ -31,6 +31,10 @@ public class EnemyDisplayController {
         usernameLabel.setText(username);
     }
 
+    public String getUsername() {
+        return usernameLabel.getText();
+    }
+
     public void setProfileImage(Image image) {
         profileImageView.setImage(image);
     }

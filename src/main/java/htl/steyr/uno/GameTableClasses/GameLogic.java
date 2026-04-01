@@ -30,6 +30,7 @@ public class GameLogic {
      */
     public void playerGetResponse(PlayerGetResponse msg) {
         getGameTable().setPlayer(msg.player());
+        
         Platform.runLater(() -> {
             getGameTable().setEnemies();
             getGameTable().open();
@@ -47,7 +48,7 @@ public class GameLogic {
     public void cardAddResponse(CardAddResponse msg) {
         Platform.runLater(() -> {
             getGameTable().getPlayer().addCardToHand(msg.card());
-            getGameTable().addCardToUI(msg.card());
+            getGameTable().updatePlayerHandUI();
         });
     }
 
@@ -71,6 +72,9 @@ public class GameLogic {
      * @param amount The number of cards the player is requesting to draw.
      */
     void requestCard(int amount) {
+        if (!getGameTable().getPlayer().isCurrentTurn()) {
+            return;
+        }
         getGameTable().getClient().getConn().sendMessage(new RequestCardRequest(gameTable.getPlayer(), amount));
     }
 
@@ -100,9 +104,25 @@ public class GameLogic {
      * @param msg
      */
     public void updateEnemyResponse(UpdateEnemyResponse msg) {
+        if (getGameTable() == null || getGameTable().getPlayer() == null) {
+            return;
+        }
+        
         for (Enemy e : getGameTable().getPlayer().getEnemies()) {
             if (e.getUsername().equals(msg.enemy().getUsername())) {
-                getGameTable().getPlayer().getEnemyByUsername(msg.enemy().getUsername()).setEnemy(msg.enemy());
+                Enemy updatedEnemy = msg.enemy();
+                e.setEnemy(updatedEnemy);
+
+                Platform.runLater(() -> {
+                    for (EnemyDisplayController ctrl : getGameTable().getEnemyControllers()) {
+                        if (ctrl != null && updatedEnemy.getUsername() != null && ctrl.getUsername() != null && 
+                            updatedEnemy.getUsername().equals(ctrl.getUsername())) {
+                            ctrl.setCardCount(updatedEnemy.getHandSize());
+                            break;
+                        }
+                    }
+                });
+                
                 break;
             }
         }
@@ -111,7 +131,9 @@ public class GameLogic {
 
 
     public void gameTurnResponse(GameTurnResponse msg) {
+        getGameTable().setGameTurnResponse(msg);
         System.out.println(msg);
+        
         if (msg.enemyIndex() == null) {
             Card initialCard = msg.card();
             Platform.runLater(() -> {
@@ -119,14 +141,42 @@ public class GameLogic {
             });
             getGameTable().getPlayer().setCurrentTurn(getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex()));
         } else {
+            Card currentTopCard = getGameTable().getCardStack().getTopCard();
+            Card playedCard = msg.card();
+
+            if (playedCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
+                playedCard.setChosenColour(msg.currentColor());
+            }
+
+            if (!isSameCard(currentTopCard, playedCard)) {
+                Platform.runLater(() -> {
+                    getGameTable().getCardStack().addToStack(playedCard);
+                });
+            }
+            
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
                 getGameTable().getPlayer().getHand().removeIf(card -> card.equals(msg.card()));
                 getGameTable().getPlayer().setCurrentTurn(false);
             } else {
                 for (Enemy e : getGameTable().getPlayer().getEnemies()) {
                     if (e.getPlayerIndex().equals(msg.enemyIndex())) {
-                        e.setHandSize(e.getHandSize() - 1);
+                        int newHandSize = e.getHandSize() - 1;
+                        e.setHandSize(newHandSize);
                         e.setCurrentTurn(false);
+
+                        String enemyUsername = e.getUsername();
+                        final int finalNewHandSize = newHandSize;
+                        
+                        Platform.runLater(() -> {
+                            for (EnemyDisplayController ctrl : getGameTable().getEnemyControllers()) {
+                                if (ctrl != null && enemyUsername != null && ctrl.getUsername() != null && 
+                                    enemyUsername.equals(ctrl.getUsername())) {
+                                    ctrl.setCardCount(finalNewHandSize);
+                                    break;
+                                }
+                            }
+                        });
+
                         break;
                     }
                 }
@@ -143,6 +193,19 @@ public class GameLogic {
                 }
             }
         }
+    }
+
+    /**
+     * Vergleicht zwei Karten nach Farbe und Wert.
+     * Verwendet dies, um zu unterscheiden, ob eine neue Karte gelegt wurde oder nur abgehoben wurde.
+     *
+     * @param c1 Erste Karte
+     * @param c2 Zweite Karte
+     * @return true wenn beide Karten gleich sind (Farbe + Wert), false sonst
+     */
+    private boolean isSameCard(Card c1, Card c2) {
+        if (c1 == null || c2 == null) return false;
+        return c1.getCardColour().equals(c2.getCardColour()) && c1.getCardValue() == c2.getCardValue();
     }
 
 

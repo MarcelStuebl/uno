@@ -4,7 +4,7 @@ import htl.steyr.uno.GameTableClasses.Card;
 
 import java.io.Serializable;
 
-public record GameTurnResponse(Integer enemyIndex, Card card, Integer drawPenaltyValue, Integer nextPlayerIndex, boolean directionClockwise) implements Serializable {
+public record GameTurnResponse(Integer enemyIndex, Card card, Integer drawPenaltyValue, Integer nextPlayerIndex, boolean directionClockwise, String currentColor) implements Serializable {
 
     @Override
     public String toString() {
@@ -14,6 +14,7 @@ public record GameTurnResponse(Integer enemyIndex, Card card, Integer drawPenalt
                 ", drawPenaltyValue=" + drawPenaltyValue +
                 ", nextPlayerIndex=" + nextPlayerIndex +
                 ", directionClockwise=" + directionClockwise +
+                ", currentColor=" + currentColor +
                 '}';
     }
 

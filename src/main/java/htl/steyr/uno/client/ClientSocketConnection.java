@@ -185,22 +185,19 @@ public class ClientSocketConnection implements Closeable {
     }
 
     private void updateEnemyResponse(UpdateEnemyResponse msg) {
-        client.getGameTable().getGameLogic().updateEnemyResponse(msg);
+        if (client.getGameTable() != null) {
+            client.getGameTable().getGameLogic().updateEnemyResponse(msg);
+        }
     }
+
 
     private void gameTurnResponse(GameTurnResponse msg) {
         client.getGameTable().getGameLogic().gameTurnResponse(msg);
     }
 
-
-
-
     /**
      * End of the response handler methods.
      */
-
-
-
 
 
     /**
@@ -244,6 +241,7 @@ public class ClientSocketConnection implements Closeable {
         SetProfileImageRequest msg = new SetProfileImageRequest(getUser(), imageBytes);
         sendMessage(msg);
     }
+
 
 
 
