@@ -245,11 +245,14 @@ public class GameLogic {
                 c.sendMessage(new UpdateEnemyResponse(updatedEnemy));
             }
         }
+
+        updateEnemy(new Enemy(player));
     }
 
 
 
     private void updateEnemy(Enemy enemy) {
+        System.out.println(enemy.getUsername() + enemy.getHandSize());
         if (enemy == null || enemy.getUsername() == null || lobby == null || lobby.getConnections() == null) {
             return;
         }
@@ -281,6 +284,8 @@ public class GameLogic {
                 break;
             }
         }
+
+        updateEnemy(new Enemy(player));
     }
 
 
