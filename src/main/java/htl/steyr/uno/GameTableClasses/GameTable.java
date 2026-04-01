@@ -30,7 +30,7 @@ public class GameTable implements Initializable {
 
     private final Client client;
     @FXML private StackPane root;
-    CardStack centralStack = new CardStack();
+    CardStack cardStack = new CardStack();
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
     private Player player;
@@ -79,8 +79,8 @@ public class GameTable implements Initializable {
     }
 
     private void setupCentralStack() {
-        StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
-        root.getChildren().add(centralStack.getVisual());
+        StackPane.setAlignment(cardStack.getVisual(), javafx.geometry.Pos.CENTER);
+        root.getChildren().add(cardStack.getVisual());
     }
 
     public void setEnemies() {
@@ -210,8 +210,8 @@ public class GameTable implements Initializable {
         cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
         cardBtn.setOnAction(e -> {
-            centralStack.layCard(c, cardBtn, player);
-            if (centralStack.getTopCard() == c) {
+            cardStack.layCard(c, cardBtn, player);
+            if (cardStack.getTopCard() == c) {
                 player.getHand().remove(c);
                 handBox.getChildren().remove(cardBtn);
             }
@@ -307,8 +307,8 @@ public class GameTable implements Initializable {
             getGameLogic().requestCard(1);
         });
 
-        root.getChildren().add(withdrawalButton);
         Platform.runLater(withdrawalButton::toFront);
+        root.getChildren().add(withdrawalButton);
     }
 
 
@@ -322,7 +322,7 @@ public class GameTable implements Initializable {
         return player;
     }
     public CardStack getCardStack() {
-        return centralStack;
+        return cardStack;
     }
     public void setPlayer(Player player) {
         this.player = player;

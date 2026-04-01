@@ -31,7 +31,11 @@ public class CardStack {
         return visual;
     }
 
+
+
+
     public void layCard(Card c, Button handButton, Player p) {
+        System.out.println("karte gelegt");
         if (c == null) return;
 
         Card top = getTopCard();
@@ -53,19 +57,10 @@ public class CardStack {
         boolean colorMatch = c.getCardColour().equals(top.getCardColour());
         boolean valueMatch = c.getCardValue() == top.getCardValue();
 
-        if ((colorMatch || valueMatch) || p.isCurrentTurn()) {
+        if (colorMatch && p.isCurrentTurn() || valueMatch && p.isCurrentTurn()) {
             // card valid, lay card
             addToStack(c);
-
-            // special card testPrint
-            switch (c.getCardValue()) {
-                case 10 -> System.out.println("Skip");
-                case 11 -> System.out.println("Reverse");
-                case 12 -> System.out.println("+2");
-                case 13 -> System.out.println("pick Colour");
-                case 14 -> System.out.println("+4 and pick Colour");
-            }
-
+            p.setCurrentTurn(false);
         } else {
             shakeHandButton(handButton);
         }
@@ -103,7 +98,7 @@ public class CardStack {
     }
 
    // makes the button that is currently clicked shake if it is layable
-    private void shakeHandButton(Button cardBtn) {
+     public void shakeHandButton(Button cardBtn) {
         TranslateTransition tt = new TranslateTransition(Duration.millis(50), cardBtn);
         tt.setFromX(0f);
         tt.setByX(10f);
