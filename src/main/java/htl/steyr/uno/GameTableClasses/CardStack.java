@@ -74,17 +74,16 @@ public class CardStack {
             return;
         }
         
-
-
-        if (c.getCardColour().equals("black") && c.getCardValue() == 13) {
-            if (top.getCardColour().equals("black")) {
-                shakeHandButton(handButton);
+        // Wenn drawPenaltyValue == 0 und die oberste Karte ist eine Penalty-Karte (+2, +4),
+        // dann hat der vorherige Spieler die Karten abgehoben. Jede Karte darf gespielt werden.
+        if (top.getCardValue() >= 12 && currentPenalty != null && currentPenalty == 0) {
+            if (c.getCardColour().equals("black")) {
+                showColorSelection(c, p);
                 return;
             }
-            if (top.getCardValue() == 12) {
-                shakeHandButton(handButton);
-                return;
-            }
+            addToStack(c);
+            getGameTable().getGameLogic().playCard(c, 0);
+            return;
         }
 
         if (c.getCardColour().equals("black")) {
@@ -116,14 +115,6 @@ public class CardStack {
         // card valid, lay card
         addToStack(c);
 
-        // special card testPrint
-        switch (c.getCardValue()) {
-            case 10 -> System.out.println("Skip");
-            case 11 -> System.out.println("Reverse");
-            case 12 -> System.out.println("+2");
-            case 13 -> System.out.println("pick Colour");
-            case 14 -> System.out.println("+4 and pick Colour");
-        }
 
         Integer drawPenaltyForThisCard = 0;
         if (c.getCardValue() == 12) {
@@ -178,8 +169,8 @@ public class CardStack {
                                             getGameTable().getGameTurnResponse().drawPenaltyValue() : 0;
                     
                     if (card.getCardValue() == 13) {
-                        // Farbwahl (13): setzt drawPenalty NICHT auf 0, bewahrt bestehende Penalty!
-                        drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0);
+                        // Farbwahl (13): setzt drawPenalty auf 0
+                        drawPenaltyForThisCard = 0;
                     } else if (card.getCardValue() == 14) {
                         // +4: ADDIERT 4 zur bestehenden Penalty!
                         drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0) + 4;

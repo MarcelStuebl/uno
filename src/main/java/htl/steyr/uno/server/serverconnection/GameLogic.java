@@ -182,10 +182,8 @@ public class GameLogic {
             // +2 Karte
             drawPenaltyValue = (receivedDrawPenaltyValue != null) ? receivedDrawPenaltyValue : drawPenaltyValue + 2;
         } else if (card.getCardValue() == 13) {
-            // Farbwahl (13)
-            if (receivedDrawPenaltyValue != null) {
-                drawPenaltyValue = receivedDrawPenaltyValue;
-            }
+            // Farbwahl (13) - Setzt drawPenaltyValue auf 0, da diese Karte keine Penalty hat
+            drawPenaltyValue = 0;
         } else if (card.getCardValue() == 14) {
             // +4 mit Farbwahl
             drawPenaltyValue = (receivedDrawPenaltyValue != null) ? receivedDrawPenaltyValue : drawPenaltyValue + 4;
@@ -197,7 +195,7 @@ public class GameLogic {
         } 
         // Setze currentColor auf null, wenn eine normale (farbige) Karte gespielt wird
         else if (!card.getCardColour().equals("black") && card.getCardValue() < 10) {
-            // Nur bei normalen Zahlenkarten die currentColor zurücksetzen, nicht bei Skip/Reverse/+2
+            // Nur bei normalen Zahlenkarten die currentColor zurücksetzen
             currentColor = null;
         }
 
@@ -252,7 +250,6 @@ public class GameLogic {
 
 
     private void updateEnemy(Enemy enemy) {
-        System.out.println(enemy.getUsername() + enemy.getHandSize());
         if (enemy == null || enemy.getUsername() == null || lobby == null || lobby.getConnections() == null) {
             return;
         }
@@ -312,6 +309,7 @@ public class GameLogic {
             addCardsToPlayer(player, card);
         }
         drawPenaltyValue = 0;
+        currentColor = null;
         
         // Wechsle zum nächsten Spieler nach dem Abheben
         currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
