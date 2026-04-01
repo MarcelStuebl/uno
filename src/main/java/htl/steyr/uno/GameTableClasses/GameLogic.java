@@ -115,14 +115,14 @@ public class GameLogic {
 
                 Platform.runLater(() -> {
                     for (EnemyDisplayController ctrl : getGameTable().getEnemyControllers()) {
-                        if (ctrl != null && updatedEnemy.getUsername() != null && ctrl.getUsername() != null && 
+                        if (ctrl != null && updatedEnemy.getUsername() != null && ctrl.getUsername() != null &&
                             updatedEnemy.getUsername().equals(ctrl.getUsername())) {
                             ctrl.setCardCount(updatedEnemy.getHandSize());
                             break;
                         }
                     }
                 });
-                
+
                 break;
             }
         }
@@ -132,7 +132,6 @@ public class GameLogic {
 
     public void gameTurnResponse(GameTurnResponse msg) {
         getGameTable().setGameTurnResponse(msg);
-        System.out.println(msg);
         
         if (msg.enemyIndex() == null) {
             Card initialCard = msg.card();
@@ -160,23 +159,7 @@ public class GameLogic {
             } else {
                 for (Enemy e : getGameTable().getPlayer().getEnemies()) {
                     if (e.getPlayerIndex().equals(msg.enemyIndex())) {
-                        int newHandSize = e.getHandSize() - 1;
-                        e.setHandSize(newHandSize);
                         e.setCurrentTurn(false);
-
-                        String enemyUsername = e.getUsername();
-                        final int finalNewHandSize = newHandSize;
-                        
-                        Platform.runLater(() -> {
-                            for (EnemyDisplayController ctrl : getGameTable().getEnemyControllers()) {
-                                if (ctrl != null && enemyUsername != null && ctrl.getUsername() != null && 
-                                    enemyUsername.equals(ctrl.getUsername())) {
-                                    ctrl.setCardCount(finalNewHandSize);
-                                    break;
-                                }
-                            }
-                        });
-
                         break;
                     }
                 }
@@ -205,8 +188,23 @@ public class GameLogic {
      */
     private boolean isSameCard(Card c1, Card c2) {
         if (c1 == null || c2 == null) return false;
-        return c1.getCardColour().equals(c2.getCardColour()) && c1.getCardValue() == c2.getCardValue();
+        
+        boolean baseEqual = c1.getCardColour().equals(c2.getCardColour()) && c1.getCardValue() == c2.getCardValue();
+
+        if (baseEqual && c1.getCardColour().equals("black")) {
+            String c1Color = c1.getChosenColour();
+            String c2Color = c2.getChosenColour();
+
+            if (c1Color == null || c1Color.isBlank()) {
+                return c2Color == null || c2Color.isBlank();
+            }
+            return c1Color.equals(c2Color);
+        }
+        
+        return baseEqual;
     }
+
+
 
 
     GameTable getGameTable() {
@@ -215,5 +213,7 @@ public class GameLogic {
     void setGameTable(GameTable gameTable) {
         this.gameTable = gameTable;
     }
+
+
 
 }

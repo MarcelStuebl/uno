@@ -195,6 +195,8 @@ public class ClientSocketConnection implements Closeable {
         client.getGameTable().getGameLogic().gameTurnResponse(msg);
     }
 
+
+
     /**
      * End of the response handler methods.
      */

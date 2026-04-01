@@ -195,7 +195,13 @@ public class GameTable implements Initializable {
         cardBtn.setOnAction(e -> {
             centralStack.layCard(c, cardBtn, player);
             if (centralStack.getTopCard() == c) {
-                player.getHand().remove(c);
+                for (int i = 0; i < player.getHand().size(); i++) {
+                    Card card = player.getHand().get(i);
+                    if (card.getCardValue() == c.getCardValue() && card.getCardColour().equals(c.getCardColour())) {
+                        player.getHand().remove(i);
+                        break;
+                    }
+                }
                 handBox.getChildren().remove(cardBtn);
             }
         });

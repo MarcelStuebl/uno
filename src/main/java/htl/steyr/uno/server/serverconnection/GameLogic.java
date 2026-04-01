@@ -191,9 +191,13 @@ public class GameLogic {
             drawPenaltyValue = (receivedDrawPenaltyValue != null) ? receivedDrawPenaltyValue : drawPenaltyValue + 4;
         }
 
+        // Setze currentColor bei schwarzen Karten mit gewählter Farbe
         if (card.getCardColour().equals("black") && card.getChosenColour() != null && !card.getChosenColour().isBlank()) {
             currentColor = card.getChosenColour();
-        } else if (!card.getCardColour().equals("black")) {
+        } 
+        // Setze currentColor auf null, wenn eine normale (farbige) Karte gespielt wird
+        else if (!card.getCardColour().equals("black") && card.getCardValue() < 10) {
+            // Nur bei normalen Zahlenkarten die currentColor zurücksetzen, nicht bei Skip/Reverse/+2
             currentColor = null;
         }
 
@@ -222,6 +226,9 @@ public class GameLogic {
         for (ServerSocketConnection c : lobby.getConnections()) {
             c.sendMessage(response);
         }
+
+        // WICHTIG: SyncEnemyHandSizeResponse wird später in syncPlayerHand() gesendet, nicht hier!
+        // Das verhindert Konflikte mit den Client-Updates
 
         for (Player p : players) {
             for (Player lobbyPlayer : players) {
@@ -317,11 +324,12 @@ public class GameLogic {
         if (cardToSend != null && !cardToSend.getCardColour().equals("black")) {
             currentColor = null;
         }
-        
-        GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), cardToSend, 0, currentPlayerIndex, directionClockwise, currentColor);
+
+        GameTurnResponse response = new GameTurnResponse(null, cardToSend, 0, currentPlayerIndex, directionClockwise, currentColor);
         for (ServerSocketConnection c : lobby.getConnections()) {
             c.sendMessage(response);
         }
+
 
         for (Player p : players) {
             for (Player lobbyPlayer : players) {
@@ -338,6 +346,8 @@ public class GameLogic {
                 c.sendMessage(new UpdateEnemyResponse(updatedEnemy));
             }
         }
+
+        updateEnemy(new Enemy(player));
     }
 
 

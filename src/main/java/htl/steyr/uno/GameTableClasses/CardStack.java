@@ -73,6 +73,7 @@ public class CardStack {
             getGameTable().getGameLogic().playCard(c, 0);
             return;
         }
+        
 
 
         if (c.getCardColour().equals("black") && c.getCardValue() == 13) {
@@ -132,6 +133,7 @@ public class CardStack {
         getGameTable().getGameLogic().playCard(c, drawPenaltyForThisCard);
     }
 
+
     private void showColorSelection(Card card, Player player) {
         Platform.runLater(() -> {
             StackPane overlay = new StackPane();
@@ -189,11 +191,16 @@ public class CardStack {
                     // Sende an Server mit korrektem drawPenalty
                     getGameTable().getGameLogic().playCard(card, drawPenaltyForThisCard);
                     
-                    // Entferne die Karte aus der Hand
-                    player.getHand().remove(card);
+                    // Entferne NUR die erste Karte, die passt (nicht alle mit removeIf!)
+                    for (int idx = 0; idx < player.getHand().size(); idx++) {
+                        Card c = player.getHand().get(idx);
+                        if (c.getCardValue() == card.getCardValue() && c.getCardColour().equals(card.getCardColour())) {
+                            player.getHand().remove(idx);
+                            break;
+                        }
+                    }
                     getGameTable().updatePlayerHandUI();
-                    
-                    // Entferne den Dialog
+
                     gameTable.getRoot().getChildren().remove(overlay);
                 });
                 
