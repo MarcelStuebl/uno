@@ -35,13 +35,13 @@
 
                     <!-- Center: SplitPane, damit der Chat „ausgeklappt“ werden kann (Divider ziehen) -->
                     <center>
-                        <SplitPane orientation="VERTICAL" styleClass="splitPane">
+                        <SplitPane orientation="VERTICAL" prefHeight="552.0" prefWidth="515.0" styleClass="splitPane">
                             <items>
 
                                 <!-- Spieler-Liste (nimmt automatisch Platz) -->
-                                <VBox prefHeight="654.0" prefWidth="868.0">
+                                <VBox prefHeight="151.0" prefWidth="441.0">
                                     <children>
-                                        <ListView fx:id="playerListView" prefHeight="627.0" prefWidth="520.0" styleClass="playerListView" VBox.vgrow="ALWAYS" />
+                                        <ListView fx:id="playerListView" prefHeight="536.0" prefWidth="484.0" styleClass="playerListView" VBox.vgrow="ALWAYS" />
                                     </children>
                                     <padding>
                                         <Insets bottom="0" left="0" right="0" top="0" />
@@ -58,9 +58,9 @@
                     <right>
 
                         <!-- Chat-Bereich (ausklappbar über SplitPane-Divider) -->
-                        <VBox alignment="BOTTOM_CENTER" prefHeight="415.0" prefWidth="261.0" spacing="8.0" BorderPane.alignment="CENTER">
+                        <VBox alignment="BOTTOM_CENTER" prefHeight="503.0" prefWidth="257.0" spacing="8.0" BorderPane.alignment="CENTER">
                             <children>
-                                <ListView fx:id="gameChatListView" cacheShape="false" centerShape="false" prefHeight="350.0" prefWidth="261.0" scaleShape="false" styleClass="gameChatListView" VBox.vgrow="ALWAYS" />
+                                <ListView fx:id="gameChatListView" cacheShape="false" centerShape="false" prefHeight="727.0" prefWidth="215.0" scaleShape="false" styleClass="gameChatListView" VBox.vgrow="ALWAYS" />
                                 <HBox alignment="BOTTOM_CENTER" prefHeight="17.0" prefWidth="265.0">
                                     <children>
                                         <TextField fx:id="gameChatTextField" onAction="#onSendMassage" opacity="0.78" prefHeight="25.0" prefWidth="246.0" promptText="Sende eine Nachricht an deine Freunde..." styleClass="gameChatTextField" />
@@ -73,7 +73,7 @@
                         </VBox>
                     </right>
                     <left>
-                        <HBox prefHeight="656.0" prefWidth="38.0" BorderPane.alignment="CENTER" />
+                        <HBox prefHeight="594.0" prefWidth="13.0" BorderPane.alignment="CENTER" />
                     </left>
                 </BorderPane>
             </children>

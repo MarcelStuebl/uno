@@ -79,7 +79,7 @@
     -fx-control-inner-background: transparent;
     -fx-control-inner-background-alt: transparent;
     -fx-padding: 4;
-    -fx-font-size: 23px;
+    -fx-font-size: 25px;
 }
 
 .playerListView .list-cell {
