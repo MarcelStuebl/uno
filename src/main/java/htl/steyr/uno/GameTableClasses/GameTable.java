@@ -30,23 +30,22 @@ public class GameTable implements Initializable {
 
     private final Client client;
     @FXML private StackPane root;
-    CardStack centralStack = new CardStack();
+    private final CardStack centralStack = new CardStack();
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
     private Player player;
     private HBox handBox;
 
-
     @FXML private StackPane enemy1;
     @FXML private StackPane enemy2;
     @FXML private StackPane enemy3;
 
-    ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
+    private final ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
 
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
         this.startGameResponse = msg;
-        player = new Player(getClient().getConn().getUser());
+        this.player = new Player(getClient().getConn().getUser());
     }
 
     private void updatePlayerFromStartGameResponse() {
@@ -57,8 +56,6 @@ public class GameTable implements Initializable {
             }
         }
     }
-
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -98,9 +95,9 @@ public class GameTable implements Initializable {
         StackPane[] slotOrder = { enemy3, enemy1, enemy2 };
 
         int[] slotIndices = switch (sorted.size()) {
-            case 1 -> new int[]{ 1 };
-            case 2 -> new int[]{ 0, 2 };
-            case 3 -> new int[]{ 0, 1, 2 };
+            case 1 -> new int[]{1};
+            case 2 -> new int[]{0, 2};
+            case 3 -> new int[]{0, 1, 2};
             default -> new int[]{};
         };
 
@@ -113,7 +110,6 @@ public class GameTable implements Initializable {
             }
         }
     }
-
 
     private EnemyDisplayController addPlayer(StackPane slot, String name, byte[] imageData, int cardCount) {
         Image profileImage;
@@ -142,15 +138,10 @@ public class GameTable implements Initializable {
         }
     }
 
-
-
     private void onSceneClose() {
         client.setGameTable(null);
-        if (client.getConn() != null) {
-            client.getConn().close();
-        }
+        client.shutdown();
     }
-
 
     public void open() {
         handBox = new HBox();
@@ -167,12 +158,6 @@ public class GameTable implements Initializable {
         root.getChildren().add(handBox);
     }
 
-    /**
-     * Fügt eine einzelne Karte zur bestehenden HBox hinzu, ohne alles neu zu rendern.
-     * Wird von GameLogic.cardAddResponse aufgerufen.
-     *
-     * @param card Die neu gezogene Karte
-     */
     public void addCardToUI(Card card) {
         if (handBox == null) return;
 
@@ -182,13 +167,9 @@ public class GameTable implements Initializable {
         }
     }
 
-    /**
-     * Erstellt einen Button für eine einzelne Karte.
-     * Extrahiert aus open() damit es auch in addCardToUI() verwendet werden kann.
-     */
     private Button createCardButton(Card c) {
         String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
-        ImageView iv = new ImageView(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+        ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
         iv.setFitWidth(137);
         iv.setFitHeight(192);
         iv.setPreserveRatio(true);
@@ -245,7 +226,6 @@ public class GameTable implements Initializable {
         return cardBtn;
     }
 
-
     public void addCloseButton(StackPane root, Stage stage) {
         Button closeBtn = new Button("X");
         closeBtn.setPrefSize(40, 40);
@@ -260,8 +240,11 @@ public class GameTable implements Initializable {
                         "-fx-background-radius: 20;"
         );
 
-        closeBtn.setOnAction(e -> stage.close());
-        stage.setOnCloseRequest(ev -> onSceneClose());
+        closeBtn.setOnAction(e -> onSceneClose());
+        stage.setOnCloseRequest(ev -> {
+            ev.consume();
+            onSceneClose();
+        });
 
         StackPane.setAlignment(closeBtn, Pos.TOP_RIGHT);
         StackPane.setMargin(closeBtn, new javafx.geometry.Insets(10));
@@ -311,21 +294,23 @@ public class GameTable implements Initializable {
         Platform.runLater(withdrawalButton::toFront);
     }
 
-
     public GameLogic getGameLogic() {
         return gameLogic;
     }
+
     public Client getClient() {
         return client;
     }
+
     public Player getPlayer() {
         return player;
     }
+
     public CardStack getCardStack() {
         return centralStack;
     }
+
     public void setPlayer(Player player) {
         this.player = player;
     }
-
 }
