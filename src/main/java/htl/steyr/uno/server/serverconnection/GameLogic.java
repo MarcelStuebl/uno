@@ -200,9 +200,24 @@ public class GameLogic {
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
             }
         } else {
-            // Bei Reverse: Spieler bleibt dran, aber überspringe passive Spieler
-            if (players.get(currentPlayerIndex).isPassive()) {
+            int activePlayerCount = 0;
+            for (Player p : players) {
+                if (!p.isPassive()) {
+                    activePlayerCount++;
+                }
+            }
+            
+            if (activePlayerCount == 2) {
+                if (players.get(currentPlayerIndex).isPassive()) {
+                    currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+                    while (players.get(currentPlayerIndex).isPassive()) {
+                        currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+                    }
+                }
+            } else {
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+                
+                // überspringe passive Spieler
                 while (players.get(currentPlayerIndex).isPassive()) {
                     currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 }
@@ -211,7 +226,18 @@ public class GameLogic {
 
         checkForWinner(player);
 
-        GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), card, drawPenaltyValue, currentPlayerIndex, directionClockwise, currentColor);
+        Card cardForResponse = card;
+        if (card.getCardColour().equals("black")) {
+            cardForResponse = new Card(card.getCardValue(), card.getCardColour());
+            String colorToSet = (card.getChosenColour() != null && !card.getChosenColour().isBlank()) 
+                ? card.getChosenColour() 
+                : currentColor;
+            if (colorToSet != null && !colorToSet.isBlank()) {
+                cardForResponse.setChosenColour(colorToSet);
+            }
+        }
+
+        GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), cardForResponse, drawPenaltyValue, currentPlayerIndex, directionClockwise, currentColor);
         for (ServerSocketConnection c : lobby.getConnections()) {
             c.sendMessage(response);
         }
