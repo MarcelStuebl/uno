@@ -99,7 +99,6 @@ public class ServerSocketConnection {
             try {
                 while (running) {
                     Object obj = in.readObject();
-                    sendLogMessage(obj);
 
                     switch (obj) {
                         case LoginRequest msg -> loginRequest(msg);
@@ -157,6 +156,7 @@ public class ServerSocketConnection {
      * @throws SQLException
      */
     private void loginRequest(LoginRequest request) throws SQLException {
+        sendLogMessage(request);
         if (server.getConnections().stream().filter(c -> c.getUser() != null).anyMatch(c -> c.getUser().getUsername().equals(request.username()))) {
             LoginFailedResponse msg = new LoginFailedResponse(2);
             sendMessage(msg);
@@ -189,21 +189,22 @@ public class ServerSocketConnection {
      * If the username is available, it adds the new user to the database and sends a CreateAccountSuccessResponse back to the client with the created user information.
      * The method also logs the outcome of the account creation attempt using the sendLogMessage method to provide feedback on the server side.
      *
-     * @param request
+     * @param msg
      * @throws SQLException
      */
-    private void createAccountRequest(CreateAccountRequest request) throws SQLException {
-        if (request.code() == null || createAccountCode == null) {
+    private void createAccountRequest(CreateAccountRequest msg) throws SQLException {
+        sendLogMessage(msg);
+        if (msg.code() == null || createAccountCode == null) {
             createAccountCode = SECURE_RANDOM.nextInt(900000) + 100000; // Generate a random 6-digit code
             MailSender ms = new MailSender();
-            ms.sendAuthenticationCode(request.email(), createAccountCode.toString());
+            ms.sendAuthenticationCode(msg.email(), createAccountCode.toString());
         } else {
-            User user = new User(request.username(), request.lastName(), request.firstName(), request.email(), request.password());
+            User user = new User(msg.username(), msg.lastName(), msg.firstName(), msg.email(), msg.password());
             DatabaseUser db1 = new DatabaseUser();
             if (db1.userExists(user)) {
                 sendMessage(new CreateAccountFailedResponse(1));
             } else {
-                if (!request.code().equals(createAccountCode)) {
+                if (!msg.code().equals(createAccountCode)) {
                     sendMessage(new CreateAccountFailedResponse(2));
                 } else {
                     DatabaseUser db = new DatabaseUser();
@@ -212,7 +213,7 @@ public class ServerSocketConnection {
                     } catch (UserAlreadyExistsException e) {
                         sendMessage(new CreateAccountFailedResponse(1));
                     }
-                    User createdUser = db.getUserPerUserName(request.username(), request.password());
+                    User createdUser = db.getUserPerUserName(msg.username(), msg.password());
                     sendMessage(new CreateAccountSuccessResponse(createdUser));
                 }
             }
@@ -227,9 +228,10 @@ public class ServerSocketConnection {
      * It then adds the current connection (this) to the newly created lobby and sends a CreateLobbySuccessResponse back to the client to indicate that the lobby has been successfully created.
      * The method also logs the creation of the lobby using the sendLogMessage method and updates the lobby information for all connected clients by calling the updateJoined method on the lobby instance.
      *
-     * @param obj
+     * @param msg
      */
-    private void createLobbyRequest(CreateLobbyRequest obj) {
+    private void createLobbyRequest(CreateLobbyRequest msg) {
+        sendLogMessage(msg);
         Lobby lobby = new Lobby(server);
         lobby.addConnection(this);
         lobby.updateJoined();
@@ -244,21 +246,22 @@ public class ServerSocketConnection {
      * If the lobby is not found, it sends a LobbyNotFoundResponse back to the client.
      * The method also logs the outcome of the join attempt using the sendLogMessage method to provide feedback on the server side.
      *
-     * @param obj
+     * @param msg
      */
-    private void joinLobbyRequest(JoinLobbyRequest obj) {
-        Lobby lobby = server.getLobbies().stream().filter(l -> l.getLobbyId() == obj.lobbyId()).findFirst().orElse(null);
+    private void joinLobbyRequest(JoinLobbyRequest msg) {
+        sendLogMessage(msg);
+        Lobby lobby = server.getLobbies().stream().filter(l -> l.getLobbyId() == msg.lobbyId()).findFirst().orElse(null);
         if (lobby != null && lobby.canJoin()) {
             lobby.addConnection(this);
             lobby.updateJoined();
         } else if (lobby != null && !lobby.canJoin()) {
-            LobbyJoinRefusedResponse msg = new LobbyJoinRefusedResponse(getUser(), lobby.getLobbyInfoResponse());
-            sendMessage(msg);
-            sendLogMessage(msg);
+            LobbyJoinRefusedResponse msg2 = new LobbyJoinRefusedResponse(getUser(), lobby.getLobbyInfoResponse());
+            sendMessage(msg2);
+            sendLogMessage(msg2);
         } else {
-            LobbyNotFoundResponse msg = new LobbyNotFoundResponse(getUser());
-            sendMessage(msg);
-            sendLogMessage(msg);
+            LobbyNotFoundResponse msg2 = new LobbyNotFoundResponse(getUser());
+            sendMessage(msg2);
+            sendLogMessage(msg2);
         }
     }
 
@@ -270,12 +273,12 @@ public class ServerSocketConnection {
      * If the lobby is found, it calls the sendChatMessage method on the lobby instance, passing the SendChatMessageRequest object to it. This allows the lobby to broadcast the chat message to all connected clients in that lobby.
      * If the lobby is not found (i.e., the connection is not part of any lobby), the method does nothing.
      *
-     * @param obj
+     * @param msg
      */
-    private void sendChatMessageRequest(SendChatMessageRequest obj) {
+    private void sendChatMessageRequest(SendChatMessageRequest msg) {
         Lobby lobby = server.getLobbies().stream().filter(l -> l.getConnections().contains(this)).findFirst().orElse(null);
         if (lobby != null) {
-            lobby.sendChatMessage(obj);
+            lobby.sendChatMessage(msg);
         }
     }
 
@@ -294,6 +297,7 @@ public class ServerSocketConnection {
      * @throws SQLException
      */
     private void forgotPasswordRequest(ForgotPasswordRequest msg) throws SQLException {
+        sendLogMessage(msg);
         // Check if there is an existing password reset request for the provided email and if it is still valid (within 1 minute)
         if (passwordForgotten == null || passwordForgotten.getRequestTime().getTime() + 60000 < System.currentTimeMillis()) {
 
@@ -325,6 +329,7 @@ public class ServerSocketConnection {
      * @param msg
      */
     private void forgotPasswordSendCodeRequest(ForgotPasswordSendCodeRequest msg) {
+        sendLogMessage(msg);
         if (passwordForgotten != null && passwordForgotten.getCode().equals(msg.code())) {
             // Code is correct, allow the user to enter a new password
             sendMessage(new ForgotPasswordResponse(3));
@@ -347,6 +352,7 @@ public class ServerSocketConnection {
      * @throws SQLException
      */
     private void changePasswordRequest(ChangePasswordRequest msg) throws SQLException {
+        sendLogMessage(msg);
         if (passwordForgotten.getCode().equals(msg.code())) {
             DatabaseUser db = new DatabaseUser();
 
@@ -396,13 +402,14 @@ public class ServerSocketConnection {
 
 
     private void startGameRequest(StartGameRequest msg) {
+        sendLogMessage(msg);
         Lobby lobby = server.getLobbyByConnection(this);
-        System.out.println(lobby);
         lobby.startGame();
     }
 
 
     private void leftLobbyRequest(LeaveLobbyRequest msg) {
+        sendLogMessage(msg);
         server.leaveLobby(this);
     }
 
@@ -416,6 +423,7 @@ public class ServerSocketConnection {
 
 
     private void readyInGameTableRequest(ReadyInGameTableRequest msg) {
+        sendLogMessage(msg);
         Lobby lobby = server.getLobbyByConnection(this);
         if (lobby != null) {
             lobby.getGameLogic().readyInGameTable(msg);
@@ -432,6 +440,7 @@ public class ServerSocketConnection {
 
 
     private void setProfileImageRequest(SetProfileImageRequest msg) {
+        sendLogMessage(msg);
         DatabaseUser db = new DatabaseUser();
         try {
             db.updateProfileImage(getUser(), msg.imageData());

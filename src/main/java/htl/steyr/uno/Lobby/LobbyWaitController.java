@@ -261,12 +261,10 @@ public class LobbyWaitController implements Initializable {
             String trimmed = text.trim();
             gameChatTextField.clear();
             sendChatMessage(trimmed);
-            System.out.println("Sent chat message: " + trimmed);
 
             if (trimmed.startsWith("@")) {
                 gameChatTextField.clear();
                 sendPrivateMessage(trimmed);
-                System.out.println("Sent private message: " + trimmed);
             }
         }
     }
@@ -363,7 +361,6 @@ public class LobbyWaitController implements Initializable {
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {
         String sender = msg.user().getUsername();
         String text = msg.message();
-        System.out.println("Received chat message from " + sender + ": " + text);
 
         Platform.runLater(() -> gameChatListView.getItems().add(new ChatMessage(sender, text)));
     }

@@ -132,15 +132,20 @@ public class GameLogic {
 
     public void gameTurnResponse(GameTurnResponse msg) {
         getGameTable().setGameTurnResponse(msg);
-        
+
+
         if (msg.enemyIndex() == null) {
-            Card initialCard = msg.card();
-            if (initialCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
-                initialCard.setChosenColour(msg.currentColor());
+            if (msg.card() != null) {
+                // Initiale Karte am Spielstart
+                Card initialCard = msg.card();
+                if (initialCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
+                    initialCard.setChosenColour(msg.currentColor());
+                }
+                Platform.runLater(() -> {
+                    getGameTable().getCardStack().addToStack(initialCard);
+                });
             }
-            Platform.runLater(() -> {
-                getGameTable().getCardStack().addToStack(initialCard);
-            });
+            
             getGameTable().getPlayer().setCurrentTurn(getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex()));
         } else {
             Card currentTopCard = getGameTable().getCardStack().getTopCard();
@@ -158,11 +163,11 @@ public class GameLogic {
                 if (playedCard.getCardColour().equals("black") && playedCard.getChosenColour() != null && !playedCard.getChosenColour().isBlank()) {
                     if (currentTopCard.getChosenColour() == null || currentTopCard.getChosenColour().isBlank()) {
                         currentTopCard.setChosenColour(playedCard.getChosenColour());
-                        Platform.runLater(() -> {
-                            getGameTable().getCardStack().addToStack(currentTopCard);
-                        });
                     }
                 }
+                Platform.runLater(() -> {
+                    getGameTable().getCardStack().addToStack(playedCard);
+                });
             }
             
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
