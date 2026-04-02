@@ -37,6 +37,7 @@ public class GameTable implements Initializable {
     private Player player;
     private HBox handBox;
     private GameTurnResponse gameTurnResponse;
+    private Button withdrawalButton;
 
     @FXML private StackPane enemy1;
     @FXML private StackPane enemy2;
@@ -158,6 +159,10 @@ public class GameTable implements Initializable {
         StackPane.setAlignment(handBox, Pos.BOTTOM_CENTER);
         StackPane.setMargin(handBox, new Insets(40));
         root.getChildren().add(handBox);
+
+        if (withdrawalButton != null) {
+            withdrawalButton.toFront();
+        }
     }
 
     public void updatePlayerHandUI() {
@@ -166,6 +171,10 @@ public class GameTable implements Initializable {
         handBox.getChildren().clear();
         for (Card c : new ArrayList<>(player.getHand())) {
             handBox.getChildren().add(createCardButton(c));
+        }
+        
+        if (withdrawalButton != null) {
+            withdrawalButton.toFront();
         }
     }
 
@@ -194,7 +203,8 @@ public class GameTable implements Initializable {
 
         cardBtn.setOnAction(e -> {
             cardStack.layCard(c, cardBtn, player);
-            if (cardStack.getTopCard() == c) {
+            Card topCard = cardStack.getTopCard();
+            if (topCard != null && topCard.getCardValue() == c.getCardValue() && topCard.getCardColour().equals(c.getCardColour())) {
                 for (int i = 0; i < player.getHand().size(); i++) {
                     Card card = player.getHand().get(i);
                     if (card.getCardValue() == c.getCardValue() && card.getCardColour().equals(c.getCardColour())) {
@@ -261,7 +271,7 @@ public class GameTable implements Initializable {
     }
 
     public void createWithdrawalStack(StackPane root) {
-        Button withdrawalButton = new Button();
+        withdrawalButton = new Button();
         withdrawalButton.setPrefSize(137, 192);
         withdrawalButton.setPadding(Insets.EMPTY);
         withdrawalButton.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
@@ -303,7 +313,6 @@ public class GameTable implements Initializable {
             }
         });
 
-        Platform.runLater(withdrawalButton::toFront);
         root.getChildren().add(withdrawalButton);
     }
 

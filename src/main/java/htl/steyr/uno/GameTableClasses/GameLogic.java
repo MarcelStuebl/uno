@@ -163,11 +163,11 @@ public class GameLogic {
                 if (playedCard.getCardColour().equals("black") && playedCard.getChosenColour() != null && !playedCard.getChosenColour().isBlank()) {
                     if (currentTopCard.getChosenColour() == null || currentTopCard.getChosenColour().isBlank()) {
                         currentTopCard.setChosenColour(playedCard.getChosenColour());
-                        Platform.runLater(() -> {
-                            getGameTable().getCardStack().addToStack(currentTopCard);
-                        });
                     }
                 }
+                Platform.runLater(() -> {
+                    getGameTable().getCardStack().addToStack(playedCard);
+                });
             }
             
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
