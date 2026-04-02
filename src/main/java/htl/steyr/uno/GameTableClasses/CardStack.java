@@ -24,7 +24,7 @@ public class CardStack {
     private StackPane visual;
     private GameTable gameTable;
 
-    public CardStack() {
+    public CardStack(GameTable gameTable) {
         this.visual = new StackPane();
         this.visual.setPrefSize(137, 192);
         this.visual.setMaxSize(137, 192);
@@ -33,6 +33,7 @@ public class CardStack {
                 "-fx-border-width: 6;" +
                 "-fx-border-radius: 5;" +
                 "-fx-background-radius: 5;");
+        this.gameTable = gameTable;
     }
 
     public StackPane getVisual() {
@@ -43,7 +44,6 @@ public class CardStack {
 
 
     public void layCard(Card c, Button handButton, Player p) {
-        System.out.println("karte gelegt");
         if (c == null) return;
 
         if (!p.isCurrentTurn()) {

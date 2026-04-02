@@ -31,7 +31,7 @@ public class GameTable implements Initializable {
 
     private final Client client;
     @FXML private StackPane root;
-    CardStack cardStack = new CardStack();
+    CardStack cardStack = new CardStack(this);
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
     private Player player;
