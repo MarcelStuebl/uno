@@ -40,7 +40,11 @@ public class CardStack {
         return visual;
     }
 
+
+
+
     public void layCard(Card c, Button handButton, Player p) {
+        System.out.println("karte gelegt");
         if (c == null) return;
 
         if (!p.isCurrentTurn()) {
@@ -49,7 +53,7 @@ public class CardStack {
         }
 
         // WICHTIG: Wenn drawPenaltyValue > 0, darf nur +2, +4 oder schwarze Karten gespielt werden!
-        Integer currentPenalty = getGameTable().getGameTurnResponse() != null ? 
+        Integer currentPenalty = getGameTable().getGameTurnResponse() != null ?
                                 getGameTable().getGameTurnResponse().drawPenaltyValue() : 0;
         if (currentPenalty != null && currentPenalty > 0) {
             // Nur +2 (12), +4 (14) oder schwarze Karten sind erlaubt
@@ -73,7 +77,7 @@ public class CardStack {
             getGameTable().getGameLogic().playCard(c, 0);
             return;
         }
-        
+
         // Wenn drawPenaltyValue == 0 und die oberste Karte ist eine Penalty-Karte (+2, +4),
         // dann hat der vorherige Spieler die Karten abgehoben. Jede Karte darf gespielt werden.
         if (top.getCardValue() >= 12 && currentPenalty != null && currentPenalty == 0) {
@@ -91,19 +95,15 @@ public class CardStack {
             return;
         }
 
+
         // check if colour of value matches
         boolean colorMatch = c.getCardColour().equals(top.getCardColour());
         boolean valueMatch = c.getCardValue() == top.getCardValue();
 
-        String currentColor = getGameTable().getGameTurnResponse() != null ? 
-                             getGameTable().getGameTurnResponse().currentColor() : null;
-        if (currentColor != null && !currentColor.isBlank()) {
-            boolean colorMatchesCurrentColor = c.getCardColour().equals(currentColor);
-            boolean isBlackCard = c.getCardColour().equals("black");
-            if (!colorMatchesCurrentColor && !isBlackCard) {
-                shakeHandButton(handButton);
-                return;
-            }
+        if (colorMatch && p.isCurrentTurn() || valueMatch && p.isCurrentTurn()) {
+            // card valid, lay card
+            addToStack(c);
+            p.setCurrentTurn(false);
         } else {
             // Normale Validierung (wenn keine aktuelle Farbe gesetzt ist)
             if (!colorMatch && !valueMatch) {
@@ -130,44 +130,44 @@ public class CardStack {
             StackPane overlay = new StackPane();
             overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7);");
             overlay.setPrefSize(gameTable.getRoot().getWidth(), gameTable.getRoot().getHeight());
-            
+
             VBox contentBox = new VBox();
             contentBox.setStyle("-fx-background-color: #1a1a1a; -fx-border-color: #00ff00; -fx-border-width: 3; -fx-padding: 30; -fx-background-radius: 15;");
             contentBox.setSpacing(20);
             contentBox.setAlignment(Pos.CENTER);
             contentBox.setMaxWidth(500);
-            
+
             Text title = new Text("Waehle eine Farbe:");
             title.setFont(new Font(28));
             title.setFill(Color.WHITE);
             contentBox.getChildren().add(title);
-            
+
             HBox buttonBox = new HBox();
             buttonBox.setSpacing(15);
             buttonBox.setAlignment(Pos.CENTER);
-            
+
             String[] colorList = {"red", "yellow", "green", "blue"};
             String[] colorNames = {"ROT", "GELB", "GREEN", "BLAU"};
             String[] colorCodes = {"#ff0000", "#ffff00", "#00ff00", "#0000ff"};
-            
+
             for (int i = 0; i < colorList.length; i++) {
                 String selectedColor = colorList[i];
                 String btnText = colorNames[i];
                 String btnColor = colorCodes[i];
-                
+
                 Button colorBtn = new Button(btnText);
                 colorBtn.setPrefSize(100, 100);
                 colorBtn.setStyle("-fx-font-size: 16; -fx-padding: 20; -fx-background-color: " + btnColor + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 10; -fx-background-radius: 10;");
-                
+
                 colorBtn.setOnAction(e -> {
                     // Speichere die gewählte Farbe
                     card.setChosenColour(selectedColor);
-                    
+
                     // Berechne den korrekten drawPenaltyValue
                     int drawPenaltyForThisCard = 0;
-                    Integer currentPenalty = getGameTable().getGameTurnResponse() != null ? 
+                    Integer currentPenalty = getGameTable().getGameTurnResponse() != null ?
                                             getGameTable().getGameTurnResponse().drawPenaltyValue() : 0;
-                    
+
                     if (card.getCardValue() == 13) {
                         // Farbwahl (13): setzt drawPenalty auf 0
                         drawPenaltyForThisCard = 0;
@@ -175,13 +175,13 @@ public class CardStack {
                         // +4: ADDIERT 4 zur bestehenden Penalty!
                         drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0) + 4;
                     }
-                    
+
                     // Lege die Karte auf den Stack
                     addToStack(card);
-                    
+
                     // Sende an Server mit korrektem drawPenalty
                     getGameTable().getGameLogic().playCard(card, drawPenaltyForThisCard);
-                    
+
                     // Entferne NUR die erste Karte, die passt (nicht alle mit removeIf!)
                     for (int idx = 0; idx < player.getHand().size(); idx++) {
                         Card c = player.getHand().get(idx);
@@ -194,10 +194,10 @@ public class CardStack {
 
                     gameTable.getRoot().getChildren().remove(overlay);
                 });
-                
+
                 buttonBox.getChildren().add(colorBtn);
             }
-            
+
             contentBox.getChildren().add(buttonBox);
             overlay.getChildren().add(contentBox);
             gameTable.getRoot().getChildren().add(overlay);
@@ -218,7 +218,7 @@ public class CardStack {
         } else {
             path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
         }
-        
+
         ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
         iv.setFitWidth(137);
         iv.setFitHeight(192);
@@ -235,7 +235,8 @@ public class CardStack {
         st.play();
     }
 
-    private void shakeHandButton(Button cardBtn) {
+   // makes the button that is currently clicked shake if it is layable
+     public void shakeHandButton(Button cardBtn) {
         TranslateTransition tt = new TranslateTransition(Duration.millis(50), cardBtn);
         tt.setFromX(0f);
         tt.setByX(10f);

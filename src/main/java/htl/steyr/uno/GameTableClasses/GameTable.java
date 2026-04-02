@@ -31,7 +31,7 @@ public class GameTable implements Initializable {
 
     private final Client client;
     @FXML private StackPane root;
-    private final CardStack centralStack = new CardStack(this);
+    CardStack cardStack = new CardStack();
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
     private Player player;
@@ -78,8 +78,8 @@ public class GameTable implements Initializable {
     }
 
     private void setupCentralStack() {
-        StackPane.setAlignment(centralStack.getVisual(), javafx.geometry.Pos.CENTER);
-        root.getChildren().add(centralStack.getVisual());
+        StackPane.setAlignment(cardStack.getVisual(), javafx.geometry.Pos.CENTER);
+        root.getChildren().add(cardStack.getVisual());
     }
 
     public void setEnemies() {
@@ -303,8 +303,8 @@ public class GameTable implements Initializable {
             }
         });
 
-        root.getChildren().add(withdrawalButton);
         Platform.runLater(withdrawalButton::toFront);
+        root.getChildren().add(withdrawalButton);
     }
 
     public GameLogic getGameLogic() {
@@ -320,7 +320,7 @@ public class GameTable implements Initializable {
     }
 
     public CardStack getCardStack() {
-        return centralStack;
+        return cardStack;
     }
 
     public StackPane getRoot() {
@@ -341,4 +341,3 @@ public class GameTable implements Initializable {
         this.gameTurnResponse = gameTurnResponse;
     }
 }
-
