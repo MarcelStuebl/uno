@@ -58,7 +58,7 @@ public class Card implements Serializable {
 
     @Override
     public String toString() {
-        return getCardColour() + getCardValue() + "";
+        return getCardColour() + getCardValue();
     }
 
     @Override
@@ -77,14 +77,6 @@ public class Card implements Serializable {
             return card.chosenColour == null;
         }
         return this.chosenColour.equals(card.chosenColour);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = CardValue;
-        result = 31 * result + CardColour.hashCode();
-        result = 31 * result + (chosenColour != null ? chosenColour.hashCode() : 0);
-        return result;
     }
 
 
