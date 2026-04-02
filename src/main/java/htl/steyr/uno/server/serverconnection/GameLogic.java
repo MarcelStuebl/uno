@@ -152,7 +152,6 @@ public class GameLogic {
         Player msgPlayer = msg.player();
         Integer receivedDrawPenaltyValue = msg.drawPenaltyValue();
 
-        // Finde den aktuellen Player aus der Server-Liste
         Player player = null;
         for (Player p : players) {
             if (p.getUsername().equals(msgPlayer.getUsername())) {
@@ -176,26 +175,18 @@ public class GameLogic {
             currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
             currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
         } else if (isReverse) {
-            // Change Direction - Spieler bleibt dran
             directionClockwise = !directionClockwise;
         } else if (card.getCardValue() == 12) {
-            // +2 Karte
-            drawPenaltyValue = (receivedDrawPenaltyValue != null) ? receivedDrawPenaltyValue : drawPenaltyValue + 2;
+            drawPenaltyValue = (receivedDrawPenaltyValue != null && receivedDrawPenaltyValue > 0) ? receivedDrawPenaltyValue : 2;
         } else if (card.getCardValue() == 13) {
-            // Farbwahl (13) - Setzt drawPenaltyValue auf 0, da diese Karte keine Penalty hat
             drawPenaltyValue = 0;
         } else if (card.getCardValue() == 14) {
-            // +4 mit Farbwahl
-            drawPenaltyValue = (receivedDrawPenaltyValue != null) ? receivedDrawPenaltyValue : drawPenaltyValue + 4;
+            drawPenaltyValue = (receivedDrawPenaltyValue != null && receivedDrawPenaltyValue > 0) ? receivedDrawPenaltyValue : 4;
         }
 
-        // Setze currentColor bei schwarzen Karten mit gewählter Farbe
         if (card.getCardColour().equals("black") && card.getChosenColour() != null && !card.getChosenColour().isBlank()) {
             currentColor = card.getChosenColour();
-        } 
-        // Setze currentColor auf null, wenn eine normale (farbige) Karte gespielt wird
-        else if (!card.getCardColour().equals("black") && card.getCardValue() < 10) {
-            // Nur bei normalen Zahlenkarten die currentColor zurücksetzen
+        } else if (!card.getCardColour().equals("black")) {
             currentColor = null;
         }
 
@@ -224,9 +215,6 @@ public class GameLogic {
         for (ServerSocketConnection c : lobby.getConnections()) {
             c.sendMessage(response);
         }
-
-        // WICHTIG: SyncEnemyHandSizeResponse wird später in syncPlayerHand() gesendet, nicht hier!
-        // Das verhindert Konflikte mit den Client-Updates
 
         for (Player p : players) {
             for (Player lobbyPlayer : players) {
@@ -309,8 +297,7 @@ public class GameLogic {
             addCardsToPlayer(player, card);
         }
         drawPenaltyValue = 0;
-        currentColor = null;
-        
+
         // Wechsle zum nächsten Spieler nach dem Abheben
         currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
         
@@ -319,16 +306,19 @@ public class GameLogic {
             currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
         }
 
+        // Sende die aktuelle oberste Karte
         Card cardToSend = getCardDeck().getTopDiscardCard();
         if (cardToSend == null) {
             cardToSend = getCurrentCard();
         }
 
+        // Nur wenn die oberste Karte NICHT schwarz ist, currentColor zurücksetzen
         if (cardToSend != null && !cardToSend.getCardColour().equals("black")) {
             currentColor = null;
         }
 
-        GameTurnResponse response = new GameTurnResponse(null, cardToSend, 0, currentPlayerIndex, directionClockwise, currentColor);
+        // Sende null statt einer Karte, um zu signalisieren, dass es kein neuer Spielzug ist
+        GameTurnResponse response = new GameTurnResponse(null, null, 0, currentPlayerIndex, directionClockwise, currentColor);
         for (ServerSocketConnection c : lobby.getConnections()) {
             c.sendMessage(response);
         }

@@ -1,6 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.UiStyleUtil;
+import htl.steyr.uno.requests.server.GameTurnResponse;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -19,7 +20,6 @@ import javafx.util.Duration;
 import java.util.Objects;
 
 public class CardStack {
-    ScaleTransition st;
     private Card topCard;
     private StackPane visual;
     private GameTable gameTable;
@@ -51,12 +51,15 @@ public class CardStack {
             return;
         }
 
-        // WICHTIG: Wenn drawPenaltyValue > 0, darf nur +2, +4 oder schwarze Karten gespielt werden!
-        Integer currentPenalty = getGameTable().getGameTurnResponse() != null ?
-                                getGameTable().getGameTurnResponse().drawPenaltyValue() : 0;
+        GameTurnResponse turnResponse = getGameTable().getGameTurnResponse();
+        Integer currentPenalty = turnResponse != null ? turnResponse.drawPenaltyValue() : 0;
+        String currentColor = turnResponse != null ? turnResponse.currentColor() : null;
+
+        // Wenn drawPenaltyValue > 0, darf nur +2 oder +4 gespielt werden!
+        // Normale Farbwechsler sind NICHT erlaubt!
         if (currentPenalty != null && currentPenalty > 0) {
-            // Nur +2 (12), +4 (14) oder schwarze Karten sind erlaubt
-            boolean isAllowedCard = c.getCardValue() == 12 || c.getCardValue() == 13 || c.getCardValue() == 14 || c.getCardColour().equals("black");
+            // Nur +2 oder +4 sind erlaubt
+            boolean isAllowedCard = c.getCardValue() == 12 || c.getCardValue() == 14;
             if (!isAllowedCard) {
                 shakeHandButton(handButton);
                 return;
@@ -77,9 +80,10 @@ public class CardStack {
             return;
         }
 
-        // Wenn drawPenaltyValue == 0 und die oberste Karte ist eine Penalty-Karte (+2, +4),
-        // dann hat der vorherige Spieler die Karten abgehoben. Jede Karte darf gespielt werden.
-        if (top.getCardValue() >= 12 && currentPenalty != null && currentPenalty == 0) {
+        // Wenn drawPenaltyValue == 0 und die oberste Karte ist eine Penalty-Karte,
+        // dann hat der vorherige Spieler die Karten abgehoben. 
+        // Wenn currentColor gesetzt ist, muss trotzdem die aktuelle Farbe beachtet werden
+        if (top.getCardValue() >= 12 && currentPenalty != null && currentPenalty == 0 && (currentColor == null || currentColor.isBlank())) {
             if (c.getCardColour().equals("black")) {
                 showColorSelection(c, p);
                 return;
@@ -90,25 +94,29 @@ public class CardStack {
         }
 
         if (c.getCardColour().equals("black")) {
+            // Wenn currentColor gesetzt ist darf der nächste Spieler nur +2 oder +4 spielen
+            if (currentColor != null && !currentColor.isBlank() && c.getCardValue() == 13) {
+                shakeHandButton(handButton);
+                return;
+            }
             showColorSelection(c, p);
             return;
         }
 
+        String effectiveTopColor = top.getCardColour();
+        if (currentColor != null && !currentColor.isBlank()) {
+            effectiveTopColor = currentColor;
+        } else if (top.getCardColour().equals("black") && top.getChosenColour() != null && !top.getChosenColour().isBlank()) {
+            effectiveTopColor = top.getChosenColour();
+        }
 
-        // check if colour of value matches
-        boolean colorMatch = c.getCardColour().equals(top.getCardColour());
+        // check if colour or value matches
+        boolean colorMatch = c.getCardColour().equals(effectiveTopColor);
         boolean valueMatch = c.getCardValue() == top.getCardValue();
 
-        if (colorMatch && p.isCurrentTurn() || valueMatch && p.isCurrentTurn()) {
-            // card valid, lay card
-            addToStack(c);
-            p.setCurrentTurn(false);
-        } else {
-            // Normale Validierung (wenn keine aktuelle Farbe gesetzt ist)
-            if (!colorMatch && !valueMatch) {
-                shakeHandButton(handButton);
-                return;
-            }
+        if (!colorMatch && !valueMatch) {
+            shakeHandButton(handButton);
+            return;
         }
 
         // card valid, lay card
@@ -168,7 +176,7 @@ public class CardStack {
                                             getGameTable().getGameTurnResponse().drawPenaltyValue() : 0;
 
                     if (card.getCardValue() == 13) {
-                        // Farbwahl (13): setzt drawPenalty auf 0
+                        // Farbwahl: setzt drawPenalty auf 0
                         drawPenaltyForThisCard = 0;
                     } else if (card.getCardValue() == 14) {
                         // +4: ADDIERT 4 zur bestehenden Penalty!
@@ -234,8 +242,8 @@ public class CardStack {
         st.play();
     }
 
-   // makes the button that is currently clicked shake if it is layable
-     public void shakeHandButton(Button cardBtn) {
+    // makes the button that is currently clicked shake if it is layable
+    public void shakeHandButton(Button cardBtn) {
         TranslateTransition tt = new TranslateTransition(Duration.millis(50), cardBtn);
         tt.setFromX(0f);
         tt.setByX(10f);

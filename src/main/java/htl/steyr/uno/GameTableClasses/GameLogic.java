@@ -132,15 +132,20 @@ public class GameLogic {
 
     public void gameTurnResponse(GameTurnResponse msg) {
         getGameTable().setGameTurnResponse(msg);
-        
+
+
         if (msg.enemyIndex() == null) {
-            Card initialCard = msg.card();
-            if (initialCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
-                initialCard.setChosenColour(msg.currentColor());
+            if (msg.card() != null) {
+                // Initiale Karte am Spielstart
+                Card initialCard = msg.card();
+                if (initialCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
+                    initialCard.setChosenColour(msg.currentColor());
+                }
+                Platform.runLater(() -> {
+                    getGameTable().getCardStack().addToStack(initialCard);
+                });
             }
-            Platform.runLater(() -> {
-                getGameTable().getCardStack().addToStack(initialCard);
-            });
+            
             getGameTable().getPlayer().setCurrentTurn(getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex()));
         } else {
             Card currentTopCard = getGameTable().getCardStack().getTopCard();
