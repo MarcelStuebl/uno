@@ -213,6 +213,7 @@ public class GameTable implements Initializable {
                     }
                 }
                 handBox.getChildren().remove(cardBtn);
+                updatePlayerHandUI();
             }
         });
 

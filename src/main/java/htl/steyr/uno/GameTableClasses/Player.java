@@ -143,7 +143,13 @@ public class Player implements Serializable {
     }
 
     public void removeCardFromHand(Card card) {
-        this.hand.remove(card);
+        for (int i = 0; i < this.hand.size(); i++) {
+            Card c = this.hand.get(i);
+            if (c.getCardValue() == card.getCardValue() && c.getCardColour().equals(card.getCardColour())) {
+                this.hand.remove(i);
+                return;
+            }
+        }
     }
 
     public byte[] getImageBytes() {

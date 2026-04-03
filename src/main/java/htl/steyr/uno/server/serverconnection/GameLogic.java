@@ -171,9 +171,18 @@ public class GameLogic {
         boolean isReverse = card.getCardValue() == 11;
 
         if (isSkip) {
-            // Skip Player: Übernächsten Spieler überspringen (2x wechseln)
+            // zum nächsten Spieler wechseln
             currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+            // Überspringe passive Spieler
+            while (players.get(currentPlayerIndex).isPassive()) {
+                currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+            }
+            // Dann nochmal zum nächsten aktiven Spieler wechseln (das ist derjenige, der übersprungen wird)
             currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+            // Überspringe passive Spieler nochmal
+            while (players.get(currentPlayerIndex).isPassive()) {
+                currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+            }
         } else if (isReverse) {
             directionClockwise = !directionClockwise;
         } else if (card.getCardValue() == 12) {
@@ -200,6 +209,7 @@ public class GameLogic {
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
             }
         } else {
+            // Bei Reverse: Zähle aktive Spieler
             int activePlayerCount = 0;
             for (Player p : players) {
                 if (!p.isPassive()) {
@@ -208,13 +218,24 @@ public class GameLogic {
             }
             
             if (activePlayerCount == 2) {
-                if (players.get(currentPlayerIndex).isPassive()) {
+                // Mit nur 2 aktiven Spielern funktioniert Reverse wie Skip
+                // Zum nächsten Spieler wechseln
+                currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+                
+                // überspringe passive Spieler
+                while (players.get(currentPlayerIndex).isPassive()) {
                     currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
-                    while (players.get(currentPlayerIndex).isPassive()) {
-                        currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
-                    }
+                }
+                
+                // Nochmal zum nächsten Spieler wechseln (zurück zum ursprünglichen)
+                currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+                
+                // überspringe passive Spieler
+                while (players.get(currentPlayerIndex).isPassive()) {
+                    currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 }
             } else {
+                // Nächsten Spieler ermitteln
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 
                 // überspringe passive Spieler

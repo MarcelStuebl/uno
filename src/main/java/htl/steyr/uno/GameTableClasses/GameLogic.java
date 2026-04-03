@@ -166,7 +166,15 @@ public class GameLogic {
             });
             
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
-                getGameTable().getPlayer().getHand().removeIf(card -> card.equals(msg.card()));
+                // Entferne die Karte - nur nach CardValue und CardColour, nicht nach chosenColour!
+                for (int i = 0; i < getGameTable().getPlayer().getHand().size(); i++) {
+                    Card c = getGameTable().getPlayer().getHand().get(i);
+                    if (c.getCardValue() == msg.card().getCardValue() && 
+                        c.getCardColour().equals(msg.card().getCardColour())) {
+                        getGameTable().getPlayer().getHand().remove(i);
+                        break;
+                    }
+                }
                 getGameTable().getPlayer().setCurrentTurn(false);
             } else {
                 for (Enemy e : getGameTable().getPlayer().getEnemies()) {
