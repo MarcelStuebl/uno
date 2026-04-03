@@ -167,14 +167,22 @@ public class LobbyController implements Initializable {
      */
     @FXML
     private void onJoinButtonClicked(ActionEvent actionEvent) throws IOException {
-        int lobbyId = Integer.parseInt(partyCodeField.getText());
-        if (lobbyId <= 100000 || lobbyId >= 999999) {
-            System.out.println("Invalid lobby ID");
-            /*
-             * @todo show error message in UI
-             */
-        } else {
-            client.joinLobby(lobbyId);
+        String input = partyCodeField.getText().trim();
+        
+        if (input.isEmpty()) {
+            // @TODO: Show error message
+            return;
+        }
+        
+        try {
+            int lobbyId = Integer.parseInt(input);
+            if (lobbyId <= 100000 || lobbyId >= 999999) {
+                // @TODO: Show error message
+            } else {
+                client.joinLobby(lobbyId);
+            }
+        } catch (NumberFormatException e) {
+            // @TODO: Show error message
         }
     }
 
