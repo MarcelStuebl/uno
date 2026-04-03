@@ -94,7 +94,7 @@ public class CardStack {
         }
 
         if (c.getCardColour().equals("black")) {
-            // Wenn currentColor gesetzt ist darf der nächste Spieler nur +2 oder +4 spielen
+            // Wenn currentColor gesetzt ist, darf der nächste Spieler nur +2 oder +4 spielen
             if (currentColor != null && !currentColor.isBlank() && c.getCardValue() == 13) {
                 shakeHandButton(handButton);
                 return;
@@ -167,7 +167,7 @@ public class CardStack {
                 colorBtn.setStyle("-fx-font-size: 16; -fx-padding: 20; -fx-background-color: " + btnColor + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 10; -fx-background-radius: 10;");
 
                 colorBtn.setOnAction(e -> {
-                    // Speichere die gewählte Farbe
+                    // Speichere die gewählte Farbe in der Karte
                     card.setChosenColour(selectedColor);
 
                     // Berechne den korrekten drawPenaltyValue
@@ -183,13 +183,7 @@ public class CardStack {
                         drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0) + 4;
                     }
 
-                    // Lege die Karte auf den Stack
-                    addToStack(card);
-
-                    // Sende an Server mit korrektem drawPenalty
-                    getGameTable().getGameLogic().playCard(card, drawPenaltyForThisCard);
-
-                    // Entferne NUR die erste Karte, die passt (nicht alle mit removeIf!)
+                    // Entferne die Karte ZUERST von der Hand (mit der korrekten chosenColour!)
                     for (int idx = 0; idx < player.getHand().size(); idx++) {
                         Card c = player.getHand().get(idx);
                         if (c.getCardValue() == card.getCardValue() && c.getCardColour().equals(card.getCardColour())) {
@@ -197,6 +191,14 @@ public class CardStack {
                             break;
                         }
                     }
+                    
+                    // Lege die Karte auf den Stack
+                    addToStack(card);
+
+                    // Sende an Server mit korrektem drawPenalty
+                    getGameTable().getGameLogic().playCard(card, drawPenaltyForThisCard);
+
+                    // Aktualisiere die UI
                     getGameTable().updatePlayerHandUI();
 
                     gameTable.getRoot().getChildren().remove(overlay);

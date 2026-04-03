@@ -184,8 +184,8 @@ public class GameLogic {
             drawPenaltyValue = (receivedDrawPenaltyValue != null && receivedDrawPenaltyValue > 0) ? receivedDrawPenaltyValue : 4;
         }
 
-        if (card.getCardColour().equals("black") && card.getChosenColour() != null && !card.getChosenColour().isBlank()) {
-            currentColor = card.getChosenColour();
+        if (card.getCardColour().equals("black") && msg.chosenColor() != null && !msg.chosenColor().isBlank()) {
+            currentColor = msg.chosenColor();
         } else if (!card.getCardColour().equals("black")) {
             currentColor = null;
         }
@@ -229,9 +229,7 @@ public class GameLogic {
         Card cardForResponse = card;
         if (card.getCardColour().equals("black")) {
             cardForResponse = new Card(card.getCardValue(), card.getCardColour());
-            String colorToSet = (card.getChosenColour() != null && !card.getChosenColour().isBlank()) 
-                ? card.getChosenColour() 
-                : currentColor;
+            String colorToSet = (msg.chosenColor() != null && !msg.chosenColor().isBlank()) ? msg.chosenColor() : currentColor;
             if (colorToSet != null && !colorToSet.isBlank()) {
                 cardForResponse.setChosenColour(colorToSet);
             }

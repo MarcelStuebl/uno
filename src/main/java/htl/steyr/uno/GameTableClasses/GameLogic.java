@@ -60,7 +60,11 @@ public class GameLogic {
      * @param card The card that the player is attempting to play.
      */
     void playCard(Card card, Integer drawPenaltyValue) {
-        CardPlayedRequest msg = new CardPlayedRequest(card, drawPenaltyValue, getGameTable().getPlayer());
+        String chosenColor = null;
+        if (card.getCardColour().equals("black") && card.getChosenColour() != null && !card.getChosenColour().isBlank()) {
+            chosenColor = card.getChosenColour();
+        }
+        CardPlayedRequest msg = new CardPlayedRequest(card, drawPenaltyValue, getGameTable().getPlayer(), chosenColor);
         getGameTable().getClient().getConn().sendMessage(msg);
     }
 
@@ -148,27 +152,18 @@ public class GameLogic {
             
             getGameTable().getPlayer().setCurrentTurn(getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex()));
         } else {
-            Card currentTopCard = getGameTable().getCardStack().getTopCard();
             Card playedCard = msg.card();
 
+            // Stelle sicher, dass schwarze Karten die chosenColour habem
             if (playedCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
-                playedCard.setChosenColour(msg.currentColor());
+                if (playedCard.getChosenColour() == null || playedCard.getChosenColour().isBlank()) {
+                    playedCard.setChosenColour(msg.currentColor());
+                }
             }
 
-            if (!isSameCard(currentTopCard, playedCard)) {
-                Platform.runLater(() -> {
-                    getGameTable().getCardStack().addToStack(playedCard);
-                });
-            } else {
-                if (playedCard.getCardColour().equals("black") && playedCard.getChosenColour() != null && !playedCard.getChosenColour().isBlank()) {
-                    if (currentTopCard.getChosenColour() == null || currentTopCard.getChosenColour().isBlank()) {
-                        currentTopCard.setChosenColour(playedCard.getChosenColour());
-                    }
-                }
-                Platform.runLater(() -> {
-                    getGameTable().getCardStack().addToStack(playedCard);
-                });
-            }
+            Platform.runLater(() -> {
+                getGameTable().getCardStack().addToStack(playedCard);
+            });
             
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
                 getGameTable().getPlayer().getHand().removeIf(card -> card.equals(msg.card()));
@@ -195,30 +190,11 @@ public class GameLogic {
         }
     }
 
-    /**
-     * Vergleicht zwei Karten nach Farbe und Wert.
-     * Verwendet dies, um zu unterscheiden, ob eine neue Karte gelegt wurde oder nur abgehoben wurde.
-     * Für schwarze Karten: ignoriert die chosenColour beim Vergleich, da sie später vom Server gesetzt wird.
-     *
-     * @param c1 Erste Karte
-     * @param c2 Zweite Karte
-     * @return true wenn beide Karten gleich sind (Farbe + Wert), false sonst
-     */
-    private boolean isSameCard(Card c1, Card c2) {
-        if (c1 == null || c2 == null) return false;
-        return c1.getCardColour().equals(c2.getCardColour()) && c1.getCardValue() == c2.getCardValue();
-    }
-
-
-
-
     GameTable getGameTable() {
         return gameTable;
     }
     void setGameTable(GameTable gameTable) {
         this.gameTable = gameTable;
     }
-
-
 
 }
