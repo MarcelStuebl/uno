@@ -56,18 +56,9 @@ public class CardStack {
         String currentColor = turnResponse != null ? turnResponse.currentColor() : null;
 
         // Wenn drawPenaltyValue > 0, darf nur +2 oder +4 gespielt werden!
-        // Normale Farbwechsler sind NICHT erlaubt!
         if (currentPenalty != null && currentPenalty > 0) {
             boolean isAllowedCard = c.getCardValue() == 12 || c.getCardValue() == 14;
             if (!isAllowedCard) {
-                shakeHandButton(handButton);
-                return;
-            }
-
-            // +2 darf nicht auf +4 gelegt werden
-            // Aber +4 darf auf +2 gelegt werden, und +2 auf +2 ist erlaubt
-            int cardPenaltyValue = (c.getCardValue() == 12) ? 2 : 4;
-            if (cardPenaltyValue < currentPenalty) {
                 shakeHandButton(handButton);
                 return;
             }

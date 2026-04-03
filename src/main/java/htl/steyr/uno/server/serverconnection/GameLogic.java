@@ -186,10 +186,14 @@ public class GameLogic {
         } else if (isReverse) {
             directionClockwise = !directionClockwise;
         } else if (card.getCardValue() == 12) {
+            // +2: Verwende die vom Client berechnete drawPenaltyValue
+            // Der Client hat bereits currentPenalty + 2 berechnet!
             drawPenaltyValue = (receivedDrawPenaltyValue != null && receivedDrawPenaltyValue > 0) ? receivedDrawPenaltyValue : 2;
         } else if (card.getCardValue() == 13) {
             drawPenaltyValue = 0;
         } else if (card.getCardValue() == 14) {
+            // +4: Verwende die vom Client berechnete drawPenaltyValue
+            // Der Client hat bereits currentPenalty + 4 berechnet!
             drawPenaltyValue = (receivedDrawPenaltyValue != null && receivedDrawPenaltyValue > 0) ? receivedDrawPenaltyValue : 4;
         }
 
@@ -246,6 +250,11 @@ public class GameLogic {
         }
 
         checkForWinner(player);
+
+        // Überspringe passive Spieler
+        while (players.get(currentPlayerIndex).isPassive()) {
+            currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+        }
 
         Card cardForResponse = card;
         if (card.getCardColour().equals("black")) {
