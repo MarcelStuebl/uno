@@ -165,6 +165,7 @@ public class GameLogic {
         }
 
         player.removeCardFromHand(card);
+
         getCardDeck().returnCardToDiscordPile(card);
 
         boolean isSkip = card.getCardValue() == 10;
@@ -202,6 +203,8 @@ public class GameLogic {
         } else if (!card.getCardColour().equals("black")) {
             currentColor = null;
         }
+
+        checkForWinner(player);
 
         if (!isReverse) {
             if (!isSkip) {
@@ -249,9 +252,7 @@ public class GameLogic {
             }
         }
 
-        checkForWinner(player);
-
-        // Überspringe passive Spieler
+        // Überspringe passive Spieler nochmal (Fallback)
         while (players.get(currentPlayerIndex).isPassive()) {
             currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
         }

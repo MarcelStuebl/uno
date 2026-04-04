@@ -145,7 +145,9 @@ public class Player implements Serializable {
     public void removeCardFromHand(Card card) {
         for (int i = 0; i < this.hand.size(); i++) {
             Card c = this.hand.get(i);
-            if (c.getCardValue() == card.getCardValue() && c.getCardColour().equals(card.getCardColour())) {
+            // Vergleiche nach cardId um sicherzustellen, dass nur die GENAUE Karte entfernt wird
+            // Nicht die erste Karte mit gleichem CardValue und CardColour
+            if (c.getCardId().equals(card.getCardId())) {
                 this.hand.remove(i);
                 return;
             }

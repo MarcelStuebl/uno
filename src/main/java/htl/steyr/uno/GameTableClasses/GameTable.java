@@ -203,18 +203,6 @@ public class GameTable implements Initializable {
 
         cardBtn.setOnAction(e -> {
             cardStack.layCard(c, cardBtn, player);
-            Card topCard = cardStack.getTopCard();
-            if (topCard != null && topCard.getCardValue() == c.getCardValue() && topCard.getCardColour().equals(c.getCardColour())) {
-                for (int i = 0; i < player.getHand().size(); i++) {
-                    Card card = player.getHand().get(i);
-                    if (card.getCardValue() == c.getCardValue() && card.getCardColour().equals(c.getCardColour())) {
-                        player.getHand().remove(i);
-                        break;
-                    }
-                }
-                handBox.getChildren().remove(cardBtn);
-                updatePlayerHandUI();
-            }
         });
 
         ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), cardPane);
