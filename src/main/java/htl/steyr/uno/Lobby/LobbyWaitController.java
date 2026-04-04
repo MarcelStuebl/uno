@@ -51,6 +51,7 @@ public class LobbyWaitController implements Initializable {
     public ListView<ChatMessage> gameChatListView = new ListView<>();
     public TextField gameChatTextField;
 
+
     private boolean intentionalClose = false;
     private final BooleanProperty chatExpanded = new SimpleBooleanProperty(false);
 
@@ -145,9 +146,7 @@ public class LobbyWaitController implements Initializable {
             }
         });
 
-        gameChatTextField.focusedProperty().addListener((obs, oldV, focused) -> {
-            if (!focused) chatExpanded.set(false);
-        });
+
 
         gameChatTextField.setOnMouseClicked(e -> chatExpanded.set(!chatExpanded.get()));
 
@@ -178,8 +177,8 @@ public class LobbyWaitController implements Initializable {
                 nameLabel.setPrefWidth(180);
                 nameLabel.setAlignment(Pos.CENTER_LEFT);
 
-                buttonBox.getChildren().addAll(kickButton, muteButton);
-                buttonBox.setAlignment(Pos.CENTER);
+                //buttonBox.getChildren().addAll(kickButton, muteButton);
+                //buttonBox.setAlignment(Pos.CENTER);
 
                 rootPane.setPadding(new Insets(6, 10, 6, 10));
                 BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
