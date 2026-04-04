@@ -166,7 +166,6 @@ public class GameLogic {
             });
             
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
-                getGameTable().getPlayer().removeCardFromHand(msg.card());
                 getGameTable().getPlayer().setCurrentTurn(false);
             } else {
                 for (Enemy e : getGameTable().getPlayer().getEnemies()) {

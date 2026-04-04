@@ -62,6 +62,17 @@ public class CardStack {
                 shakeHandButton(handButton);
                 return;
             }
+
+            // +2 auf +2: erlaubt
+            // +4 auf +4: erlaubt
+            // +4 auf +2: erlaubt
+            // +2 auf +4: NICHT erlaubt
+            Card top = getTopCard();
+            if (top != null && top.getCardValue() == 14 && c.getCardValue() == 12) {
+                // Versuchen, +2 auf +4 zu legen - NICHT erlaubt!
+                shakeHandButton(handButton);
+                return;
+            }
         }
 
         Card top = getTopCard();
@@ -122,6 +133,13 @@ public class CardStack {
         addToStack(c);
 
         p.removeCardFromHand(c);
+        
+        // Wenn der Spieler keine Karten mehr hat, setze ihn auf passiv
+        if (p.getHand().isEmpty()) {
+            p.setPassive(true);
+        }
+        
+        getGameTable().updatePlayerHandUI();
 
         Integer drawPenaltyForThisCard = 0;
         if (c.getCardValue() == 12) {
@@ -186,16 +204,14 @@ public class CardStack {
                     // Entferne die Karte ZUERST von der Hand
                     // Verwende removeCardFromHand um sicherzustellen, dass nur eine Karte entfernt wird
                     player.removeCardFromHand(card);
-                    
-                    // Lege die Karte auf den Stack
+
+                    if (player.getHand().isEmpty()) {
+                        player.setPassive(true);
+                    }
+
                     addToStack(card);
-
-                    // Sende an Server mit korrektem drawPenalty
                     getGameTable().getGameLogic().playCard(card, drawPenaltyForThisCard);
-
-                    // Aktualisiere die UI
                     getGameTable().updatePlayerHandUI();
-
                     gameTable.getRoot().getChildren().remove(overlay);
                 });
 

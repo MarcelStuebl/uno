@@ -2,6 +2,7 @@ package htl.steyr.uno.GameTableClasses;
 
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class Card implements Serializable {
     //CardValue 0 bis 9 stands for the Number on the Card
@@ -16,15 +17,15 @@ public class Card implements Serializable {
     private final int CardValue;
     //Colours: yellow, green, blue, red
     private final String CardColour;
-
     private String chosenColour;
+    private final String cardId;
 
     public Card(int value, String colour) {
         colour = colour.toLowerCase();
 
         this.CardValue = value;
         this.CardColour = colour;
-
+        this.cardId = UUID.randomUUID().toString();
     }
 
     @Override
@@ -38,16 +39,14 @@ public class Card implements Serializable {
         if (obj == null || getClass() != obj.getClass()) return false;
         
         Card card = (Card) obj;
-        
-        // Vergleiche CardValue und CardColour
+
         if (this.CardValue != card.CardValue) return false;
-        if (!this.CardColour.equals(card.CardColour)) return false;
-        
-        // Vergleiche chosenColour (kann null sein)
-        if (this.chosenColour == null) {
-            return card.chosenColour == null;
-        }
-        return this.chosenColour.equals(card.chosenColour);
+        return this.CardColour.equals(card.CardColour);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(CardValue, CardColour);
     }
 
 
@@ -64,6 +63,10 @@ public class Card implements Serializable {
     }
     public void setChosenColour(String chosenColour) {
         this.chosenColour = chosenColour;
+    }
+    
+    public String getCardId() {
+        return this.cardId;
     }
 
 
