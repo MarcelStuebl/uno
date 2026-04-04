@@ -1,11 +1,9 @@
 package htl.steyr.uno.server.serverconnection;
 
 import htl.steyr.uno.GameTableClasses.Card;
-import htl.steyr.uno.GameTableClasses.exceptions.InvalidCardException;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 public class CardDeck {
 

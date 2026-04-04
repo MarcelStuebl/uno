@@ -52,20 +52,20 @@ uno/
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
 │   │   ├── bug_report.md
-│   │   ├── feature_request.md
-│   │   └── custom.md
+│   │   ├── custom.md
+│   │   └── feature_request.md
 │   ├── workflows/
 │   │   ├── client-release.yml
-│   │   └── push-ghcr.yml
+│   │   ├── push-ghcr.yml
+│   │   └── trigger.txt
 │   └── PULL_REQUEST_TEMPLATE.md
 │
-├── src/main/java/htl/steyr.uno/
+├── src/main/java/htl.steyr.uno/
 │   ├── client/
 │   │   ├── Client.java
 │   │   └── ClientSocketConnection.java
 │   │
 │   ├── GameTableClasses/
-│   │   ├── exceptions/
 │   │   ├── Card.java
 │   │   ├── CardStack.java
 │   │   ├── Enemy.java
@@ -80,7 +80,7 @@ uno/
 │   │   └── LobbyWaitController.java
 │   │
 │   ├── requests/
-│   │   ├── client/               # Client → Server Requests
+│   │   ├── client/
 │   │   │   ├── CardPlayedRequest.java
 │   │   │   ├── ChangePasswordRequest.java
 │   │   │   ├── CheckIfUserAlreadyExistsRequest.java
@@ -97,11 +97,12 @@ uno/
 │   │   │   ├── SetProfileImageRequest.java
 │   │   │   └── StartGameRequest.java
 │   │   │
-│   │   └── server/               # Server → Client Responses
+│   │   └── server/
 │   │       ├── CardAddResponse.java
 │   │       ├── CheckIfUserAlreadyExistsResponse.java
 │   │       ├── CreateAccountFailedResponse.java
 │   │       ├── CreateAccountSuccessResponse.java
+│   │       ├── EnemyDrawnCardsResponse.java
 │   │       ├── ForgotPasswordResponse.java
 │   │       ├── GameTurnResponse.java
 │   │       ├── LobbyInfoResponse.java
@@ -163,7 +164,6 @@ uno/
 │   ├── lobbyWait.fxml
 │   └── loginScreen.fxml
 │
-├── .env
 ├── .gitignore
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
@@ -172,7 +172,8 @@ uno/
 ├── mvnw
 ├── mvnw.cmd
 ├── pom.xml
-├── Regelwerk.md
+├── README.md
+├── REGELWERK.md
 └── SECURITY.md
 ```
 
