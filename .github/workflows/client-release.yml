@@ -37,7 +37,7 @@ jobs:
 
       - name: Build EXE
         shell: pwsh
-        run: mvn jpackage:jpackage -P client "-Dapp.version=${{ steps.version.outputs.VERSION }}"
+        run: mvn install -P client "-Dapp.version=${{ steps.version.outputs.VERSION }}" -DskipTests
 
       - name: Upload EXE to Release
         uses: softprops/action-gh-release@v2
