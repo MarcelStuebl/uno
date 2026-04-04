@@ -89,3 +89,66 @@
 .uno-card-back {
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 4, 0, 1, 2);
 }
+
+.game-over-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.45);
+}
+
+.game-over-panel {
+    -fx-background-color: rgba(18, 28, 40, 0.82);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.22);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 18;
+    -fx-padding: 22 28 22 28;
+}
+
+.game-over-title {
+    -fx-text-fill: white;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+.game-over-ranking-list {
+    -fx-alignment: center-left;
+}
+
+.game-over-ranking-row {
+    -fx-alignment: center-left;
+    -fx-spacing: 12;
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 10;
+    -fx-padding: 8 12 8 12;
+}
+
+.game-over-ranking-row-left {
+    -fx-opacity: 0.5;
+    -fx-background-color: rgba(120, 120, 120, 0.2);
+}
+
+.game-over-rank-label {
+    -fx-text-fill: #ffd54f;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-min-width: 34;
+}
+
+.game-over-name-label {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+}
+
+.game-over-back-button {
+    -fx-background-color: #2b8a3e;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-padding: 10 18 10 18;
+    -fx-background-radius: 16;
+}
+
+.game-over-back-button:hover {
+    -fx-background-color: #34a34a;
+    -fx-cursor: hand;
+}

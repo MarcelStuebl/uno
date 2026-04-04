@@ -192,6 +192,17 @@ public class GameLogic {
         }
     }
 
+
+
+    public void gameOverResponse(GameOverResponse msg) {
+        Platform.runLater(() -> {
+            if (getGameTable() != null) {
+                getGameTable().showGameOverOverlay(msg);
+            }
+        });
+    }
+    
+
     GameTable getGameTable() {
         return gameTable;
     }

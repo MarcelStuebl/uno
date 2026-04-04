@@ -7,7 +7,10 @@ import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class GameLogic {
 
@@ -20,6 +23,9 @@ public class GameLogic {
     private Card currentCard;
     private Integer drawPenaltyValue = 0;
     private String currentColor = null;  // Aktuelle Spielfarbe (von schwarzen Karten)
+    private final ArrayList<String> finishOrder = new ArrayList<>();
+    private final LinkedHashSet<String> leftPlayers = new LinkedHashSet<>();
+    private boolean gameOverSent = false;
 
 
     GameLogic(Lobby lobby) {
@@ -39,6 +45,9 @@ public class GameLogic {
         currentPlayerIndex = 0;
         directionClockwise = true;
         drawPenaltyValue = 0;
+        finishOrder.clear();
+        leftPlayers.clear();
+        gameOverSent = false;
 
         while (getCurrentCard() == null || getCurrentCard().getCardValue() >= 10) {
             setCurrentCard(getCardDeck().getCardFromStack());
@@ -208,6 +217,9 @@ public class GameLogic {
         }
 
         checkForWinner(player);
+        if (checkAndSendGameOver()) {
+            return;
+        }
 
         if (!isReverse) {
             if (!isSkip) {
@@ -356,6 +368,10 @@ public class GameLogic {
         }
         drawPenaltyValue = 0;
 
+        if (checkAndSendGameOver()) {
+            return;
+        }
+
         // Wechsle zum nächsten Spieler nach dem Abheben
         currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
         
@@ -405,8 +421,120 @@ public class GameLogic {
     private void checkForWinner(Player player) {
         if (player.getHand().isEmpty()) {
             player.setPassive(true);
+            addToFinishOrder(player.getUsername());
             updateEnemy(new Enemy(player));
         }
+    }
+
+    void handlePlayerLeft(String username) {
+        if (username == null || username.isBlank()) {
+            return;
+        }
+
+        for (Player player : players) {
+            if (username.equals(player.getUsername())) {
+                player.setPassive(true);
+                leftPlayers.add(username);
+                updateEnemy(new Enemy(player));
+                break;
+            }
+        }
+
+        checkAndSendGameOver();
+    }
+
+    private void addToFinishOrder(String username) {
+        if (username == null || username.isBlank()) {
+            return;
+        }
+        if (!finishOrder.contains(username)) {
+            finishOrder.add(username);
+        }
+    }
+
+    private int countActivePlayers() {
+        int active = 0;
+        for (Player player : players) {
+            if (player != null && !player.isPassive()) {
+                active++;
+            }
+        }
+        return active;
+    }
+
+    private boolean checkAndSendGameOver() {
+        if (gameOverSent || players.isEmpty()) {
+            return gameOverSent;
+        }
+
+        int activePlayers = countActivePlayers();
+        if (activePlayers > 1) {
+            return false;
+        }
+
+        if (activePlayers == 1) {
+            for (Player player : players) {
+                if (player != null && !player.isPassive()) {
+                    player.setPassive(true);
+                    addToFinishOrder(player.getUsername());
+                    updateEnemy(new Enemy(player));
+                    break;
+                }
+            }
+        }
+
+        ArrayList<Player> ranking = buildRankingForGameOver();
+        lobby.sendInfoToAll(new GameOverResponse(ranking, new ArrayList<>(leftPlayers)));
+        gameOverSent = true;
+        return true;
+    }
+
+    private ArrayList<Player> buildRankingForGameOver() {
+        ArrayList<Player> ranking = new ArrayList<>();
+        Set<String> added = new HashSet<>();
+
+        for (String username : finishOrder) {
+            if (leftPlayers.contains(username)) {
+                continue;
+            }
+
+            Player player = findPlayerByUsername(username);
+            if (player != null && added.add(username)) {
+                ranking.add(player);
+            }
+        }
+
+        for (Player player : players) {
+            if (player != null
+                    && player.getUsername() != null
+                    && !leftPlayers.contains(player.getUsername())
+                    && added.add(player.getUsername())) {
+                ranking.add(player);
+            }
+        }
+
+        for (String username : leftPlayers) {
+            Player player = findPlayerByUsername(username);
+            if (player != null && added.add(username)) {
+                ranking.add(player);
+            }
+        }
+
+        return ranking;
+    }
+
+    private Player findPlayerByUsername(String username) {
+        if (username == null) {
+            return null;
+        }
+
+        for (Player player : players) {
+            if (player != null && username.equals(player.getUsername())) {
+                return player;
+            }
+        }
+
+        return null;
     }
 
 

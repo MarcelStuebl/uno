@@ -1,7 +1,10 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.HelloApplication;
+import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.server.GameOverResponse;
 import htl.steyr.uno.requests.server.GameTurnResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.animation.ScaleTransition;
@@ -12,7 +15,9 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -39,6 +44,7 @@ public class GameTable implements Initializable {
     private HBox handBox;
     private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
+    private boolean gameOverOverlayShown = false;
 
     //variables used for PlayerHand
     private VBox handVBox; // VBox holding multiple rows of cards
@@ -413,6 +419,93 @@ public class GameTable implements Initializable {
                 }
             }
         });
+    }
+
+    public void showGameOverOverlay(GameOverResponse msg) {
+        if (msg == null || gameOverOverlayShown || root == null) {
+            return;
+        }
+        gameOverOverlayShown = true;
+
+        VBox rankingList = new VBox(8);
+        rankingList.getStyleClass().add("game-over-ranking-list");
+
+        int rank = 1;
+        for (Player rankedPlayer : msg.getPlayers()) {
+            if (rankedPlayer == null || rankedPlayer.getUsername() == null) {
+                continue;
+            }
+
+            HBox row = new HBox();
+            row.getStyleClass().add("game-over-ranking-row");
+
+            Label rankLabel = new Label(rank + ".");
+            rankLabel.getStyleClass().add("game-over-rank-label");
+
+            Label nameLabel = new Label(rankedPlayer.getUsername());
+            nameLabel.getStyleClass().add("game-over-name-label");
+
+            row.getChildren().addAll(rankLabel, nameLabel);
+
+            if (msg.isLeftPlayer(rankedPlayer.getUsername())) {
+                row.getStyleClass().add("game-over-ranking-row-left");
+            }
+
+            rankingList.getChildren().add(row);
+            rank++;
+        }
+
+        Label titleLabel = new Label("Spiel beendet - Ranking");
+        titleLabel.getStyleClass().add("game-over-title");
+
+        Button backToLobbyButton = new Button("Zurueck zur Lobby");
+        backToLobbyButton.getStyleClass().add("game-over-back-button");
+        backToLobbyButton.setOnAction(e -> switchBackToLobby());
+
+        VBox panel = new VBox(16, titleLabel, rankingList, backToLobbyButton);
+        panel.getStyleClass().add("game-over-panel");
+        panel.setAlignment(Pos.CENTER);
+        panel.setMaxWidth(500);
+
+        StackPane overlay = new StackPane(panel);
+        overlay.getStyleClass().add("game-over-overlay");
+        overlay.setPickOnBounds(true);
+        overlay.setOnMouseClicked(e -> e.consume());
+
+        root.getChildren().add(overlay);
+        overlay.toFront();
+    }
+
+    private void switchBackToLobby() {
+        try {
+            if (client.getConn() != null) {
+                client.getConn().leaveLobby();
+            }
+
+            Stage stage = new Stage();
+            Stage currentStage = (Stage) root.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("lobby.fxml"));
+            LobbyController controller = new LobbyController(client);
+            loader.setController(controller);
+
+            client.setLobbyController(controller);
+            client.setLobbyWaitController(null);
+            client.setGameTable(null);
+
+            Scene scene = new Scene(loader.load());
+            UiStyleUtil.applyGlobalFocusStyle(scene);
+
+            stage.setTitle("UNO - Lobby");
+            stage.setScene(scene);
+            UiStyleUtil.setAppIcon(stage);
+            stage.setMaximized(true);
+            stage.show();
+
+            currentStage.close();
+        } catch (IOException e) {
+            System.err.println("Fehler beim Zurueckkehren zur Lobby: " + e.getMessage());
+        }
     }
 
     public GameLogic getGameLogic() {

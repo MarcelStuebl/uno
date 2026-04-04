@@ -114,6 +114,7 @@ public class ClientSocketConnection implements Closeable {
                         case StackInfoResponse msg -> stackInfoResponse(msg);
                         case UpdateEnemyResponse msg -> updateEnemyResponse(msg);
                         case GameTurnResponse msg -> gameTurnResponse(msg);
+                        case GameOverResponse msg -> gameOverResponse(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
                 }
@@ -233,6 +234,10 @@ public class ClientSocketConnection implements Closeable {
 
     private void gameTurnResponse(GameTurnResponse msg) {
         client.getGameTable().getGameLogic().gameTurnResponse(msg);
+    }
+
+    private void  gameOverResponse(GameOverResponse msg) {
+        client.getGameTable().getGameLogic().gameOverResponse(msg);
     }
 
 

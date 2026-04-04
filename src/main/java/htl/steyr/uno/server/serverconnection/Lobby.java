@@ -67,7 +67,11 @@ public class Lobby {
         try {
             User user = connection.getUser();
             if (user != null && user.getUsername() != null) {
-                getGameLogic().getPlayers().removeIf(player -> player.getUsername().equals(user.getUsername()));
+                if (status != null && status == 2) {
+                    getGameLogic().handlePlayerLeft(user.getUsername());
+                } else {
+                    getGameLogic().getPlayers().removeIf(player -> player.getUsername().equals(user.getUsername()));
+                }
             }
         } catch (Exception e) {
             System.out.println("Error removing player from game logic: " + e.getMessage());
