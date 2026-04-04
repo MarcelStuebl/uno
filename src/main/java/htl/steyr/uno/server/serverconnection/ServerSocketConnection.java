@@ -194,11 +194,15 @@ public class ServerSocketConnection {
      * This prevents resource leaks and ensures that the connection is completely terminated.
      */
     private void cleanupConnection() {
+        if (user != null) {
+            System.out.println("Cleaning up connection for user: " + user.getUsername());
+        }
         running = false;
         try {
             server.removeConnection(this);
         } catch (Exception e) {
             System.out.println("Error removing connection: " + e.getMessage());
+            e.printStackTrace();
         }
         
         try {
@@ -233,6 +237,17 @@ public class ServerSocketConnection {
      */
     private void loginRequest(LoginRequest request) throws SQLException {
         sendLogMessage(request);
+
+        server.getConnections().removeIf(c -> {
+            try {
+                return c.getUser() != null && c.getUser().getUsername() != null &&
+                       c.getUser().getUsername().equals(request.username()) &&
+                       (c.getSocket() == null || c.getSocket().isClosed() || !c.isRunning());
+            } catch (Exception e) {
+                return false;
+            }
+        });
+
         if (server.getConnections().stream().filter(c -> c.getUser() != null).anyMatch(c -> c.getUser().getUsername().equals(request.username()))) {
             LoginFailedResponse msg = new LoginFailedResponse(2);
             sendMessage(msg);
@@ -585,5 +600,13 @@ public class ServerSocketConnection {
         });
         heartbeatThread.setDaemon(true);
         heartbeatThread.start();
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 }

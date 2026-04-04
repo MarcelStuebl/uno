@@ -122,8 +122,8 @@ public class Server {
             if (lobby.getConnections().contains(serverSocketConnection)) {
                 System.out.println("Removing connection from lobby " + lobby.getLobbyId());
                 lobby.playerLeft(serverSocketConnection);
-                
-                if (lobby.getConnections().isEmpty() && lobby.getGameLogic().getPlayers().isEmpty()) {
+
+                if (lobby.getConnections().isEmpty()) {
                     lobbies.remove(lobby);
                     System.out.println("Lobby " + lobby.getLobbyId() + " removed (empty)");
                 }
