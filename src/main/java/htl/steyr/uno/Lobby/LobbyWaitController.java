@@ -30,6 +30,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -61,6 +62,9 @@ public class LobbyWaitController implements Initializable {
 
     /** Button zum Verlassen der Lobby. */
     public Button leaveLobbyButton;
+
+    /** Container für den Chat-Bereich. */
+    public StackPane chatBox;
 
     /** Liste aller Spieler in der Lobby. */
     public ListView<String> playerListView = new ListView<>();
@@ -160,14 +164,29 @@ public class LobbyWaitController implements Initializable {
         gameChatListView.setVisible(false);
         gameChatListView.setManaged(false);
 
+        chatBox.setPrefHeight(720);
+        chatBox.setMinHeight(720);
+        chatBox.setMaxHeight(720);
+        chatBox.setOpacity(0);
+        chatBox.setVisible(false);
+        chatBox.setManaged(true);
+
         Timeline expand = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(chatBox.opacityProperty(), 0)
+                ),
                 new KeyFrame(Duration.millis(220),
-                        new KeyValue(gameChatListView.prefHeightProperty(), 300))
+                        new KeyValue(chatBox.opacityProperty(), 1)
+                )
         );
 
         Timeline collapse = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(chatBox.opacityProperty(), 1)
+                ),
                 new KeyFrame(Duration.millis(220),
-                        new KeyValue(gameChatListView.prefHeightProperty(), 0))
+                        new KeyValue(chatBox.opacityProperty(), 0)
+                )
         );
 
         chatExpanded.addListener((obs, oldVal, open) -> {
@@ -175,11 +194,13 @@ public class LobbyWaitController implements Initializable {
             collapse.stop();
 
             if (open) {
+                chatBox.setVisible(true);
                 gameChatListView.setManaged(true);
                 gameChatListView.setVisible(true);
                 expand.playFromStart();
             } else {
                 collapse.setOnFinished(ev -> {
+                    chatBox.setVisible(false);
                     gameChatListView.setVisible(false);
                     gameChatListView.setManaged(false);
                 });
@@ -390,7 +411,8 @@ public class LobbyWaitController implements Initializable {
 
         try {
             thisStage.setOnCloseRequest(null);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         thisStage.close();
     }
 
