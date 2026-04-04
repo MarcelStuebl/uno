@@ -42,6 +42,13 @@
     -fx-background-color: linear-gradient(to bottom, rgba(255, 110, 110, 1), rgba(230, 70, 70, 1));
 }
 
+.playButton:disabled {
+    -fx-background-color: linear-gradient(to bottom, rgba(130, 130, 130, 0.95), rgba(95, 95, 95, 0.95));
+    -fx-text-fill: rgba(255, 255, 255, 0.75);
+    -fx-effect: none;
+    -fx-opacity: 0.85;
+}
+
 .leaveButton {
     -fx-background-color: rgba(255, 255, 255, 0.08);
     -fx-background-radius: 14;

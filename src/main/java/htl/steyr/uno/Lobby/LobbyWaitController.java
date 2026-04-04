@@ -161,8 +161,10 @@ public class LobbyWaitController implements Initializable {
 
         String hostUsername = users.isEmpty() ? null : users.getFirst().getUsername();
         boolean isHost = currentUsername.equals(hostUsername);
+        boolean hasEnoughPlayersToStart = users.size() >= 2;
 
         playButton.setVisible(isHost);
+        playButton.setDisable(!isHost || !hasEnoughPlayersToStart);
 
         playerListView.setCellFactory(list -> new ListCell<String>() {
             private final BorderPane rootPane = new BorderPane();
@@ -275,6 +277,9 @@ public class LobbyWaitController implements Initializable {
     }
 
     public void playButtonClicked(ActionEvent actionEvent) throws IOException {
+        if (lobby == null || lobby.users() == null || lobby.users().size() < 2) {
+            return;
+        }
         client.getConn().startGame();
     }
 
