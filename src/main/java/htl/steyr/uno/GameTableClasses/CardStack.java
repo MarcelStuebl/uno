@@ -14,6 +14,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -152,74 +153,87 @@ public class CardStack {
 
     private void showColorSelection(Card card, Player player) {
         Platform.runLater(() -> {
+
             StackPane overlay = new StackPane();
-            overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7);");
-            overlay.setPrefSize(gameTable.getRoot().getWidth(), gameTable.getRoot().getHeight());
+            overlay.setStyle("-fx-background-color: rgba(10,10,10,0.8);");
 
-            VBox contentBox = new VBox();
-            contentBox.setStyle("-fx-background-color: #1a1a1a; -fx-border-color: #00ff00; -fx-border-width: 3; -fx-padding: 30; -fx-background-radius: 15;");
-            contentBox.setSpacing(20);
-            contentBox.setAlignment(Pos.CENTER);
-            contentBox.setMaxWidth(500);
+            VBox container = new VBox(30);
+            container.setAlignment(Pos.CENTER);
 
-            Text title = new Text("Waehle eine Farbe:");
-            title.setFont(new Font(28));
+            Text title = new Text("FARBE WÄHLEN");
+            title.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 32));
             title.setFill(Color.WHITE);
-            contentBox.getChildren().add(title);
 
-            HBox buttonBox = new HBox();
-            buttonBox.setSpacing(15);
-            buttonBox.setAlignment(Pos.CENTER);
+            HBox cardsBox = new HBox(25);
+            cardsBox.setAlignment(Pos.CENTER);
 
             String[] colorList = {"red", "yellow", "green", "blue"};
-            String[] colorNames = {"ROT", "GELB", "GREEN", "BLAU"};
-            String[] colorCodes = {"#ff0000", "#ffff00", "#00ff00", "#0000ff"};
+            String[] colorNames = {"ROT", "GELB", "GRÜN", "BLAU"};
+            String[] colorCodes = {"#c62828", "#f9a825", "#2e7d32", "#1565c0"};
 
             for (int i = 0; i < colorList.length; i++) {
                 String selectedColor = colorList[i];
-                String btnText = colorNames[i];
-                String btnColor = colorCodes[i];
+                String name = colorNames[i];
+                String color = colorCodes[i];
 
-                Button colorBtn = new Button(btnText);
-                colorBtn.setPrefSize(100, 100);
-                colorBtn.setStyle("-fx-font-size: 16; -fx-padding: 20; -fx-background-color: " + btnColor + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 10; -fx-background-radius: 10;");
+                StackPane cardTile = new StackPane();
+                cardTile.setPrefSize(120, 160);
 
-                colorBtn.setOnAction(e -> {
-                    // Speichere die gewählte Farbe in der Karte
+                cardTile.setStyle("""
+                -fx-background-radius: 15;
+                -fx-border-radius: 15;
+                -fx-border-color: white;
+                -fx-border-width: 2;
+            """);
+
+                cardTile.setStyle(cardTile.getStyle() + "-fx-background-color: " + color + ";");
+
+                Text label = new Text(name);
+                label.setFill(Color.WHITE);
+                label.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+
+                cardTile.getChildren().add(label);
+
+                // ✨ Hover Effekt
+                cardTile.setOnMouseEntered(e -> {
+                    cardTile.setScaleX(1.1);
+                    cardTile.setScaleY(1.1);
+                    cardTile.setOpacity(0.9);
+                });
+
+                cardTile.setOnMouseExited(e -> {
+                    cardTile.setScaleX(1);
+                    cardTile.setScaleY(1);
+                    cardTile.setOpacity(1);
+                });
+
+                cardTile.setOnMouseClicked(e -> {
                     card.setChosenColour(selectedColor);
 
-                    // Berechne den korrekten drawPenaltyValue
                     int drawPenaltyForThisCard = 0;
                     Integer currentPenalty = getGameTable().getGameTurnResponse() != null ?
-                                            getGameTable().getGameTurnResponse().drawPenaltyValue() : 0;
+                            getGameTable().getGameTurnResponse().drawPenaltyValue() : 0;
 
                     if (card.getCardValue() == 13) {
-                        // Farbwahl: setzt drawPenalty auf 0
                         drawPenaltyForThisCard = 0;
                     } else if (card.getCardValue() == 14) {
-                        // +4: ADDIERT 4 zur bestehenden Penalty!
                         drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0) + 4;
                     }
 
-                    // Entferne die Karte ZUERST von der Hand
-                    // Verwende removeCardFromHand um sicherzustellen, dass nur eine Karte entfernt wird
                     player.removeCardFromHand(card);
-
-                    if (player.getHand().isEmpty()) {
-                        player.setPassive(true);
-                    }
-
                     addToStack(card);
                     getGameTable().getGameLogic().playCard(card, drawPenaltyForThisCard);
                     getGameTable().updatePlayerHandUI();
+
                     gameTable.getRoot().getChildren().remove(overlay);
                 });
 
-                buttonBox.getChildren().add(colorBtn);
+                cardsBox.getChildren().add(cardTile);
             }
 
-            contentBox.getChildren().add(buttonBox);
-            overlay.getChildren().add(contentBox);
+            container.getChildren().addAll(title, cardsBox);
+            overlay.getChildren().add(container);
+
             gameTable.getRoot().getChildren().add(overlay);
         });
     }
