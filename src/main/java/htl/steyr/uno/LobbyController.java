@@ -36,6 +36,9 @@ public class LobbyController implements Initializable {
     @FXML private Button joinPartyButton;
     @FXML private TextField partyCodeField;
     @FXML private Label errorLabel;
+    @FXML private Label gamesPlayedLabel;
+    @FXML private Label gamesWonLabel;
+    @FXML private Label winRateLabel;
     @FXML private ImageView profileImageView;
 
     private Client client;
@@ -62,7 +65,22 @@ public class LobbyController implements Initializable {
         setProfileImage();
 
         getClient().setLobbyController(this);
+
+
+        int wonGames = getClient().getConn().getUser().getGamesWon();
+        int lostGames = getClient().getConn().getUser().getGamesLost();
+
+        gamesWonLabel.setText("Siege: " + Integer.toString(wonGames));
+        gamesPlayedLabel.setText("Spiele: " + Integer.toString(wonGames + lostGames));
+
+        System.out.println(getClient().getConn().getUser().getGamesWon());
+        System.out.println(getClient().getConn().getUser().getGamesLost());
+
+
+
+
     }
+
 
 
     private void setProfileImage() {
