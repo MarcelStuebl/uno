@@ -120,6 +120,7 @@ public class GameLogic {
                         if (ctrl != null && updatedEnemy.getUsername() != null && ctrl.getUsername() != null &&
                             updatedEnemy.getUsername().equals(ctrl.getUsername())) {
                             ctrl.setCardCount(updatedEnemy.getHandSize());
+                            ctrl.setPassive(updatedEnemy.isPassive());
                             break;
                         }
                     }
@@ -145,7 +146,10 @@ public class GameLogic {
                 }
                 Platform.runLater(() -> {
                     getGameTable().getCardStack().addToStack(initialCard);
+                    getGameTable().refreshEnemyTurnHighlight(msg.nextPlayerIndex());
                 });
+            } else {
+                Platform.runLater(() -> getGameTable().refreshEnemyTurnHighlight(msg.nextPlayerIndex()));
             }
             
             getGameTable().getPlayer().setCurrentTurn(getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex()));
@@ -161,6 +165,7 @@ public class GameLogic {
 
             Platform.runLater(() -> {
                 getGameTable().getCardStack().addToStack(playedCard);
+                getGameTable().refreshEnemyTurnHighlight(msg.nextPlayerIndex());
             });
             
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {

@@ -8,6 +8,7 @@
 
 <HBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
+      fx:id="rootPanel"
       fx:controller="htl.steyr.uno.GameTableClasses.EnemyDisplayController"
       stylesheets="@style/GameTableStyle.css"
       styleClass="player-panel"

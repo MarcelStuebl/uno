@@ -4,10 +4,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 public class EnemyDisplayController {
 
+    @FXML private HBox rootPanel;
     @FXML private Label usernameLabel;
     @FXML private ImageView profileImageView;
     @FXML private Pane cardPane;
@@ -17,6 +19,8 @@ public class EnemyDisplayController {
     private static final double PANE_MAX_W = 150.0;
 
     private static final String CARD_IMAGE_PATH = "/htl/steyr/uno/Uno_Cards/backside.png";
+    private static final String ACTIVE_TURN_STYLE_CLASS = "turn-active";
+    private static final String PASSIVE_STYLE_CLASS = "passive";
 
     private static Image cachedCardImage = null;
 
@@ -39,6 +43,33 @@ public class EnemyDisplayController {
         profileImageView.setImage(image);
     }
 
+    public void setTurnActive(boolean active) {
+        if (rootPanel == null) {
+            return;
+        }
+
+        if (active) {
+            if (!rootPanel.getStyleClass().contains(ACTIVE_TURN_STYLE_CLASS)) {
+                rootPanel.getStyleClass().add(ACTIVE_TURN_STYLE_CLASS);
+            }
+        } else {
+            rootPanel.getStyleClass().remove(ACTIVE_TURN_STYLE_CLASS);
+        }
+    }
+
+    public void setPassive(boolean passive) {
+        if (rootPanel == null) {
+            return;
+        }
+
+        if (passive) {
+            if (!rootPanel.getStyleClass().contains(PASSIVE_STYLE_CLASS)) {
+                rootPanel.getStyleClass().add(PASSIVE_STYLE_CLASS);
+            }
+        } else {
+            rootPanel.getStyleClass().remove(PASSIVE_STYLE_CLASS);
+        }
+    }
 
     public void setCardCount(int count) {
         currentCardCount = Math.max(0, count);

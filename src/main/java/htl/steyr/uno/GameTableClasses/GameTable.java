@@ -93,6 +93,8 @@ public class GameTable implements Initializable {
         int myIndex = player.getPlayerIndex();
         int totalPlayers = enemies.size() + 1;
 
+        enemyControllers.clear();
+
         List<Enemy> sorted = new ArrayList<>(enemies);
         sorted.sort((a, b) -> {
             int ai = (a.getPlayerIndex() - myIndex + totalPlayers) % totalPlayers;
@@ -112,14 +114,44 @@ public class GameTable implements Initializable {
         for (int i = 0; i < slotIndices.length && i < sorted.size(); i++) {
             Enemy enemy = sorted.get(i);
             StackPane slot = slotOrder[slotIndices[i]];
-            EnemyDisplayController ctrl = addPlayer(slot, enemy.getUsername(), enemy.getImageBytes(), enemy.getHandSize());
+            EnemyDisplayController ctrl = addPlayer(slot, enemy.getUsername(), enemy.getImageBytes(), enemy.getHandSize(), enemy.isPassive());
             if (ctrl != null) {
                 enemyControllers.add(ctrl);
             }
         }
+
+        Integer activePlayerIndex = gameTurnResponse != null ? gameTurnResponse.nextPlayerIndex() : null;
+        refreshEnemyTurnHighlight(activePlayerIndex);
     }
 
-    private EnemyDisplayController addPlayer(StackPane slot, String name, byte[] imageData, int cardCount) {
+    public void refreshEnemyTurnHighlight(Integer activePlayerIndex) {
+        if (player == null) {
+            return;
+        }
+
+        for (EnemyDisplayController ctrl : enemyControllers) {
+            if (ctrl == null) {
+                continue;
+            }
+
+            boolean isActiveTurn = false;
+            if (activePlayerIndex != null) {
+                for (Enemy enemy : player.getEnemies()) {
+                    if (enemy != null
+                            && enemy.getUsername() != null
+                            && enemy.getUsername().equals(ctrl.getUsername())
+                            && activePlayerIndex.equals(enemy.getPlayerIndex())) {
+                        isActiveTurn = true;
+                        break;
+                    }
+                }
+            }
+
+            ctrl.setTurnActive(isActiveTurn);
+        }
+    }
+
+    private EnemyDisplayController addPlayer(StackPane slot, String name, byte[] imageData, int cardCount, boolean passive) {
         Image profileImage;
         if (imageData != null && imageData.length > 0) {
             profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
@@ -138,6 +170,7 @@ public class GameTable implements Initializable {
             ctrl.setUsername(name);
             ctrl.setCardCount(cardCount);
             ctrl.setProfileImage(profileImage);
+            ctrl.setPassive(passive);
             slot.getChildren().setAll(panel);
             return ctrl;
         } catch (IOException e) {
