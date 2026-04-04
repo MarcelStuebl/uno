@@ -37,7 +37,7 @@
                     <center>
                         <VBox BorderPane.alignment="CENTER">
                             <children>
-                                <ListView fx:id="playerListView" prefHeight="635.0" prefWidth="667.0" styleClass="playerListView" VBox.vgrow="ALWAYS">
+                                <ListView fx:id="playerListView" mouseTransparent="true" prefHeight="635.0" prefWidth="667.0" styleClass="playerListView" VBox.vgrow="ALWAYS">
                                     <VBox.margin>
                                         <Insets />
                                     </VBox.margin>
