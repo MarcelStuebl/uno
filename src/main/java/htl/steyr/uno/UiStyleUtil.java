@@ -3,8 +3,10 @@ package htl.steyr.uno;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 
 import java.util.Objects;
 
@@ -34,5 +36,21 @@ public final class UiStyleUtil {
         clip.setArcHeight(arcSize);
         imageView.setClip(clip);
     }
-}
 
+    /**
+     * Setzt das AppIcon auf die übergebene Stage.
+     * Das Icon wird aus der Ressource img/logo.png geladen.
+     *
+     * @param stage die Stage auf der das Icon gesetzt werden soll
+     */
+    public static void setAppIcon(Stage stage) {
+        try {
+            Image icon = new Image(Objects.requireNonNull(
+                    UiStyleUtil.class.getResourceAsStream("/htl/steyr/uno/img/logo.png")
+            ));
+            stage.getIcons().add(icon);
+        } catch (Exception e) {
+            System.err.println("Fehler beim Laden des AppIcons: " + e.getMessage());
+        }
+    }
+}

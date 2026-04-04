@@ -483,8 +483,9 @@ public class LoginController implements Initializable {
         Scene scene = new Scene(loader.load());
         UiStyleUtil.applyGlobalFocusStyle(scene);
 
-        stage.setTitle("LobbyErstellen");
+        stage.setTitle("UNO - Lobby");
         stage.setScene(scene);
+        UiStyleUtil.setAppIcon(stage);
         stage.setMaximized(true);
         stage.show();
         thisStage.close();

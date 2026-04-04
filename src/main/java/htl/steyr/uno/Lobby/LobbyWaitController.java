@@ -295,7 +295,9 @@ public class LobbyWaitController implements Initializable {
         Scene scene = new Scene(loader.load());
         UiStyleUtil.applyGlobalFocusStyle(scene);
 
+        stage.setTitle("UNO - Game");
         stage.setScene(scene);
+        UiStyleUtil.setAppIcon(stage);
         stage.show();
 
         try {
@@ -334,6 +336,7 @@ public class LobbyWaitController implements Initializable {
 
         stage.setTitle("WarteLobby");
         stage.setScene(scene);
+        UiStyleUtil.setAppIcon(stage);
         stage.setMaximized(true);
         stage.setResizable(false);
         stage.show();

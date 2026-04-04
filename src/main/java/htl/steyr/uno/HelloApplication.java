@@ -1,6 +1,4 @@
 package htl.steyr.uno;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,9 +12,11 @@ public class HelloApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("loginScreen.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         UiStyleUtil.applyGlobalFocusStyle(scene);
-        stage.setTitle("Login");
+        stage.setTitle("UNO");
         stage.setScene(scene);
-        //stage.setFullScreen(true);
+
+        UiStyleUtil.setAppIcon(stage);
+
         stage.setMaximized(true);
         stage.show();
     }

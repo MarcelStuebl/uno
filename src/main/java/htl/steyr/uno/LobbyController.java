@@ -212,8 +212,9 @@ public class LobbyController implements Initializable {
         Scene scene = new Scene(loader.load());
         UiStyleUtil.applyGlobalFocusStyle(scene);
 
-        stage.setTitle("WarteLobby");
+        stage.setTitle("UNO - WarteLobby");
         stage.setScene(scene);
+        UiStyleUtil.setAppIcon(stage);
         stage.setMaximized(true);
         stage.show();
         thisStage.close();
@@ -232,6 +233,7 @@ public class LobbyController implements Initializable {
         UiStyleUtil.applyGlobalFocusStyle(scene);
         stage.setTitle("UNO-AnmeldeBildschirm");
         stage.setScene(scene);
+        UiStyleUtil.setAppIcon(stage);
         stage.setMaximized(true);
         stage.show();
         thisStage.close();

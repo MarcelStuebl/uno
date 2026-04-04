@@ -66,6 +66,14 @@
     </dependencies>
 
     <build>
+        <!-- Ressourcen konfigurieren -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <!-- Compiler -->
             <plugin>
@@ -163,25 +171,44 @@
 
                     <!-- jpackage → Windows EXE -->
                     <plugin>
-                        <groupId>org.panteleyev</groupId>
-                        <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.5</version>
-                        <configuration>
-                            <name>UNO</name>
-                            <appVersion>${app.version}</appVersion> <!-- ← dynamisch -->
-                            <vendor>HTBLA Steyr</vendor>
-                            <destination>target/dist</destination>
-                            <input>target</input>
-                            <mainJar>uno-client.jar</mainJar>
-                            <mainClass>htl.steyr.uno.Launcher</mainClass>
-                            <javaOptions>
-                                <javaOption>-Dfile.encoding=UTF-8</javaOption>
-                            </javaOptions>
-                            <winDirChooser>true</winDirChooser>
-                            <winMenu>true</winMenu>
-                            <winShortcut>true</winShortcut>
-                            <type>EXE</type>
-                        </configuration>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>jpackage</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>jpackage</executable>
+                                    <arguments>
+                                        <argument>--input</argument>
+                                        <argument>${project.build.directory}</argument>
+                                        <argument>--name</argument>
+                                        <argument>UNO</argument>
+                                        <argument>--main-jar</argument>
+                                        <argument>uno-client.jar</argument>
+                                        <argument>--main-class</argument>
+                                        <argument>htl.steyr.uno.Launcher</argument>
+                                        <argument>--type</argument>
+                                        <argument>EXE</argument>
+                                        <argument>--dest</argument>
+                                        <argument>${project.build.directory}/dist</argument>
+                                        <argument>--vendor</argument>
+                                        <argument>HTBLA Steyr</argument>
+                                        <argument>--app-version</argument>
+                                        <argument>${app.version}</argument>
+                                        <argument>--icon</argument>
+                                        <argument>src/main/resources/htl/steyr/uno/img/logo.png</argument>
+                                        <argument>--win-dir-chooser</argument>
+                                        <argument>--win-menu</argument>
+                                        <argument>--win-shortcut</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
