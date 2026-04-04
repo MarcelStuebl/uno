@@ -108,7 +108,7 @@ public class GameLogic {
                 continue;
             }
             
-            for (ServerSocketConnection c : lobby.getConnections()) {
+            for (ServerSocketConnection c : new ArrayList<>(lobby.getConnections())) {
                 if (c == null || c.getUser() == null || c.getUser().getUsername() == null) {
                     continue;
                 }
@@ -266,13 +266,13 @@ public class GameLogic {
         }
 
         GameTurnResponse response = new GameTurnResponse(player.getPlayerIndex(), cardForResponse, drawPenaltyValue, currentPlayerIndex, directionClockwise, currentColor);
-        for (ServerSocketConnection c : lobby.getConnections()) {
+        for (ServerSocketConnection c : new ArrayList<>(lobby.getConnections())) {
             c.sendMessage(response);
         }
 
-        for (Player p : players) {
-            for (Player lobbyPlayer : players) {
-                for (Enemy e : lobbyPlayer.getEnemies()) {
+        for (Player p : new ArrayList<>(players)) {
+            for (Player lobbyPlayer : new ArrayList<>(players)) {
+                for (Enemy e : new ArrayList<>(lobbyPlayer.getEnemies())) {
                     if (e.getUsername().equals(p.getUsername())) {
                         e.setEnemy(new Enemy(p));
                         break;
@@ -281,7 +281,7 @@ public class GameLogic {
             }
             
             Enemy updatedEnemy = new Enemy(p);
-            for (ServerSocketConnection c : lobby.getConnections()) {
+            for (ServerSocketConnection c : new ArrayList<>(lobby.getConnections())) {
                 c.sendMessage(new UpdateEnemyResponse(updatedEnemy));
             }
         }
@@ -296,7 +296,7 @@ public class GameLogic {
             return;
         }
 
-        for (ServerSocketConnection c : lobby.getConnections()) {
+        for (ServerSocketConnection c : new ArrayList<>(lobby.getConnections())) {
             if (c != null && c.getUser() != null && c.getUser().getUsername() != null) {
                 c.sendMessage(new UpdateEnemyResponse(enemy));
             }
@@ -313,7 +313,7 @@ public class GameLogic {
         }
 
         player.addCardToHand(card);
-        for (ServerSocketConnection c : lobby.getConnections()) {
+        for (ServerSocketConnection c : new ArrayList<>(lobby.getConnections())) {
             if (c == null || c.getUser() == null || c.getUser().getUsername() == null) {
                 continue;
             }
@@ -373,14 +373,14 @@ public class GameLogic {
 
         // Sende null statt einer Karte, um zu signalisieren, dass es kein neuer Spielzug ist
         GameTurnResponse response = new GameTurnResponse(null, null, 0, currentPlayerIndex, directionClockwise, currentColor);
-        for (ServerSocketConnection c : lobby.getConnections()) {
+        for (ServerSocketConnection c : new ArrayList<>(lobby.getConnections())) {
             c.sendMessage(response);
         }
 
 
-        for (Player p : players) {
-            for (Player lobbyPlayer : players) {
-                for (Enemy e : lobbyPlayer.getEnemies()) {
+        for (Player p : new ArrayList<>(players)) {
+            for (Player lobbyPlayer : new ArrayList<>(players)) {
+                for (Enemy e : new ArrayList<>(lobbyPlayer.getEnemies())) {
                     if (e.getUsername().equals(p.getUsername())) {
                         e.setEnemy(new Enemy(p));
                         break;
@@ -389,7 +389,7 @@ public class GameLogic {
             }
             
             Enemy updatedEnemy = new Enemy(p);
-            for (ServerSocketConnection c : lobby.getConnections()) {
+            for (ServerSocketConnection c : new ArrayList<>(lobby.getConnections())) {
                 c.sendMessage(new UpdateEnemyResponse(updatedEnemy));
             }
         }
