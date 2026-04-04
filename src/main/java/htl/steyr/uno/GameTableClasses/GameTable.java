@@ -46,7 +46,7 @@ public class GameTable implements Initializable {
     private Button withdrawalButton;
     private boolean gameOverOverlayShown = false;
 
-    //variables used for PlayerHand
+    // Variables used for the player hand UI.
     private VBox handVBox; // VBox holding multiple rows of cards
     private int maxCardsPerRow = 30; // maximum cards in one row
 
@@ -56,11 +56,13 @@ public class GameTable implements Initializable {
 
     private final ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
 
+
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
         this.startGameResponse = msg;
         this.player = new Player(getClient().getConn().getUser());
     }
+
 
     private void updatePlayerFromStartGameResponse() {
         for (Enemy enemy : startGameResponse.enemies()) {
@@ -70,6 +72,7 @@ public class GameTable implements Initializable {
             }
         }
     }
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -89,11 +92,20 @@ public class GameTable implements Initializable {
         });
     }
 
+
     private void setupCentralStack() {
         StackPane.setAlignment(cardStack.getVisual(), javafx.geometry.Pos.CENTER);
         root.getChildren().add(cardStack.getVisual());
     }
 
+
+    /**
+     * Updates the enemy displays based on the current enemy list in the player object.
+     * Enemies are sorted so the player with the lowest relative player index is shown first.
+     * Depending on the number of enemies, they are placed in enemy1, enemy2, and enemy3
+     * so they are distributed evenly around the local player
+     * (e.g., with two enemies one is shown left and one right; with three enemies they form a triangle).
+     */
     public void setEnemies() {
         List<Enemy> enemies = player.getEnemies();
         int myIndex = player.getPlayerIndex();
@@ -130,6 +142,12 @@ public class GameTable implements Initializable {
         refreshEnemyTurnHighlight(activePlayerIndex);
     }
 
+
+    /**
+     * Updates the highlight state of enemy displays to indicate whose turn it is.
+     *
+     * @param activePlayerIndex
+     */
     public void refreshEnemyTurnHighlight(Integer activePlayerIndex) {
         if (player == null) {
             return;
@@ -157,6 +175,17 @@ public class GameTable implements Initializable {
         }
     }
 
+
+    /**
+     * Adds an enemy display to the specified slot.
+     *
+     * @param slot
+     * @param name
+     * @param imageData
+     * @param cardCount
+     * @param passive
+     * @return
+     */
     private EnemyDisplayController addPlayer(StackPane slot, String name, byte[] imageData, int cardCount, boolean passive) {
         Image profileImage;
         if (imageData != null && imageData.length > 0) {
@@ -185,11 +214,19 @@ public class GameTable implements Initializable {
         }
     }
 
+
     private void onSceneClose() {
         client.setGameTable(null);
         client.shutdown();
     }
 
+
+    /**
+     * Creates the player's hand card display at the bottom of the scene.
+     * Uses a VBox (handVBox) to support multiple card rows when the player has many cards.
+     * Each row is slightly overlapped so all cards remain visible.
+     * Also ensures the draw stack button stays in front and is not hidden by hand cards.
+     */
     public void open() {
         handVBox = new VBox();
         handVBox.setAlignment(Pos.BOTTOM_CENTER);
@@ -207,7 +244,12 @@ public class GameTable implements Initializable {
         }
     }
 
-    // Calculate horizontal spacing between cards in a row
+    /**
+     * Calculating the horizontal spacing between cards based on the number of cards in the row.
+     *
+     * @param cardCount
+     * @return
+     */
     private double calculateSpacing(int cardCount) {
         double minSpacing = -140; // tighter overlap for crowded rows
         double maxSpacing = -50;  // less overlap for small rows
@@ -219,6 +261,13 @@ public class GameTable implements Initializable {
         return maxSpacing - ((cardCount - 5) * (Math.abs(maxSpacing - minSpacing) / (maxCardsPerRow - 5)));
     }
 
+
+    /**
+     * Updates the player's hand card display.
+     * Splits cards into multiple rows if there are more cards than the maximum per row (maxCardsPerRow).
+     * Each row is slightly overlapped so all cards remain visible.
+     * Also ensures the draw stack button always stays in front.
+     */
     public void updatePlayerHandUI() {
         if (handVBox == null) return;
 
@@ -260,6 +309,15 @@ public class GameTable implements Initializable {
         }
     }
 
+
+    /**
+     * Creates the card as a button with the corresponding card image.
+     * On hover, the card is slightly enlarged.
+     * On click, the card is played (layCard).
+     *
+     * @param c
+     * @return
+     */
     private Button createCardButton(Card c) {
         String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
         ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
@@ -315,6 +373,13 @@ public class GameTable implements Initializable {
         return cardBtn;
     }
 
+
+    /**
+     * Creates the close button "X" in the top-right corner of the scene.
+     *
+     * @param root
+     * @param stage
+     */
     public void addCloseButton(StackPane root, Stage stage) {
         Button closeBtn = new Button("X");
         closeBtn.setPrefSize(40, 40);
@@ -341,6 +406,14 @@ public class GameTable implements Initializable {
         root.getChildren().add(closeBtn);
     }
 
+
+    /**
+     * Creates the draw stack as a button with the backside.png image.
+     * On hover, the stack is slightly enlarged.
+     * On click, a card is drawn (or multiple cards if a penalty is active).
+     *
+     * @param root
+     */
     public void createWithdrawalStack(StackPane root) {
         withdrawalButton = new Button();
         withdrawalButton.setPrefSize(137, 192);
@@ -388,7 +461,7 @@ public class GameTable implements Initializable {
     }
 
     /**
-     * Zeigt an, dass der Abhebestapel leer ist, indem das emptyStack.png Image angezeigt wird
+     * Indicates that the draw stack is empty by showing the emptyStack.png image.
      */
     public void showEmptyDrawStack() {
         Platform.runLater(() -> {
@@ -404,8 +477,9 @@ public class GameTable implements Initializable {
         });
     }
 
+
     /**
-     * Stellt das ursprüngliche Image des Abhebestapels wieder her (backside.png)
+     * Restores the original draw stack image (backside.png).
      */
     public void restoreDrawStackImage() {
         Platform.runLater(() -> {
@@ -421,6 +495,12 @@ public class GameTable implements Initializable {
         });
     }
 
+
+    /**
+     * Shows the player ranking once the game has ended.
+     *
+     * @param msg
+     */
     public void showGameOverOverlay(GameOverResponse msg) {
         if (msg == null || gameOverOverlayShown || root == null) {
             return;
@@ -458,7 +538,7 @@ public class GameTable implements Initializable {
         Label titleLabel = new Label("Spiel beendet - Ranking");
         titleLabel.getStyleClass().add("game-over-title");
 
-        Button backToLobbyButton = new Button("Zurueck zur Lobby");
+        Button backToLobbyButton = new Button("Zurück zur Lobby");
         backToLobbyButton.getStyleClass().add("game-over-back-button");
         backToLobbyButton.setOnAction(e -> switchBackToLobby());
 
@@ -476,6 +556,13 @@ public class GameTable implements Initializable {
         overlay.toFront();
     }
 
+
+    /**
+     * Called when the player wants to return to the lobby after a game ends.
+     * Ensures the connection to the current lobby is left and a new lobby scene is shown.
+     * Also closes the current GameTable scene and updates the client's LobbyController reference
+     * so the player can interact in the lobby again.
+     */
     private void switchBackToLobby() {
         try {
             if (client.getConn() != null) {
