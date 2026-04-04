@@ -222,7 +222,7 @@ public class ClientSocketConnection implements Closeable {
     }
 
     private void stackInfoResponse(StackInfoResponse msg) {
-        client.getGameTable().getGameLogic().stackInfoResponse(msg);
+        client.getGameTable().getGameLogic().withDrawStackInfoResponse(msg);
     }
 
     private void updateEnemyResponse(UpdateEnemyResponse msg) {

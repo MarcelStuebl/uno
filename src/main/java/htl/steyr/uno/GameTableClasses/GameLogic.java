@@ -87,15 +87,13 @@ public class GameLogic {
      * Handels the logic for when the player receives a response to their request to draw a card from the central stack.
      * This method should update the player's hand and the UI to reflect the new cards, or show a message if the stack is empty.
      *
-     * @param msg
+     * @param msg The StackInfoResponse message containing the stack status
      */
-    public void stackInfoResponse(StackInfoResponse msg) {
+    public void withDrawStackInfoResponse(StackInfoResponse msg) {
         if (msg.statusCode() == 0) {
-            // @TODO: Stack is not empty, the player can draw cards from the stack
-
+            getGameTable().restoreDrawStackImage();
         } else if (msg.statusCode() == 1) {
-            // @TODO: Stack is empty, stop the player from drawing cards and show a message that the stack is empty
-
+            getGameTable().showEmptyDrawStack();
         }
     }
 

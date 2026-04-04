@@ -10,14 +10,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -348,6 +346,40 @@ public class GameTable implements Initializable {
         });
 
         root.getChildren().add(withdrawalButton);
+    }
+
+    /**
+     * Zeigt an, dass der Abhebestapel leer ist, indem das emptyStack.png Image angezeigt wird
+     */
+    public void showEmptyDrawStack() {
+        Platform.runLater(() -> {
+            if (withdrawalButton != null && withdrawalButton.getGraphic() instanceof ImageView iv) {
+                String path = "/htl/steyr/uno/Uno_Cards/emptyStack.png";
+                try {
+                    Image emptyImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
+                    iv.setImage(emptyImage);
+                } catch (NullPointerException e) {
+                    System.err.println("Warnung: emptyStack.png nicht gefunden.");
+                }
+            }
+        });
+    }
+
+    /**
+     * Stellt das ursprüngliche Image des Abhebestapels wieder her (backside.png)
+     */
+    public void restoreDrawStackImage() {
+        Platform.runLater(() -> {
+            if (withdrawalButton != null && withdrawalButton.getGraphic() instanceof ImageView iv) {
+                String path = "/htl/steyr/uno/Uno_Cards/backside.png";
+                try {
+                    Image backSideImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
+                    iv.setImage(backSideImage);
+                } catch (NullPointerException e) {
+                    System.err.println("Fehler: backside.png nicht gefunden.");
+                }
+            }
+        });
     }
 
     public GameLogic getGameLogic() {

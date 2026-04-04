@@ -24,6 +24,7 @@ public class CardStack {
     private Card topCard;
     private StackPane visual;
     private GameTable gameTable;
+    private boolean isEmpty = false;
 
     public CardStack(GameTable gameTable) {
         this.visual = new StackPane();

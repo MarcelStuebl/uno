@@ -168,6 +168,9 @@ public class GameLogic {
 
         getCardDeck().returnCardToDiscordPile(card);
 
+        getCardDeck().refill();
+        checkForEmptyStack();
+
         boolean isSkip = card.getCardValue() == 10;
         boolean isReverse = card.getCardValue() == 11;
 
