@@ -121,6 +121,7 @@ public class CardStack {
         // card valid, lay card
         addToStack(c);
 
+        p.removeCardFromHand(c);
 
         Integer drawPenaltyForThisCard = 0;
         if (c.getCardValue() == 12) {
@@ -182,14 +183,9 @@ public class CardStack {
                         drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0) + 4;
                     }
 
-                    // Entferne die Karte ZUERST von der Hand (mit der korrekten chosenColour!)
-                    for (int idx = 0; idx < player.getHand().size(); idx++) {
-                        Card c = player.getHand().get(idx);
-                        if (c.getCardValue() == card.getCardValue() && c.getCardColour().equals(card.getCardColour())) {
-                            player.getHand().remove(idx);
-                            break;
-                        }
-                    }
+                    // Entferne die Karte ZUERST von der Hand
+                    // Verwende removeCardFromHand um sicherzustellen, dass nur eine Karte entfernt wird
+                    player.removeCardFromHand(card);
                     
                     // Lege die Karte auf den Stack
                     addToStack(card);
