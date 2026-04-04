@@ -27,6 +27,28 @@ public class Client {
         this.loginController = controller;
     }
 
+    /**
+     * Initializes the connection to the server in a separate background thread.
+     * This method is called when the application starts to establish the connection to the server.
+     * 
+     * The method:
+     * 1. Checks if a connection thread is already running to prevent multiple connection attempts
+     * 2. Sets the running flag to true
+     * 3. Creates a new background thread that attempts to establish a socket connection
+     * 4. Retries connection every 5 seconds if the initial attempt fails
+     * 5. Once connected, starts the receive thread to listen for server messages
+     * 6. Notifies the UI when the connection is ready via the login controller
+     * 
+     * The connection thread:
+     * - Attempts to create a new ClientSocketConnection to the server
+     * - If successful, starts the receive thread and notifies the UI
+     * - If failed, waits 5 seconds and retries (unless the application is shutting down)
+     * - Continues until a connection is successfully established
+     * - Is marked as daemon so it doesn't prevent application shutdown
+     * 
+     * This design ensures resilient connection handling and allows the user interface
+     * to start immediately even if the server is temporarily unavailable.
+     */
     public void start() {
         if (connectionThread != null && connectionThread.isAlive()) {
             return;
@@ -99,25 +121,25 @@ public class Client {
         }
     }
 
-    public void logIn(String username, String password) {
+    public synchronized void logIn(String username, String password) {
         if (getConn() == null) return;
         LoginRequest msg = new LoginRequest(username, password);
         getConn().sendMessage(msg);
     }
 
-    public void createLobby() {
+    public synchronized void createLobby() {
         if (getConn() == null) return;
         CreateLobbyRequest msg = new CreateLobbyRequest(getConn().getUser());
         getConn().sendMessage(msg);
     }
 
-    public void joinLobby(int lobbyId) {
+    public synchronized void joinLobby(int lobbyId) {
         if (getConn() == null) return;
         JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId);
         getConn().sendMessage(msg);
     }
 
-    public void createAccount(String username, String firstName, String lastName, String email, String password) {
+    public synchronized void createAccount(String username, String firstName, String lastName, String email, String password) {
         if (getConn() == null) return;
         CreateAccountRequest msg = new CreateAccountRequest(username, firstName, lastName, email, password);
         getConn().sendMessage(msg);

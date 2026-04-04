@@ -46,6 +46,7 @@ public class Server {
 
                     ServerSocketConnection client = new ServerSocketConnection(s, this);
                     client.startReceiving();
+                    client.startHeartbeat();
 
                     connections.add(client);
                     System.out.println("[" + s.getRemoteSocketAddress() + "] New connection");
@@ -62,18 +63,69 @@ public class Server {
     }
 
 
+    /**
+     * Removes a connection from the server and ensures all associated resources are cleaned up.
+     * This method is called when a client disconnects or when a connection error is detected.
+     * 
+     * The method performs the following operations:
+     * 1. Checks if the connection is null (defensive programming)
+     * 2. Removes the connection from the server's active connections list
+     * 3. Ensures the connection is removed from any active lobby it might be in
+     * 4. Logs the removal for debugging and monitoring purposes
+     * 
+     * This is a critical cleanup method that ensures:
+     * - No zombie connections remain in the server's connection list
+     * - Players are properly removed from lobbies when they disconnect
+     * - Game state remains consistent
+     * - Other players are notified of the disconnection
+     * 
+     * @param connection the ServerSocketConnection to remove from the server
+     */
     void removeConnection(ServerSocketConnection connection) {
-        connections.remove(connection);
+        if (connection == null) {
+            return;
+        }
+        
+        boolean removed = connections.remove(connection);
+        if (removed) {
+            System.out.println("[" + connection + "] Connection removed");
+        }
+        
         leaveLobby(connection);
     }
 
+    /**
+     * Removes a connection from its active lobby and cleans up empty lobbies.
+     * This method searches for the lobby that the connection is part of and removes the connection from it.
+     * 
+     * The method performs the following:
+     * 1. Iterates through all active lobbies on the server (using a copy to avoid ConcurrentModificationException)
+     * 2. Checks if the connection is part of any lobby
+     * 3. Removes the connection from the lobby by calling playerLeft()
+     * 4. If the lobby becomes empty (no players and no players in game), removes the lobby entirely
+     * 5. Logs the removal for debugging purposes
+     * 
+     * This ensures that:
+     * - Players are properly notified when someone leaves their lobby
+     * - Empty lobbies are cleaned up to free server resources
+     * - Game state remains consistent
+     * - No orphaned lobbies accumulate over time
+     * 
+     * @param serverSocketConnection the ServerSocketConnection to remove from its lobby
+     */
     void leaveLobby(ServerSocketConnection serverSocketConnection) {
-        for (Lobby lobby : lobbies) {
+        if (serverSocketConnection == null) {
+            return;
+        }
+        
+        for (Lobby lobby : new ArrayList<>(lobbies)) {
             if (lobby.getConnections().contains(serverSocketConnection)) {
+                System.out.println("Removing connection from lobby " + lobby.getLobbyId());
                 lobby.playerLeft(serverSocketConnection);
+                
                 if (lobby.getConnections().isEmpty() && lobby.getGameLogic().getPlayers().isEmpty()) {
                     lobbies.remove(lobby);
-                    System.out.println("Lobby " + lobby.getLobbyId() + " removed");
+                    System.out.println("Lobby " + lobby.getLobbyId() + " removed (empty)");
                 }
                 break;
             }

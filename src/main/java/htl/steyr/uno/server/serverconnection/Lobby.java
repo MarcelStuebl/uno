@@ -41,9 +41,7 @@ public class Lobby {
 
     LobbyInfoResponse getLobbyInfoResponse() {
         synchronized (connections) {
-            List<User> users = connections.stream()
-                    .map(ServerSocketConnection::getUser)
-                    .toList();
+            List<User> users = connections.stream().map(ServerSocketConnection::getUser).toList();
             return new LobbyInfoResponse(lobbyId, status, users);
         }
     }
@@ -60,8 +58,21 @@ public class Lobby {
 
 
     void playerLeft(ServerSocketConnection connection) {
+        if (connection == null) {
+            return;
+        }
+        
         connections.remove(connection);
-        getGameLogic().getPlayers().removeIf(player -> player.getUsername().equals(connection.getUser().getUsername()));
+        
+        try {
+            User user = connection.getUser();
+            if (user != null && user.getUsername() != null) {
+                getGameLogic().getPlayers().removeIf(player -> player.getUsername().equals(user.getUsername()));
+            }
+        } catch (Exception e) {
+            System.out.println("Error removing player from game logic: " + e.getMessage());
+        }
+        
         updateJoined();
     }
 
@@ -85,7 +96,18 @@ public class Lobby {
 
     void sendInfoToAll(Object message) {
         synchronized (connections) {
-            for (var c : connections) c.sendMessage(message);
+            List<ServerSocketConnection> failedConnections = new ArrayList<>();
+            for (var c : connections) {
+                try {
+                    c.sendMessage(message);
+                } catch (Exception e) {
+                    failedConnections.add(c);
+                }
+            }
+
+            for (var failedConnection : failedConnections) {
+                playerLeft(failedConnection);
+            }
         }
     }
 

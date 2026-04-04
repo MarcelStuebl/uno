@@ -34,6 +34,8 @@ public class ClientSocketConnection implements Closeable {
         this.socket = new Socket(host, port);
         this.client = client;
 
+        socket.setKeepAlive(true);
+
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
@@ -58,7 +60,29 @@ public class ClientSocketConnection implements Closeable {
 
     /**
      * Starts a background thread to continuously receive messages from the server.
-     * The thread will process incoming messages and invoke appropriate callbacks on the client.
+     * This method initiates a daemon thread that handles all incoming messages and processes them appropriately.
+     * 
+     * The receiving thread:
+     * 1. Runs in a loop while the 'running' flag is true
+     * 2. Reads objects from the input stream (blocking operation)
+     * 3. Uses pattern matching to determine the message type
+     * 4. Delegates to appropriate handler methods based on the message type
+     * 5. Handles various connection errors gracefully
+     * 
+     * Exception Handling:
+     * - EOFException: Indicates the server has closed the connection normally
+     * - SocketException: Network-level errors (e.g., connection reset)
+     * - SocketTimeoutException: Connection timeout after idle period
+     * - StreamCorruptedException: Protocol error or corrupted stream
+     * - ClassNotFoundException: Received serialized object of unknown class
+     * - IOException: General I/O errors
+     * - Other exceptions: Unexpected errors are logged with stack trace
+     * 
+     * The finally block ensures that:
+     * - The running flag is set to false to stop processing
+     * - The connection is marked as lost in the user interface
+     * 
+     * The thread is marked as daemon so it doesn't prevent the application from shutting down.
      */
     public void startReceiving() {
         running = true;
@@ -93,10 +117,29 @@ public class ClientSocketConnection implements Closeable {
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
                 }
+            } catch (java.io.EOFException e) {
+                System.out.println("Server disconnected (EOF)");
+            } catch (java.net.SocketException e) {
+                System.out.println("Connection lost (Socket error): " + e.getMessage());
+            } catch (java.net.SocketTimeoutException e) {
+                System.out.println("Connection timeout: " + e.getMessage());
+            } catch (java.io.StreamCorruptedException e) {
+                System.out.println("Stream corrupted: " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                System.out.println("Class not found: " + e.getMessage());
+            } catch (IOException e) {
+                System.out.println("IO error: " + e.getMessage());
             } catch (Exception e) {
-                if (running) System.out.println("Receive error: " + e.getMessage());
+                System.out.println("Unexpected error in receive thread: " + e.getMessage());
+                e.printStackTrace();
+            } finally {
+                if (running) {
+                    running = false;
+                    System.out.println("Receive thread ended, connection lost");
+                }
             }
         });
+        receiveThread.setDaemon(true);
         receiveThread.start();
     }
 
@@ -131,8 +174,6 @@ public class ClientSocketConnection implements Closeable {
             } else if (client.getLobbyController() != null) {
                 client.getLobbyController().createOrJoinPartySuccess(msg);
             }
-        } else {
-            System.out.println("Lobby operation failed.");
         }
     }
 
@@ -189,7 +230,6 @@ public class ClientSocketConnection implements Closeable {
             client.getGameTable().getGameLogic().updateEnemyResponse(msg);
         }
     }
-
 
     private void gameTurnResponse(GameTurnResponse msg) {
         client.getGameTable().getGameLogic().gameTurnResponse(msg);

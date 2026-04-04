@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.SocketException;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -22,8 +21,8 @@ public class ServerSocketConnection {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private final Server server;
     private final Socket socket;
-    private final ObjectInputStream in;
-    private final ObjectOutputStream out;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
     private Thread receivethread;
     private boolean running;
     private User user;
@@ -44,12 +43,14 @@ public class ServerSocketConnection {
         this.server = server;
         this.socket = socket;
         try {
+            socket.setKeepAlive(true);
+            
             out = new ObjectOutputStream(socket.getOutputStream());
             out.flush();
             in = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
             System.out.println("Error setting up connection: " + e.getMessage());
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to initialize ServerSocketConnection: " + e.getMessage(), e);
         }
     }
 
@@ -58,18 +59,50 @@ public class ServerSocketConnection {
      * The sendMessage method is responsible for sending a message to the client through the output stream.
      * It takes an Object as a parameter, which represents the message to be sent.
      * The method first resets the output stream to ensure that any previous messages are cleared, then it writes the message object to the stream and flushes it to ensure that the message is sent immediately
-     * If an IOException occurs during the process of sending the message, it throws a RuntimeException.
+     * If an IOException occurs during the process of sending the message, the connection is closed and cleaned up.
      *
      * @param message
      */
     public void sendMessage(Object message) {
+        if (!running) {
+            return;
+        }
         try {
             out.reset();
             out.writeObject(message);
             out.flush();
         } catch (IOException e) {
-            System.out.println("Error sending message: " + e.getMessage());
-            throw new RuntimeException(e);
+            handleDisconnection("Send error: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Internal method to handle disconnection gracefully.
+     * This method ensures that when a connection error occurs (e.g., IOException during message sending),
+     * the connection is properly closed and cleaned up without throwing exceptions.
+     * It sets the running flag to false, notifies the server to remove this connection from its list,
+     * removes the connection from any active lobby, and closes the socket.
+     * This prevents zombie connections and ensures that other players in the lobby are notified of the disconnection.
+     *
+     * @param reason a descriptive string explaining why the disconnection occurred
+     */
+    private void handleDisconnection(String reason) {
+        if (!running) {
+            return;
+        }
+        
+        running = false;
+        sendLogMessage("Disconnecting - Reason: " + reason);
+        
+        try {
+            server.removeConnection(this);
+        } catch (Exception e) {
+            System.out.println("Error during removeConnection: " + e.getMessage());
+        }
+        
+        try {
+            socket.close();
+        } catch (IOException ignored) {
         }
     }
 
@@ -77,10 +110,10 @@ public class ServerSocketConnection {
     /**
      * The sendLogMessage method is a helper method that formats and sends a log message to the server's logging system.
      * It takes an Object as a parameter, which represents the message to be logged.
-     * The method constructs a log message by combining the client's remote socket address with the provided message, and then it calls the server's setLogMessage method to update the log.
-     * This allows for tracking client interactions and activities on the server side.
+     * The method constructs a log message by combining the client's remote socket address with the provided message, and then it calls the server's sendLogMessage method to update the log.
+     * This allows for tracking client interactions and activities on the server side for debugging and monitoring purposes.
      *
-     * @param msg
+     * @param msg the message object to be logged
      */
     private void sendLogMessage(Object msg) {
         server.sendLogMessage("[" + socket.getRemoteSocketAddress() + "] " + msg);
@@ -91,7 +124,7 @@ public class ServerSocketConnection {
      * The startReceiving method initiates a separate thread to continuously listen for incoming messages from the client.
      * It sets the running flag to true and creates a new thread that reads objects from the input stream in a loop.
      * Depending on the type of the received object, it calls the appropriate handler method (e.g., loginRequest, createAccountRequest, createLobbyRequest, ...) to process the request.
-     * If an exception occurs while reading from the input stream, it is caught and ignored, and the running flag is set to false to stop the thread.
+     * If an exception occurs while reading from the input stream, it is caught and the connection is properly closed.
      */
     public void startReceiving() {
         running = true;
@@ -99,6 +132,11 @@ public class ServerSocketConnection {
             try {
                 while (running) {
                     Object obj = in.readObject();
+                    
+                    if (obj == null) {
+                        System.out.println("Received null object from " + socket.getRemoteSocketAddress());
+                        break;
+                    }
 
                     switch (obj) {
                         case LoginRequest msg -> loginRequest(msg);
@@ -119,19 +157,57 @@ public class ServerSocketConnection {
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
                 }
-            } catch (EOFException | SocketException e) {
-                System.out.println("Client disconnected: " + socket.getRemoteSocketAddress());
+            } catch (EOFException e) {
+                System.out.println("Client disconnected (EOF): " + socket.getRemoteSocketAddress());
+            } catch (java.net.SocketException e) {
+                System.out.println("Socket error (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
+            } catch (java.net.SocketTimeoutException e) {
+                System.out.println("Socket timeout (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
+            } catch (java.io.InvalidClassException e) {
+                System.out.println("Invalid class received (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
+            } catch (java.io.StreamCorruptedException e) {
+                System.out.println("Stream corrupted (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                System.out.println("Class not found (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
+            } catch (IOException e) {
+                System.out.println("IO error (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
             } catch (Exception e) {
-                System.out.println("Error receiving message: " + e.getMessage());
+                System.out.println("Unexpected error (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
+                e.printStackTrace();
             } finally {
-                running = false;
-                server.removeConnection(this);
-                try {
-                    socket.close();
-                } catch (IOException ignored) {}
+                cleanupConnection();
             }
         });
+        receivethread.setDaemon(false);
         receivethread.start();
+    }
+    
+    /**
+     * Cleanup method to ensure the connection is properly closed and removed from server.
+     * This method is called in the finally block of the receive thread to guarantee that cleanup operations
+     * are executed even if an exception occurs during message processing.
+     * It ensures that:
+     * 1. The running flag is set to false to stop any ongoing operations
+     * 2. The connection is removed from the server's connection list and its lobby
+     * 3. The socket is properly closed to free network resources
+     * 
+     * This prevents resource leaks and ensures that the connection is completely terminated.
+     */
+    private void cleanupConnection() {
+        running = false;
+        try {
+            server.removeConnection(this);
+        } catch (Exception e) {
+            System.out.println("Error removing connection: " + e.getMessage());
+        }
+        
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            System.out.println("Error closing socket: " + e.getMessage());
+        }
     }
 
 
@@ -461,4 +537,53 @@ public class ServerSocketConnection {
     }
 
 
+    /**
+     * Starts a periodic heartbeat/ping thread to detect dead connections proactively.
+     * This method creates and starts a daemon thread that periodically checks if the connection is still active.
+     * 
+     * The heartbeat mechanism works as follows:
+     * 1. It sleeps for 30 seconds (HEARTBEAT_INTERVAL)
+     * 2. Every 30 seconds, it checks if the socket is still connected and not closed
+     * 3. If the socket is detected as closed or disconnected, it calls handleDisconnection()
+     * 4. This prevents "zombie connections" that appear active but cannot communicate
+     * 
+     * This is particularly useful for detecting:
+     * - Abruptly disconnected clients (network cable unplugged, WiFi lost, etc.)
+     * - Clients that close their connection without sending a proper disconnect message
+     * - Network issues that break the connection on the OS level
+     * 
+     * The heartbeat thread runs as a daemon thread, so it won't prevent the JVM from shutting down.
+     * It will continue running in the background until the connection is closed or the application terminates.
+     */
+    public void startHeartbeat() {
+        Thread heartbeatThread = new Thread(() -> {
+            final long HEARTBEAT_INTERVAL = 30000;
+            final long HEARTBEAT_TIMEOUT = 60000;
+            
+            while (running) {
+                try {
+                    Thread.sleep(HEARTBEAT_INTERVAL);
+                    
+                    if (!running || socket.isClosed()) {
+                        break;
+                    }
+                    
+                    // Check if connection is still active by attempting to access socket properties
+                    if (!socket.isConnected() || socket.isClosed()) {
+                        handleDisconnection("Heartbeat timeout - no activity for " + HEARTBEAT_TIMEOUT + "ms");
+                        break;
+                    }
+                    
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    handleDisconnection("Heartbeat error: " + e.getMessage());
+                    break;
+                }
+            }
+        });
+        heartbeatThread.setDaemon(true);
+        heartbeatThread.start();
+    }
 }
