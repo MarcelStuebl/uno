@@ -86,3 +86,12 @@
     -fx-text-fill: #cfcfe6;
     -fx-font-size: 11px;
 }
+
+.errorLabel {
+    -fx-text-fill: rgba(255, 80, 80, 0.9);
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(255, 60, 60, 0.3), 6, 0.2, 0, 0);
+}

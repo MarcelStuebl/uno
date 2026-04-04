@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -34,6 +35,7 @@ public class LobbyController implements Initializable {
     @FXML private Button createPartyButton;
     @FXML private Button joinPartyButton;
     @FXML private TextField partyCodeField;
+    @FXML private Label errorLabel;
     @FXML private ImageView profileImageView;
 
     private Client client;
@@ -124,14 +126,27 @@ public class LobbyController implements Initializable {
     }
 
     public void joinPartyFailed(LobbyJoinRefusedResponse msg) {
-        if (msg.lobbyInfo().status() == 1) {
-            System.out.println("Lobby is full. Please try again.");
-        } else if (msg.lobbyInfo().status() == 2) {
-            System.out.println("Game already started. Please try again.");
-        } else {
-            System.out.println("Unknown error. Please try again.");
-        }
-        // @TODO: show error message in UI
+        Platform.runLater(() -> {
+            if (msg.lobbyInfo().status() == 1) {
+                System.out.println("Lobby is full. Please try again.");
+
+                errorLabel.setText("Lobby is full. Please try again.");
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
+            } else if (msg.lobbyInfo().status() == 2) {
+                System.out.println("Game already started. Please try again.");
+
+                errorLabel.setText("Game already started. Please try again.");
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
+            } else {
+                System.out.println("Unknown error. Please try again.");
+
+                errorLabel.setText("Unknown error. Please try again.");
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
+            }
+        });
     }
 
 
@@ -170,19 +185,22 @@ public class LobbyController implements Initializable {
         String input = partyCodeField.getText().trim();
         
         if (input.isEmpty()) {
-            // @TODO: Show error message
+            errorLabel.setText("Please enter a lobby ID.");
+            errorLabel.setVisible(true);
             return;
         }
         
         try {
             int lobbyId = Integer.parseInt(input);
             if (lobbyId <= 100000 || lobbyId >= 999999) {
-                // @TODO: Show error message
+                errorLabel.setText("Invalid lobby ID. Please try again.");
+                errorLabel.setVisible(true);
             } else {
                 client.joinLobby(lobbyId);
             }
         } catch (NumberFormatException e) {
-            // @TODO: Show error message
+            errorLabel.setText("Lobby ID must be a number.");
+            errorLabel.setVisible(true);
         }
     }
 
