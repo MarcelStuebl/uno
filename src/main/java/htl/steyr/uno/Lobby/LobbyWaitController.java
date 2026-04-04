@@ -361,7 +361,20 @@ public class LobbyWaitController implements Initializable {
         String sender = msg.user().getUsername();
         String text = msg.message();
 
-        Platform.runLater(() -> gameChatListView.getItems().add(new ChatMessage(sender, text)));
+        Platform.runLater(() -> {
+            gameChatListView.getItems().add(new ChatMessage(sender, text));
+
+            // Chat aufklappen falls noch zu
+            if (!chatExpanded.get()) {
+                chatExpanded.set(true);
+            }
+
+            // Zur letzten Nachricht scrollen
+            int lastIndex = gameChatListView.getItems().size() - 1;
+            if (lastIndex >= 0) {
+                gameChatListView.scrollTo(lastIndex);
+            }
+        });
     }
 
     public record ChatMessage(String sender, String text) {
