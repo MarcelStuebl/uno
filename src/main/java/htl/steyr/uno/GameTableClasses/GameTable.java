@@ -10,14 +10,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -38,6 +41,10 @@ public class GameTable implements Initializable {
     private HBox handBox;
     private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
+
+    //variables used for PlayerHand
+    private VBox handVBox; // VBox holding multiple rows of cards
+    private int maxCardsPerRow = 30; // maximum cards in one row
 
     @FXML private StackPane enemy1;
     @FXML private StackPane enemy2;
@@ -147,32 +154,70 @@ public class GameTable implements Initializable {
     }
 
     public void open() {
-        handBox = new HBox();
-        handBox.setAlignment(Pos.BOTTOM_CENTER);
-        handBox.setSpacing(-100);
-        handBox.setMouseTransparent(false);
+        handVBox = new VBox();
+        handVBox.setAlignment(Pos.BOTTOM_CENTER);
+        handVBox.setSpacing(-200); // rows slightly overlap each other
+        handVBox.setMouseTransparent(false);
 
-        for (Card c : new ArrayList<>(player.getHand())) {
-            handBox.getChildren().add(createCardButton(c));
-        }
+        updatePlayerHandUI();
 
-        StackPane.setAlignment(handBox, Pos.BOTTOM_CENTER);
-        StackPane.setMargin(handBox, new Insets(40));
-        root.getChildren().add(handBox);
+        StackPane.setAlignment(handVBox, Pos.BOTTOM_CENTER);
+        StackPane.setMargin(handVBox, new Insets(40));
+        root.getChildren().add(handVBox);
 
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
         }
     }
 
-    public void updatePlayerHandUI() {
-        if (handBox == null) return;
+    // Calculate horizontal spacing between cards in a row
+    private double calculateSpacing(int cardCount) {
+        double minSpacing = -140; // tighter overlap for crowded rows
+        double maxSpacing = -50;  // less overlap for small rows
 
-        handBox.getChildren().clear();
-        for (Card c : new ArrayList<>(player.getHand())) {
-            handBox.getChildren().add(createCardButton(c));
+        if (cardCount <= 5) return maxSpacing;
+        if (cardCount >= maxCardsPerRow) return minSpacing;
+
+        // Linear interpolation between min and max
+        return maxSpacing - ((cardCount - 5) * (Math.abs(maxSpacing - minSpacing) / (maxCardsPerRow - 5)));
+    }
+
+    public void updatePlayerHandUI() {
+        if (handVBox == null) return;
+
+        handVBox.getChildren().clear();
+
+        List<Card> cards = new ArrayList<>(player.getHand());
+        int index = 0;
+        int rowNumber = 0;
+
+        while (index < cards.size()) {
+            HBox row = new HBox();
+            row.setAlignment(Pos.BOTTOM_CENTER);
+
+            int remaining = cards.size() - index;
+            int cardsInThisRow = Math.min(remaining, maxCardsPerRow);
+
+            double spacing = calculateSpacing(cardsInThisRow);
+            row.setSpacing(spacing); // negative spacing = cards closer together
+
+            // Add cards to row
+            for (int i = 0; i < cardsInThisRow; i++) {
+                Button cardButton = createCardButton(cards.get(index));
+                // Slightly move cards upward for a layered effect
+                cardButton.setTranslateY(40 * rowNumber);
+                row.getChildren().add(cardButton);
+                index++;
+            }
+
+            // Slightly shift each row downward so previous rows are visible
+            row.setTranslateY(10 * rowNumber);
+            rowNumber++;
+
+            handVBox.getChildren().add(row);
         }
-        
+
+        // Make sure the withdrawal button is always on top
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
         }
