@@ -77,17 +77,13 @@
          <children>
             <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS">
                <children>
-                  <Label fx:id="gamesPlayedLabel" styleClass="stats" text="Spiele:" />
+                  <Label fx:id="gamesPlayedLabel" prefHeight="28.0" prefWidth="70.0" styleClass="stats" text="Spiele:" />
                </children>
             </StackPane>
+            <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS" />
             <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS">
                <children>
-                  <Label fx:id="gamesWonLabel" styleClass="stats" text="Siege:" />
-               </children>
-            </StackPane>
-            <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label fx:id="winRateLabel" styleClass="stats" text="Siegrate:" />
+                  <Label fx:id="gamesWonLabel" prefHeight="29.0" prefWidth="73.0" styleClass="stats" text="Siege:" />
                </children>
             </StackPane>
          </children>

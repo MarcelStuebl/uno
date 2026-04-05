@@ -73,12 +73,6 @@ public class LobbyController implements Initializable {
         gamesWonLabel.setText("Siege: " + Integer.toString(wonGames));
         gamesPlayedLabel.setText("Spiele: " + Integer.toString(wonGames + lostGames));
 
-        System.out.println(getClient().getConn().getUser().getGamesWon());
-        System.out.println(getClient().getConn().getUser().getGamesLost());
-
-
-
-
     }
 
 

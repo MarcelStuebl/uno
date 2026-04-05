@@ -84,7 +84,7 @@
 
 .stats {
     -fx-text-fill: #cfcfe6;
-    -fx-font-size: 11px;
+    -fx-font-size: 13px;
 }
 
 .errorLabel {
