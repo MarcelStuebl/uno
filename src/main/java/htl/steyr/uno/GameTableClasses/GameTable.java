@@ -45,6 +45,7 @@ public class GameTable implements Initializable {
     private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
     private boolean gameOverOverlayShown = false;
+    private Label yourTurnLabel;
 
     // Variables used for the player hand UI.
     private VBox handVBox; // VBox holding multiple rows of cards
@@ -89,6 +90,11 @@ public class GameTable implements Initializable {
             setupCentralStack();
             addCloseButton(root, stage);
             createWithdrawalStack(root);
+
+            if (startGameResponse.enemies().getFirst().getUsername().equals(getClient().getConn().getUser())){
+                yourTurnLabel.setText("Your Turn");
+            }
+
         });
     }
 
@@ -170,6 +176,7 @@ public class GameTable implements Initializable {
                     }
                 }
             }
+
 
             ctrl.setTurnActive(isActiveTurn);
         }
@@ -593,6 +600,20 @@ public class GameTable implements Initializable {
         } catch (IOException e) {
             System.err.println("Fehler beim Zurueckkehren zur Lobby: " + e.getMessage());
         }
+    }
+
+    public void setCurrentTurneLabel(boolean a) {
+        if (yourTurnLabel == null) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            if (a) {
+                yourTurnLabel.setText("Your Turn!");
+            } else {
+                yourTurnLabel.setText("");
+            }
+        });
     }
 
     public GameLogic getGameLogic() {

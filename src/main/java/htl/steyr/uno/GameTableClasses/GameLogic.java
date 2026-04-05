@@ -157,7 +157,7 @@ public class GameLogic {
         } else {
             Card playedCard = msg.card();
 
-            // Stelle sicher, dass schwarze Karten die chosenColour habem
+            // Stelle sicher, dass schwarze Karten die chosenColour haben
             if (playedCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
                 if (playedCard.getChosenColour() == null || playedCard.getChosenColour().isBlank()) {
                     playedCard.setChosenColour(msg.currentColor());
@@ -171,6 +171,7 @@ public class GameLogic {
             
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
                 getGameTable().getPlayer().setCurrentTurn(false);
+                gameTable.setCurrentTurneLabel(false);
             } else {
                 for (Enemy e : getGameTable().getPlayer().getEnemies()) {
                     if (e.getPlayerIndex().equals(msg.enemyIndex())) {
@@ -181,7 +182,8 @@ public class GameLogic {
             }
 
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex())) {
-                gameTable.getPlayer().setCurrentTurn(true);
+                getGameTable().getPlayer().setCurrentTurn(true);
+                gameTable.setCurrentTurneLabel(true);
             } else {
                 for (Enemy e : getGameTable().getPlayer().getEnemies()) {
                     if (e.getPlayerIndex().equals(msg.nextPlayerIndex())) {
