@@ -37,16 +37,14 @@ public class Card implements Serializable {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        
-        Card card = (Card) obj;
 
-        if (this.CardValue != card.CardValue) return false;
-        return this.CardColour.equals(card.CardColour);
+        Card card = (Card) obj;
+        return this.cardId.equals(card.cardId);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(CardValue, CardColour);
+        return java.util.Objects.hash(cardId);
     }
 
 
@@ -64,7 +62,7 @@ public class Card implements Serializable {
     public void setChosenColour(String chosenColour) {
         this.chosenColour = chosenColour;
     }
-    
+
     public String getCardId() {
         return this.cardId;
     }
