@@ -209,6 +209,8 @@ public class GameLogic {
             }
         } else if (isReverse) {
             directionClockwise = !directionClockwise;
+            // With 2 players, Reverse acts like a Skip (player goes again)
+            // We need to check this after the direction change
         } else if (card.getCardValue() == 12) {
             drawPenaltyValue = (receivedDrawPenaltyValue != null && receivedDrawPenaltyValue > 0) ? receivedDrawPenaltyValue : 2;
         } else if (card.getCardValue() == 13) {
@@ -256,6 +258,7 @@ public class GameLogic {
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
             }
         } else {
+            // Reverse card logic
             int activePlayerCount = 0;
             for (Player p : players) {
                 if (!p.isPassive()) {
@@ -264,15 +267,24 @@ public class GameLogic {
             }
 
             if (activePlayerCount == 2) {
+                // With 2 active players, Reverse acts like a Skip
+                // Skip the next player (who is the only other active player)
+                // So the current player goes again
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 while (players.get(currentPlayerIndex).isPassive()) {
                     currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 }
+                // Skip that player too - go to the next one (which brings us back to current due to 2 players)
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 while (players.get(currentPlayerIndex).isPassive()) {
                     currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 }
             } else {
+                // With 3+ active players, Reverse skips the next player in the new direction
+                currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+                while (players.get(currentPlayerIndex).isPassive()) {
+                    currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
+                }
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 while (players.get(currentPlayerIndex).isPassive()) {
                     currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
