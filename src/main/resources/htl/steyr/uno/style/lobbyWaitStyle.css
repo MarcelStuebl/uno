@@ -1,187 +1,422 @@
+/* =========================
+   HAUPT-CONTAINER
+   ========================= */
 .mainPaine {
+
+    /* Definiert den Hintergrund als Farbverlauf (Gradient)
+       "from 0% 0% to 100% 100%" bedeutet:
+       → Start oben links
+       → Ende unten rechts (diagonal) */
     -fx-background-color:
             linear-gradient(from 0% 0% to 100% 100%,
+
+                /* Erste Farbe (Startpunkt des Verlaufs)
+                   sehr dunkles Blau → sorgt für "Dark UI" Basis */
             rgba(14, 20, 36, 1.0),
+
+                /* Mittlere Farbe → erzeugt Tiefe im Verlauf */
             rgba(23, 38, 62, 0.98),
+
+                /* Letzte Farbe (Ende)
+                   noch dunkler → sorgt für Kontrast */
             rgba(9, 12, 22, 1.0));
+
+    /* Innenabstand:
+       Abstand zwischen Rand und Inhalt (in alle Richtungen gleich) */
     -fx-padding: 18;
 }
 
-.secondaryPane {
-    -fx-background-color: transparent;
-    -fx-padding: 18 14 18 14;
-}
-
+/* =========================
+   ZENTRALER BEREICH
+   ========================= */
 .centerArea {
+
+    /* Transparent → übernimmt optisch Hintergrund vom Parent */
     -fx-background-color: transparent;
 }
 
+
+/* =========================
+   LOBBY CODE TEXT
+   ========================= */
 .lobbyCodeLabel {
+
+    /* Textfarbe = weiß */
     -fx-text-fill: white;
+
+    /* Schrift fett */
     -fx-font-weight: bold;
+
+    /* Große Schriftgröße → wichtiges Element */
     -fx-font-size: 35px;
+
+    /* Schatteneffekt:
+       gaussian = weicher Schatten
+       rgba(...) = Farbe des Schattens (leicht blau)
+       12 = Blur-Radius (wie weich)
+       0.2 = Spread (Ausbreitung)
+       0,0 = Offset (zentriert hinter Text)
+
+       → erzeugt "Glow" Effekt */
     -fx-effect: dropshadow(gaussian, rgba(100, 180, 255, 0.35), 12, 0.2, 0, 0);
 }
 
+
+/* =========================
+   STANDARD LABELS
+   ========================= */
 .labels {
+
+    /* Alle normalen Texte werden weiß dargestellt */
     -fx-text-fill: white;
 }
 
+
+/* =========================
+   PLAY BUTTON
+   ========================= */
 .playButton {
-    -fx-background-color: linear-gradient(to bottom, rgba(255, 92, 92, 0.98), rgba(214, 54, 54, 0.98));
+
+    /* Vertikaler Farbverlauf:
+       oben heller → unten dunkler
+       → erzeugt 3D Button Look */
+    -fx-background-color:
+            linear-gradient(to bottom,
+            rgba(255, 92, 92, 0.98),
+            rgba(214, 54, 54, 0.98));
+
+    /* Rundet die Ecken des Buttons */
     -fx-background-radius: 18;
     -fx-border-radius: 18;
+
+    /* Textfarbe */
     -fx-text-fill: white;
+
+    /* Fett für bessere Lesbarkeit */
     -fx-font-weight: bold;
+
+    /* Innenabstand → macht Button größer */
     -fx-padding: 16 28 16 28;
+
+    /* Schriftgröße */
     -fx-font-size: 18px;
-    -fx-effect: dropshadow(gaussian, rgba(255, 92, 92, 0.22), 18, 0.15, 0, 4);
+
+    /* Schatten:
+       gibt dem Button "Tiefe" (schwebender Effekt) */
+    -fx-effect:
+            dropshadow(gaussian,
+            rgba(255, 92, 92, 0.22),
+            18, 0.15, 0, 4);
 }
 
+
+/* Hover (Maus darüber) */
 .playButton:hover {
-    -fx-background-color: linear-gradient(to bottom, rgba(255, 110, 110, 1), rgba(230, 70, 70, 1));
+
+    /* Button wird heller → visuelles Feedback */
+    -fx-background-color:
+            linear-gradient(to bottom,
+            rgba(255, 110, 110, 1),
+            rgba(230, 70, 70, 1));
 }
 
+
+/* Wenn Button deaktiviert ist */
 .playButton:disabled {
-    -fx-background-color: linear-gradient(to bottom, rgba(130, 130, 130, 0.95), rgba(95, 95, 95, 0.95));
+
+    /* Grauer Farbverlauf → zeigt "nicht klickbar" */
+    -fx-background-color:
+            linear-gradient(to bottom,
+            rgba(130, 130, 130, 0.95),
+            rgba(95, 95, 95, 0.95));
+
+    /* Text wird transparenter */
     -fx-text-fill: rgba(255, 255, 255, 0.75);
+
+    /* Schatten wird entfernt */
     -fx-effect: none;
+
+    /* gesamte Transparenz reduziert */
     -fx-opacity: 0.85;
 }
 
+
+/* =========================
+   LEAVE BUTTON
+   ========================= */
 .leaveButton {
+
+    /* Sehr dezenter Hintergrund */
     -fx-background-color: rgba(255, 255, 255, 0.08);
+
+    /* Runde Ecken */
     -fx-background-radius: 14;
     -fx-border-radius: 14;
+
+    /* dünner Rand */
     -fx-border-color: rgba(255, 255, 255, 0.08);
+
+    /* Text */
     -fx-text-fill: white;
     -fx-font-weight: bold;
+
+    /* Innenabstand */
     -fx-padding: 14 22 14 22;
+
+    /* Schriftgröße */
     -fx-font-size: 15px;
 }
 
+
+/* Hover */
 .leaveButton:hover {
+
+    /* etwas heller → Hover Feedback */
     -fx-background-color: rgba(255, 255, 255, 0.13);
 }
 
+
+/* =========================
+   SPIELER PANEL (KARTE)
+   ========================= */
 .playerPanel {
+
+    /* halbtransparenter Verlauf → "Glassmorphism" Look */
     -fx-background-color:
             linear-gradient(to bottom,
             rgba(18, 24, 40, 0.18),
             rgba(12, 16, 28, 0.35));
+
+    /* große Rundung → modernes UI */
     -fx-background-radius: 22;
     -fx-border-radius: 22;
+
+    /* dünner Rand */
     -fx-border-color: rgba(255, 255, 255, 0.06);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.28), 22, 0.14, 0, 6);
+
+    /* Schatten → Karte hebt sich vom Hintergrund ab */
+    -fx-effect:
+            dropshadow(gaussian,
+            rgba(0, 0, 0, 0.28),
+            22, 0.14, 0, 6);
 }
 
+
+/* =========================
+   HEADER IM PANEL
+   ========================= */
 .playerHeader {
+
+    /* leichter Overlay-Effekt */
     -fx-background-color: rgba(255, 255, 255, 0.03);
+
     -fx-background-radius: 18;
     -fx-border-radius: 18;
+
     -fx-border-color: rgba(255, 255, 255, 0.05);
+
+    /* Innenabstand */
     -fx-padding: 10 12 10 12;
 }
 
+
+/* Header Text */
 .playerHeaderLabel {
     -fx-text-fill: white;
     -fx-font-size: 26px;
     -fx-font-weight: bold;
 }
 
+
+/* =========================
+   LISTVIEW (SPIELER)
+   ========================= */
 .playerListView {
+
+    /* gleicher Stil wie Panel → konsistent */
     -fx-background-color:
             linear-gradient(to bottom,
             rgba(18, 24, 40, 0.18),
             rgba(12, 16, 28, 0.35));
+
     -fx-background-radius: 22;
     -fx-border-radius: 22;
+
     -fx-border-color: rgba(255, 255, 255, 0.06);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.28), 22, 0.14, 0, 6);
+
+    -fx-effect: dropshadow(gaussian,
+    rgba(0, 0, 0, 0.28),
+    22, 0.14, 0, 6);
+
+    /* Entfernt Standard-Hintergrund der Liste */
     -fx-control-inner-background: transparent;
     -fx-control-inner-background-alt: transparent;
+
     -fx-padding: 4;
+
+    /* Schriftgröße der Einträge */
     -fx-font-size: 25px;
+
+    /* maximale Höhe → wächst mit Inhalt */
     -fx-max-height: 1.7976931348623157E308;
 }
 
+
+/* einzelne Zellen */
 .playerListView .list-cell {
+
+    /* keine Standardfarbe */
     -fx-background-color: transparent;
+
+    /* kein extra Padding */
     -fx-padding: 0;
 }
 
+
+/* Entfernt Auswahl-Hervorhebung */
 .playerListView .list-cell:filled:selected,
 .playerListView .list-cell:filled:selected:hover {
     -fx-background-color: transparent;
 }
 
+
+/* einzelne Spielerkarte */
 .playerCellRoot {
+
+    /* leichter Hintergrund */
     -fx-background-color: rgba(255, 255, 255, 0.03);
+
     -fx-background-radius: 16;
     -fx-border-radius: 16;
+
     -fx-border-color: rgba(255, 255, 255, 0.05);
 }
 
+
+/* =========================
+   CHAT
+   ========================= */
 .chatBox {
     -fx-background-color: transparent;
     -fx-padding: 0;
 }
 
+
+/* Chat Liste */
 .gameChatListView {
+
+    /* gleicher Stil wie Panels */
     -fx-background-color:
             linear-gradient(to bottom,
             rgba(18, 24, 40, 0.18),
             rgba(12, 16, 28, 0.35));
+
     -fx-background-radius: 22;
     -fx-border-radius: 22;
+
     -fx-border-color: rgba(255, 255, 255, 0.06);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.28), 22, 0.14, 0, 6);
+
+    -fx-effect: dropshadow(gaussian,
+    rgba(0, 0, 0, 0.28),
+    22, 0.14, 0, 6);
+
     -fx-control-inner-background: transparent;
     -fx-control-inner-background-alt: transparent;
+
     -fx-padding: 4;
 }
 
+
+/* Chat Zellen */
 .gameChatListView .list-cell {
     -fx-background-color: transparent;
     -fx-padding: 0;
 }
 
+
+/* Auswahl deaktiviert */
 .gameChatListView .list-cell:filled:selected,
 .gameChatListView .list-cell:filled:selected:hover {
     -fx-background-color: transparent;
 }
 
+
+/* Chat Eingabe */
 .gameChatTextField {
+
+    /* leichter Hintergrund */
     -fx-background-color: rgba(255, 255, 255, 0.06);
+
     -fx-background-radius: 16;
     -fx-border-radius: 16;
+
+    /* Text */
     -fx-text-fill: white;
+
+    /* Placeholder Text */
     -fx-prompt-text-fill: rgba(255, 255, 255, 0.45);
+
     -fx-border-color: rgba(255, 255, 255, 0.08);
 }
 
+
+/* Name über Nachricht */
 .chatSenderLabel {
+
+    /* leicht transparent */
     -fx-text-fill: rgba(255, 255, 255, 0.72);
+
     -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
 
+
+/* eigene Nachricht */
 .chatBubbleMine {
-    -fx-background-color: linear-gradient(to bottom, rgba(86, 145, 255, 0.78), rgba(57, 103, 210, 0.72));
+
+    /* blauer Verlauf */
+    -fx-background-color:
+            linear-gradient(to bottom,
+            rgba(86, 145, 255, 0.78),
+            rgba(57, 103, 210, 0.72));
+
     -fx-background-radius: 16;
     -fx-border-radius: 16;
+
+    /* auffälliger Rand */
     -fx-border-color: rgba(0, 255, 9, 0.91);
+
     -fx-text-fill: white;
     -fx-padding: 10 14 10 14;
-    -fx-effect: dropshadow(gaussian, rgba(86, 145, 255, 0.16), 14, 0.12, 0, 3);
+
+    /* Glow */
+    -fx-effect:
+            dropshadow(gaussian,
+            rgba(86, 145, 255, 0.16),
+            14, 0.12, 0, 3);
 }
 
+
+/* fremde Nachricht */
 .chatBubbleOther {
-    -fx-background-color: linear-gradient(to bottom, rgba(24, 30, 48, 0.72), rgba(16, 20, 34, 0.78));
+
+    /* dunkler Verlauf */
+    -fx-background-color:
+            linear-gradient(to bottom,
+            rgba(24, 30, 48, 0.72),
+            rgba(16, 20, 34, 0.78));
+
     -fx-background-radius: 16;
     -fx-border-radius: 16;
+
     -fx-border-color: rgba(255, 255, 255, 0.27);
+
     -fx-text-fill: white;
     -fx-padding: 10 14 10 14;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 10, 0.12, 0, 2);
+
+    /* leichter Schatten */
+    -fx-effect:
+            dropshadow(gaussian,
+            rgba(0, 0, 0, 0.18),
+            10, 0.12, 0, 2);
 }

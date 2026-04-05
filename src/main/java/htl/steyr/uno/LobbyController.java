@@ -19,8 +19,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import javafx.scene.input.MouseEvent;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,18 @@ import java.nio.file.Files;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-
+/**
+ * Controller-Klasse für die Lobby-Ansicht der UNO-Anwendung.
+ * <p>
+ * Diese Klasse verwaltet:
+ * <ul>
+ *     <li>Erstellen und Beitreten zu Lobbys</li>
+ *     <li>Anzeigen von Spielerstatistiken</li>
+ *     <li>Profilbild-Verwaltung</li>
+ *     <li>Navigation zwischen Szenen</li>
+ *     <li>Empfang von Serverantworten</li>
+ * </ul>
+ */
 public class LobbyController implements Initializable {
 
     @FXML private Button createPartyButton;
@@ -41,19 +52,33 @@ public class LobbyController implements Initializable {
     @FXML private Label winRateLabel;
     @FXML private ImageView profileImageView;
 
+    /** Client zur Kommunikation mit dem Server */
     private Client client;
+
+    /** Aktuelle Lobby-Informationen */
     private LobbyInfoResponse lobby;
 
-
+    /**
+     * Konstruktor für den LobbyController.
+     *
+     * @param client der Client für Serverkommunikation
+     */
     public LobbyController(Client client) {
         this.client = client;
     }
 
-
     /**
-     *  Calls the onSceneClose funktion to close the Client when the Scene is closed
-     * @param url
-     * @param resourceBundle
+     * Initialisiert die Benutzeroberfläche nach dem Laden.
+     * <p>
+     * Setzt:
+     * <ul>
+     *     <li>Event-Handler beim Schließen des Fensters</li>
+     *     <li>Profilbild</li>
+     *     <li>Spielstatistiken</li>
+     * </ul>
+     *
+     * @param url Ressourcen-URL
+     * @param resourceBundle Ressourcen-Bundle
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -62,48 +87,64 @@ public class LobbyController implements Initializable {
                 onSceneClose();
             });
         });
+
         setProfileImage();
-
         getClient().setLobbyController(this);
-
 
         int wonGames = getClient().getConn().getUser().getGamesWon();
         int lostGames = getClient().getConn().getUser().getGamesLost();
 
-        gamesWonLabel.setText("Siege: " + Integer.toString(wonGames));
-        gamesPlayedLabel.setText("Spiele: " + Integer.toString(wonGames + lostGames));
-
+        gamesWonLabel.setText("Siege: " + wonGames);
+        gamesPlayedLabel.setText("Spiele: " + (wonGames + lostGames));
     }
 
-
-
+    /**
+     * Setzt das Profilbild des Benutzers.
+     * <p>
+     * Falls kein Bild vorhanden ist, wird ein Standardbild verwendet.
+     */
     private void setProfileImage() {
         byte[] imageData = getClient().getConn().getUser().getProfileImageData();
         Image profileImage;
+
         if (imageData == null || imageData.length == 0) {
-            profileImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")), 50, 50, true, true);
+            profileImage = new Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
+                    50, 50, true, true
+            );
         } else {
             profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
         }
+
         profileImageView.setImage(profileImage);
     }
 
+    /**
+     * Wird ausgelöst, wenn das Profilbild angeklickt wird.
+     * <p>
+     * Öffnet einen FileChooser zum Auswählen eines neuen Bildes
+     * und lädt dieses hoch.
+     *
+     * @param event MouseEvent
+     */
     @FXML
     public void onProfileImageClicked(MouseEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Profilbild auswählen");
 
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Bilddateien", "*.png", "*.jpg", "*.jpeg"));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Bilddateien", "*.png", "*.jpg", "*.jpeg")
+        );
 
         Stage stage = (Stage) profileImageView.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
 
         if (file != null) {
             int maxFileSize = 10 * 1024 * 1024;
+
             if (file.length() > maxFileSize) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Datei zu groß");
-                alert.setHeaderText(null);
                 alert.setContentText("Das Profilbild darf maximal 10 MB groß sein.");
                 alert.showAndWait();
                 return;
@@ -112,24 +153,26 @@ public class LobbyController implements Initializable {
             try {
                 Image image = new Image(file.toURI().toString(), 60, 60, true, true);
                 profileImageView.setImage(image);
+
                 byte[] imageBytes = Files.readAllBytes(file.toPath());
                 getClient().getConn().getUser().setProfileImageData(imageBytes);
+
                 setProfileImage();
                 getClient().getConn().setProfileImageRequest(imageBytes);
+
             } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Fehler beim Laden des Bildes");
-                alert.setHeaderText(null);
-                alert.setContentText("Das ausgewählte Bild konnte nicht geladen werden. Bitte versuchen Sie es erneut.");
+                alert.setContentText("Das ausgewählte Bild konnte nicht geladen werden.");
                 alert.showAndWait();
             }
         }
     }
 
-
-
     /**
-     * Closes the Client when the Scene is closed
+     * Wird beim Schließen der Szene aufgerufen.
+     * <p>
+     * Schließt die Verbindung zum Server.
      */
     private void onSceneClose() {
         if (getClient().getConn() != null) {
@@ -137,34 +180,29 @@ public class LobbyController implements Initializable {
         }
     }
 
+    /**
+     * Wird aufgerufen, wenn das Beitreten zu einer Lobby fehlschlägt.
+     *
+     * @param msg Antwort vom Server mit Fehlerstatus
+     */
     public void joinPartyFailed(LobbyJoinRefusedResponse msg) {
         Platform.runLater(() -> {
             if (msg.lobbyInfo().status() == 1) {
-                System.out.println("Lobby is full. Please try again.");
-
                 errorLabel.setText("Lobby is full. Please try again.");
-                errorLabel.setVisible(true);
-                errorLabel.setManaged(true);
             } else if (msg.lobbyInfo().status() == 2) {
-                System.out.println("Game already started. Please try again.");
-
                 errorLabel.setText("Game already started. Please try again.");
-                errorLabel.setVisible(true);
-                errorLabel.setManaged(true);
             } else {
-                System.out.println("Unknown error. Please try again.");
-
                 errorLabel.setText("Unknown error. Please try again.");
-                errorLabel.setVisible(true);
-                errorLabel.setManaged(true);
             }
+            errorLabel.setVisible(true);
+            errorLabel.setManaged(true);
         });
     }
 
-
     /**
-     * Generats a new LobbyCode used to join s lobby
-     * @param actionEvent
+     * Wird aufgerufen, wenn der "Create Party"-Button geklickt wird.
+     *
+     * @param actionEvent Event
      */
     @FXML
     private void onCreatePartyButtonClicked(ActionEvent actionEvent) {
@@ -172,8 +210,9 @@ public class LobbyController implements Initializable {
     }
 
     /**
-     * Calls switchToLobbyWait when create or join was a success
-     * @param lobby
+     * Wird aufgerufen, wenn das Erstellen oder Beitreten zu einer Lobby erfolgreich war.
+     *
+     * @param lobby Lobby-Informationen
      */
     public void createOrJoinPartySuccess(LobbyInfoResponse lobby) {
         this.lobby = lobby;
@@ -185,31 +224,34 @@ public class LobbyController implements Initializable {
                 throw new RuntimeException(e);
             }
         });
-
     }
 
     /**
-     *  Joins a new game with all players that are in the party
-     * @param actionEvent
+     * Wird aufgerufen, wenn der "Join"-Button geklickt wird.
+     *
+     * @param actionEvent Event
+     * @throws IOException falls ein Fehler beim Laden der Szene auftritt
      */
     @FXML
     private void onJoinButtonClicked(ActionEvent actionEvent) throws IOException {
         String input = partyCodeField.getText().trim();
-        
+
         if (input.isEmpty()) {
             errorLabel.setText("Please enter a lobby ID.");
             errorLabel.setVisible(true);
             return;
         }
-        
+
         try {
             int lobbyId = Integer.parseInt(input);
+
             if (lobbyId <= 100000 || lobbyId >= 999999) {
                 errorLabel.setText("Invalid lobby ID. Please try again.");
                 errorLabel.setVisible(true);
             } else {
                 client.joinLobby(lobbyId);
             }
+
         } catch (NumberFormatException e) {
             errorLabel.setText("Lobby ID must be a number.");
             errorLabel.setVisible(true);
@@ -217,17 +259,16 @@ public class LobbyController implements Initializable {
     }
 
     /**
-     * Handles a lobby not found response from the server by notifying the user and prompting
-     * them to join or create a lobby again.
+     * Wird aufgerufen, wenn keine Lobby gefunden wurde.
      */
     public void lobbyNotFound() {
         System.out.println("Invalid lobby ID. Please try again.");
     }
 
-
     /**
-     * Changes the scene to lobbyWait when joinPartyButton ist clicked
-     * @throws IOException
+     * Wechselt zur Lobby-Warteansicht.
+     *
+     * @throws IOException falls die FXML-Datei nicht geladen werden kann
      */
     private void switchToLobbyWait() throws IOException {
         Stage stage = new Stage();
@@ -247,41 +288,67 @@ public class LobbyController implements Initializable {
         UiStyleUtil.setAppIcon(stage);
         stage.setMaximized(true);
         stage.show();
+
         thisStage.close();
     }
 
     /**
-     * Logs the acc out / goes back to the login screen when logOutButton is clicked
-     * @param actionEvent
+     * Wird aufgerufen, wenn der Benutzer sich ausloggt.
+     *
+     * @param actionEvent Event
+     * @throws IOException falls die Szene nicht geladen werden kann
      */
     @FXML
     private void onLogoutButtonClicked(ActionEvent actionEvent) throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) createPartyButton.getScene().getWindow();
+
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("loginScreen.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+
         UiStyleUtil.applyGlobalFocusStyle(scene);
         stage.setTitle("UNO-AnmeldeBildschirm");
         stage.setScene(scene);
         UiStyleUtil.setAppIcon(stage);
         stage.setMaximized(true);
         stage.show();
+
         thisStage.close();
         onSceneClose();
     }
 
+    /**
+     * Gibt den aktuellen Client zurück.
+     *
+     * @return Client
+     */
     public Client getClient() {
         return client;
     }
 
+    /**
+     * Setzt den Client.
+     *
+     * @param client Client
+     */
     public void setClient(Client client) {
         this.client = client;
     }
 
+    /**
+     * Sendet eine Chatnachricht an den Server.
+     *
+     * @param message Nachricht
+     */
     private void sendChatMessage(String message) {
         client.sendChatMessage(message);
     }
 
+    /**
+     * Verarbeitet eine empfangene Chatnachricht vom Server.
+     *
+     * @param msg Chatnachricht
+     */
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {
         String sender = msg.user().getUsername();
         String message = msg.message();
