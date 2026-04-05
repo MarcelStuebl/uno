@@ -87,12 +87,17 @@ public class CardStack {
                 return;
             }
             addToStack(c);
+            p.removeCardFromHand(c);
+            if (p.getHand().isEmpty()) {
+                p.setPassive(true);
+            }
+            getGameTable().updatePlayerHandUI();
             getGameTable().getGameLogic().playCard(c, 0);
             return;
         }
 
         // Wenn drawPenaltyValue == 0 und die oberste Karte ist eine Penalty-Karte,
-        // dann hat der vorherige Spieler die Karten abgehoben. 
+        // dann hat der vorherige Spieler die Karten abgehoben.
         // Wenn currentColor gesetzt ist, muss trotzdem die aktuelle Farbe beachtet werden
         if (top.getCardValue() >= 12 && currentPenalty != null && currentPenalty == 0 && (currentColor == null || currentColor.isBlank())) {
             if (c.getCardColour().equals("black")) {
@@ -100,6 +105,11 @@ public class CardStack {
                 return;
             }
             addToStack(c);
+            p.removeCardFromHand(c);
+            if (p.getHand().isEmpty()) {
+                p.setPassive(true);
+            }
+            getGameTable().updatePlayerHandUI();
             getGameTable().getGameLogic().playCard(c, 0);
             return;
         }
@@ -135,12 +145,12 @@ public class CardStack {
         addToStack(c);
 
         p.removeCardFromHand(c);
-        
+
         // Wenn der Spieler keine Karten mehr hat, setze ihn auf passiv
         if (p.getHand().isEmpty()) {
             p.setPassive(true);
         }
-        
+
         getGameTable().updatePlayerHandUI();
 
         Integer drawPenaltyForThisCard = 0;
@@ -195,7 +205,7 @@ public class CardStack {
 
                 cardTile.getChildren().add(label);
 
-                // ✨ Hover Effekt
+                // Hover Effekt
                 cardTile.setOnMouseEntered(e -> {
                     cardTile.setScaleX(1.1);
                     cardTile.setScaleY(1.1);
