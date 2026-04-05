@@ -208,9 +208,9 @@ public class GameLogic {
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
             }
         } else if (isReverse) {
+            // Reverse card was played - change direction
             directionClockwise = !directionClockwise;
-            // With 2 players, Reverse acts like a Skip (player goes again)
-            // We need to check this after the direction change
+            // Note: further handling is done after the card is applied below
         } else if (card.getCardValue() == 12) {
             drawPenaltyValue = (receivedDrawPenaltyValue != null && receivedDrawPenaltyValue > 0) ? receivedDrawPenaltyValue : 2;
         } else if (card.getCardValue() == 13) {
@@ -280,11 +280,8 @@ public class GameLogic {
                     currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 }
             } else {
-                // With 3+ active players, Reverse skips the next player in the new direction
-                currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
-                while (players.get(currentPlayerIndex).isPassive()) {
-                    currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
-                }
+                // With 3+ active players, Reverse changes direction and skips the next player
+                // in the new direction - the current player does NOT go again
                 currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
                 while (players.get(currentPlayerIndex).isPassive()) {
                     currentPlayerIndex = (currentPlayerIndex + (directionClockwise ? 1 : -1) + players.size()) % players.size();
