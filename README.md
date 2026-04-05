@@ -8,9 +8,25 @@ Ein ITP-Schulprojekt der **HTBLA Steyr**
 
 UNO ist eine digitale Umsetzung des gleichnamigen Kartenspiels, entwickelt von 4 Schülern der HTBLA Steyr im Rahmen des ITP-Unterrichts (Informationstechnische Projekte).
 
-Das Spiel ermöglicht es mehreren Spielern, über das Netzwerk gemeinsam UNO zu spielen. Die Kommunikation zwischen Client und Server erfolgt über eine Socket-Verbindung. Als Server dient ein Docker-Container, der auf einem Raspberry Pi betrieben wird — dadurch ist das Spiel jederzeit erreichbar, ohne dass ein eigener Rechner laufen muss.
+Das Spiel ist **rein auf Multiplayer ausgelegt**: Ein **Singleplayer-Modus ist nicht verfügbar**. Eine Runde kann nur gestartet werden, wenn **mindestens 2 und maximal 4 Spieler** in einer Lobby sind.
+
+Die Kommunikation zwischen Client und Server erfolgt über eine Socket-Verbindung. Als Server dient ein Docker-Container, der auf einem Raspberry Pi betrieben wird — dadurch ist das Spiel jederzeit erreichbar, ohne dass ein eigener Rechner laufen muss.
 
 Das Projekt wurde innerhalb einer Zeitvorgabe von 2 Monaten gestartet und wird seither laufend weiterentwickelt. Der Fokus liegt auf einer stabilen Serverarchitektur, einer benutzerfreundlichen JavaFX-Oberfläche sowie einer sauberen Umsetzung der UNO-Spielregeln.
+
+---
+
+## Features
+
+- **Multiplayer (2–4 Spieler)** über Lobbys (Lobby erstellen / Lobby beitreten)
+- **Lobby-Chat** zum Schreiben mit allen Spielern in der Lobby
+- **Account-System** (Registrieren / Login)
+- **Passwort vergessen** inkl. Code-Verifikation und Passwort ändern
+- **Profilbild ändern**: Nach dem Anmelden im Lobby-Screen auf das **Profilbild klicken** und ein Bild auswählen
+- **Spiel-Statistiken** im Lobby-Screen:
+  - **Spiele gesamt**
+  - **Siege**
+- UNO-GameTable mit Gegner-Anzeige (Benutzername + Profilbild) und Spielstatus-Updates in Echtzeit
 
 ---
 
