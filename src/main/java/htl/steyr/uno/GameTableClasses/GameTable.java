@@ -45,6 +45,7 @@ public class GameTable implements Initializable {
     private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
     private boolean gameOverOverlayShown = false;
+    @FXML private Label yourTurnLabel;
 
     // Variables used for the player hand UI.
     private VBox handVBox; // VBox holding multiple rows of cards
@@ -89,9 +90,23 @@ public class GameTable implements Initializable {
             setupCentralStack();
             addCloseButton(root, stage);
             createWithdrawalStack(root);
+
+            if (yourTurnLabel != null) {
+                StackPane.setAlignment(yourTurnLabel, Pos.TOP_CENTER);
+                StackPane.setMargin(yourTurnLabel, new Insets(90, 0, 0, 0));
+                yourTurnLabel.toFront();
+            }
+
+            if (yourTurnLabel != null && getClient().getConn() != null && getClient().getConn().getUser() != null) {
+                String myUsername = getClient().getConn().getUser().getUsername();
+                if (startGameResponse.enemies().getFirst().getUsername().equals(myUsername)) {
+                    yourTurnLabel.setText("Your Turn!");
+                } else {
+                    yourTurnLabel.setText("");
+                }
+            }
         });
     }
-
 
     private void setupCentralStack() {
         StackPane.setAlignment(cardStack.getVisual(), javafx.geometry.Pos.CENTER);
@@ -170,6 +185,7 @@ public class GameTable implements Initializable {
                     }
                 }
             }
+
 
             ctrl.setTurnActive(isActiveTurn);
         }
@@ -495,6 +511,20 @@ public class GameTable implements Initializable {
         });
     }
 
+    public void setCurrentTurneLabel(boolean a) {
+        if (yourTurnLabel == null) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            if (a) {
+                yourTurnLabel.setText("Your Turn!");
+            } else {
+                yourTurnLabel.setText("");
+            }
+        });
+    }
+
 
     /**
      * Shows the player ranking once the game has ended.
@@ -594,6 +624,8 @@ public class GameTable implements Initializable {
             System.err.println("Fehler beim Zurueckkehren zur Lobby: " + e.getMessage());
         }
     }
+
+
 
     public GameLogic getGameLogic() {
         return gameLogic;

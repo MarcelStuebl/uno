@@ -137,10 +137,8 @@ public class GameLogic {
     public void gameTurnResponse(GameTurnResponse msg) {
         getGameTable().setGameTurnResponse(msg);
 
-
         if (msg.enemyIndex() == null) {
             if (msg.card() != null) {
-                // Initiale Karte am Spielstart
                 Card initialCard = msg.card();
                 if (initialCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
                     initialCard.setChosenColour(msg.currentColor());
@@ -152,12 +150,15 @@ public class GameLogic {
             } else {
                 Platform.runLater(() -> getGameTable().refreshEnemyTurnHighlight(msg.nextPlayerIndex()));
             }
-            
-            getGameTable().getPlayer().setCurrentTurn(getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex()));
+
+            if (getGameTable().getPlayer() != null) {
+                boolean myTurn = getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex());
+                getGameTable().getPlayer().setCurrentTurn(myTurn);
+                getGameTable().setCurrentTurneLabel(myTurn);
+            }
         } else {
             Card playedCard = msg.card();
 
-            // Stelle sicher, dass schwarze Karten die chosenColour habem
             if (playedCard.getCardColour().equals("black") && msg.currentColor() != null && !msg.currentColor().isBlank()) {
                 if (playedCard.getChosenColour() == null || playedCard.getChosenColour().isBlank()) {
                     playedCard.setChosenColour(msg.currentColor());
@@ -168,7 +169,7 @@ public class GameLogic {
                 getGameTable().getCardStack().addToStack(playedCard);
                 getGameTable().refreshEnemyTurnHighlight(msg.nextPlayerIndex());
             });
-            
+
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
                 getGameTable().getPlayer().setCurrentTurn(false);
             } else {
@@ -181,8 +182,10 @@ public class GameLogic {
             }
 
             if (getGameTable().getPlayer().getPlayerIndex().equals(msg.nextPlayerIndex())) {
-                gameTable.getPlayer().setCurrentTurn(true);
+                getGameTable().getPlayer().setCurrentTurn(true);
+                getGameTable().setCurrentTurneLabel(true);
             } else {
+                getGameTable().setCurrentTurneLabel(false);
                 for (Enemy e : getGameTable().getPlayer().getEnemies()) {
                     if (e.getPlayerIndex().equals(msg.nextPlayerIndex())) {
                         e.setCurrentTurn(true);

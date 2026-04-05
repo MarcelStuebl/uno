@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.StackPane?>
 
 <StackPane fx:id="root" stylesheets="@style/GameTableStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Pane fx:id="table" styleClass="table" StackPane.alignment="CENTER" />
+        <StackPane fx:id="table" styleClass="table" StackPane.alignment="CENTER">
+            <children>
+                <StackPane translateY="60" StackPane.alignment="CENTER">
+                    <children>
+                        <Label fx:id="yourTurnLabel" prefHeight="58.0" prefWidth="269.0" styleClass="yourTurnLabel" StackPane.alignment="CENTER" />
+                    </children>
+                </StackPane>
+            </children></StackPane>
 
         <StackPane fx:id="enemy1" disable="true" maxHeight="100" maxWidth="320" minHeight="100" minWidth="320" StackPane.alignment="TOP_CENTER" />
         <StackPane fx:id="enemy2" disable="true" maxHeight="100" maxWidth="320" minHeight="100" minWidth="320.0" prefHeight="100.0" prefWidth="237.0" StackPane.alignment="CENTER_LEFT" />
