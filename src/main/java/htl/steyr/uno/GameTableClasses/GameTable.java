@@ -48,6 +48,7 @@ public class GameTable implements Initializable {
     private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
     private boolean gameOverOverlayShown = false;
+    private boolean withdrawalButtonCooldown = false;
     @FXML private Label yourTurnLabel;
 
     // Variables used for the player hand UI.
@@ -437,17 +438,31 @@ public class GameTable implements Initializable {
             hoverOut.stop();
             hoverIn.playFromStart();
         });
-        withdrawalButton.setOnMouseExited(e -> {
+         withdrawalButton.setOnMouseExited(e -> {
             hoverIn.stop();
             hoverOut.playFromStart();
         });
 
         withdrawalButton.setOnAction(e -> {
+            // Prevent spam by checking cooldown flag
+            if (withdrawalButtonCooldown) {
+                return;
+            }
+            
+            // Set cooldown
+            withdrawalButtonCooldown = true;
+            
             if (gameTurnResponse != null && gameTurnResponse.drawPenaltyValue() > 0) {
                 getGameLogic().requestCard(gameTurnResponse.drawPenaltyValue());
             } else {
                 getGameLogic().requestCard(1);
             }
+            
+            // Re-enable button after 1 second
+            Timeline cooldownTimer = new Timeline(
+                    new KeyFrame(Duration.seconds(1), event -> withdrawalButtonCooldown = false)
+            );
+            cooldownTimer.play();
         });
 
         root.getChildren().add(withdrawalButton);
