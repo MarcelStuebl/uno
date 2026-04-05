@@ -7,6 +7,7 @@ import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.GameOverResponse;
 import htl.steyr.uno.requests.server.GameTurnResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
+import htl.steyr.uno.requests.server.UnoNotificationResponse;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -64,13 +65,11 @@ public class GameTable implements Initializable {
     private boolean unoTimeActive = false; // Indicates if the UNO countdown is active
     private Timeline unoCountdownTimer; // Timer for the UNO countdown
 
-
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
         this.startGameResponse = msg;
         this.player = new Player(getClient().getConn().getUser());
     }
-
 
     private void updatePlayerFromStartGameResponse() {
         for (Enemy enemy : startGameResponse.enemies()) {
@@ -80,7 +79,6 @@ public class GameTable implements Initializable {
             }
         }
     }
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -126,7 +124,6 @@ public class GameTable implements Initializable {
         root.getChildren().add(cardStack.getVisual());
     }
 
-
     /**
      * Updates the enemy displays based on the current enemy list in the player object.
      */
@@ -166,7 +163,6 @@ public class GameTable implements Initializable {
         refreshEnemyTurnHighlight(activePlayerIndex);
     }
 
-
     /**
      * Updates the highlight state of enemy displays to indicate whose turn it is.
      */
@@ -196,7 +192,6 @@ public class GameTable implements Initializable {
             ctrl.setTurnActive(isActiveTurn);
         }
     }
-
 
     /**
      * Adds an enemy display to the specified slot.
@@ -229,12 +224,10 @@ public class GameTable implements Initializable {
         }
     }
 
-
     private void onSceneClose() {
         client.setGameTable(null);
         client.shutdown();
     }
-
 
     /**
      * Creates the player's hand card display at the bottom of the scene.
@@ -271,7 +264,6 @@ public class GameTable implements Initializable {
 
         return maxSpacing - ((cardCount - 5) * (Math.abs(maxSpacing - minSpacing) / (maxCardsPerRow - 5)));
     }
-
 
     /**
      * Updates the player's hand card display.
@@ -315,7 +307,6 @@ public class GameTable implements Initializable {
             sayUnoButton.toFront();
         }
     }
-
 
     /**
      * Creates a card button for the player's hand.
@@ -373,7 +364,6 @@ public class GameTable implements Initializable {
         return cardBtn;
     }
 
-
     /**
      * Creates the close button in the top-right corner.
      */
@@ -402,7 +392,6 @@ public class GameTable implements Initializable {
 
         root.getChildren().add(closeBtn);
     }
-
 
     /**
      * Creates the draw stack button.
@@ -456,15 +445,18 @@ public class GameTable implements Initializable {
      * Creates the "Say UNO" button.
      */
     private void createSayUnoButton(StackPane root) {
-        sayUnoButton = new Button("Say UNO");
+        sayUnoButton = new Button("UNO!");
         sayUnoButton.setPrefSize(100, 50);
+        sayUnoButton.setAlignment(Pos.CENTER_LEFT);
+        sayUnoButton.setPadding(new Insets(8, 18, 8, 14));
         sayUnoButton.setStyle(
                 "-fx-font-size: 14;" +
                         "-fx-font-weight: bold;" +
                         "-fx-background-color: #FFC107;" +
                         "-fx-text-fill: #000000;" +
                         "-fx-padding: 8px 16px;" +
-                        "-fx-background-radius: 8;"
+                        "-fx-background-radius: 8;" +
+                        "-fx-alignment: center"
         );
         sayUnoButton.setDisable(true);
         sayUnoButton.setMouseTransparent(false);
@@ -516,12 +508,6 @@ public class GameTable implements Initializable {
 
     /**
      * Activates the UNO countdown and gives the player 3 seconds to say UNO.
-     *
-     * FIX: The entire method is now wrapped in Platform.runLater() because it is
-     * called from CardStack.layCard() which runs on the JavaFX thread via a card
-     * button click — but the UNO countdown involves Timeline and Button.setDisable()
-     * which must always execute on the FX thread. Previously, inconsistent thread
-     * context caused the button to appear enabled but be unresponsive on the first attempt.
      */
     public void startUnoCountdown() {
         Platform.runLater(() -> {
@@ -537,9 +523,6 @@ public class GameTable implements Initializable {
                 unoCountdownTimer.stop();
             }
 
-            // Single KeyFrame fires after exactly 3 seconds — simpler and more reliable
-            // than setCycleCount(3) with a 1-second frame, which had edge cases where
-            // forgotToSayUno() was called in the wrong tick.
             unoCountdownTimer = new Timeline(
                     new KeyFrame(Duration.seconds(3), e -> {
                         unoTimeActive = false;
@@ -568,7 +551,6 @@ public class GameTable implements Initializable {
         });
     }
 
-
     /**
      * Indicates that the draw stack is empty by showing the emptyStack.png image.
      */
@@ -585,7 +567,6 @@ public class GameTable implements Initializable {
             }
         });
     }
-
 
     /**
      * Restores the original draw stack image (backside.png).
@@ -611,7 +592,6 @@ public class GameTable implements Initializable {
 
         Platform.runLater(() -> yourTurnLabel.setText(a ? "Your Turn!" : ""));
     }
-
 
     /**
      * Shows the player ranking once the game has ended.
@@ -671,7 +651,6 @@ public class GameTable implements Initializable {
         overlay.toFront();
     }
 
-
     /**
      * Switches back to the lobby after the game ends.
      */
@@ -706,7 +685,6 @@ public class GameTable implements Initializable {
             System.err.println("Fehler beim Zurueckkehren zur Lobby: " + e.getMessage());
         }
     }
-
 
     public GameLogic getGameLogic() {
         return gameLogic;

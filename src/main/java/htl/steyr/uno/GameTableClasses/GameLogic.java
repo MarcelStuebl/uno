@@ -267,7 +267,7 @@ public class GameLogic {
             if (msg.didSayUno()) {
                 notificationText = msg.username() + ": UNO!";
             } else {
-                notificationText = msg.username() + " forgot to say UNO! +2 cards";
+                notificationText = msg.username() + " forgot to say UNO!";
             }
 
             gameTable.getYourTurnLabel().setText(notificationText);

@@ -1,10 +1,6 @@
-package htl.steyr.uno.Lobby;
+package htl.steyr.uno;
 
 import htl.steyr.uno.GameTableClasses.GameTable;
-import htl.steyr.uno.HelloApplication;
-import htl.steyr.uno.LobbyController;
-import htl.steyr.uno.UiStyleUtil;
-import htl.steyr.uno.User;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
