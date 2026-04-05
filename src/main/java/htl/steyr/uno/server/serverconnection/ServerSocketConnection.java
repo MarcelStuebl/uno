@@ -44,6 +44,7 @@ public class ServerSocketConnection {
         this.socket = socket;
         try {
             socket.setKeepAlive(true);
+            socket.setSoTimeout(45000);
             
             out = new ObjectOutputStream(socket.getOutputStream());
             out.flush();
@@ -128,6 +129,7 @@ public class ServerSocketConnection {
      */
     public void startReceiving() {
         running = true;
+        startHeartbeat(); // Start heartbeat monitoring
         receivethread = new Thread(() -> {
             try {
                 while (running) {
@@ -557,8 +559,8 @@ public class ServerSocketConnection {
      * This method creates and starts a daemon thread that periodically checks if the connection is still active.
      * 
      * The heartbeat mechanism works as follows:
-     * 1. It sleeps for 30 seconds (HEARTBEAT_INTERVAL)
-     * 2. Every 30 seconds, it checks if the socket is still connected and not closed
+     * 1. It sleeps for 15 seconds (HEARTBEAT_INTERVAL) - reduced for faster detection
+     * 2. Every 15 seconds, it checks if the socket is still connected and not closed
      * 3. If the socket is detected as closed or disconnected, it calls handleDisconnection()
      * 4. This prevents "zombie connections" that appear active but cannot communicate
      * 
@@ -572,8 +574,7 @@ public class ServerSocketConnection {
      */
     public void startHeartbeat() {
         Thread heartbeatThread = new Thread(() -> {
-            final long HEARTBEAT_INTERVAL = 30000;
-            final long HEARTBEAT_TIMEOUT = 60000;
+            final long HEARTBEAT_INTERVAL = 15000;
             
             while (running) {
                 try {
@@ -583,9 +584,9 @@ public class ServerSocketConnection {
                         break;
                     }
                     
-                    // Check if connection is still active by attempting to access socket properties
+                    // Check if socket is still connected
                     if (!socket.isConnected() || socket.isClosed()) {
-                        handleDisconnection("Heartbeat timeout - no activity for " + HEARTBEAT_TIMEOUT + "ms");
+                        handleDisconnection("Heartbeat detected closed socket");
                         break;
                     }
                     
@@ -599,6 +600,7 @@ public class ServerSocketConnection {
             }
         });
         heartbeatThread.setDaemon(true);
+        heartbeatThread.setName("Heartbeat-" + socket.getRemoteSocketAddress());
         heartbeatThread.start();
     }
 
