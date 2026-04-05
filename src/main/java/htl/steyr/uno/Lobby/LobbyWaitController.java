@@ -35,6 +35,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -209,6 +211,7 @@ public class LobbyWaitController implements Initializable {
         });
 
         gameChatTextField.setOnMouseClicked(e -> chatExpanded.set(!chatExpanded.get()));
+        lobbyCodeLabel.setOnMouseClicked(e -> copyLobbyCodeToClipboard());
 
         updateLobbyInfo();
     }
@@ -327,6 +330,30 @@ public class LobbyWaitController implements Initializable {
                 Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
                 50, 50, true, true
         );
+    }
+
+    /**
+     * Kopiert den Lobby-Code in die Zwischenablage und zeigt eine
+     * Bestätigung im lobbyCodeLabel an.
+     *
+     * <p>Der ursprüngliche Text wird nach 2 Sekunden wiederhergestellt.</p>
+     */
+    private void copyLobbyCodeToClipboard() {
+        String fullText = lobbyCodeLabel.getText();
+        String code = fullText.replace("Lobby Code: ", "").trim();
+
+        StringSelection stringSelection = new StringSelection(code);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+
+        String originalText = lobbyCodeLabel.getText();
+        lobbyCodeLabel.setText("Code in der Zwischenablage gespeichert");
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(2), event -> {
+                    lobbyCodeLabel.setText(originalText);
+                })
+        );
+        timeline.play();
     }
 
     /**
