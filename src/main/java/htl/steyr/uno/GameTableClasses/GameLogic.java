@@ -2,7 +2,6 @@ package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
-import htl.steyr.uno.server.database.DatabaseUser;
 import javafx.application.Platform;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -52,6 +51,11 @@ public class GameLogic {
         Platform.runLater(() -> {
             getGameTable().getPlayer().addCardToHand(msg.card());
             getGameTable().updatePlayerHandUI();
+
+            // Check if player now has only 1 card left and it's their turn - start UNO countdown
+            if (getGameTable().getPlayer().isCurrentTurn() && getGameTable().getPlayer().getHand().size() == 1) {
+                getGameTable().startUnoCountdown();
+            }
         });
     }
 

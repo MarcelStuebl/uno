@@ -525,7 +525,7 @@ public class GameTable implements Initializable {
      */
     public void startUnoCountdown() {
         Platform.runLater(() -> {
-            if (unoTimeActive || !player.isCurrentTurn()) {
+            if (unoTimeActive) {
                 return;
             }
 

@@ -43,8 +43,6 @@ public class CardStack {
     }
 
 
-
-
     public void layCard(Card c, Button handButton, Player p) {
         if (c == null) return;
 
@@ -71,7 +69,6 @@ public class CardStack {
             // +2 auf +4: NICHT erlaubt
             Card top = getTopCard();
             if (top != null && top.getCardValue() == 14 && c.getCardValue() == 12) {
-                // Versuchen, +2 auf +4 zu legen - NICHT erlaubt!
                 shakeHandButton(handButton);
                 return;
             }
@@ -79,9 +76,8 @@ public class CardStack {
 
         Card top = getTopCard();
 
-        // if no card, just lay card
+        // Keine Karte auf dem Stapel — erste Karte legen
         if (top == null) {
-            // Wenn es eine black card ist, Farbe auswählen
             if (c.getCardColour().equals("black")) {
                 showColorSelection(c, p);
                 return;
@@ -92,7 +88,6 @@ public class CardStack {
                 p.setPassive(true);
             }
             getGameTable().updatePlayerHandUI();
-            // Check if player has only 1 card left - start UNO countdown
             if (p.getHand().size() == 1) {
                 getGameTable().startUnoCountdown();
             }
@@ -101,8 +96,8 @@ public class CardStack {
         }
 
         // Wenn drawPenaltyValue == 0 und die oberste Karte ist eine Penalty-Karte,
-        // dann hat der vorherige Spieler die Karten abgehoben.
-        // Wenn currentColor gesetzt ist, muss trotzdem die aktuelle Farbe beachtet werden
+        // dann hat der vorherige Spieler die Karten bereits abgehoben.
+        // FIX: startUnoCountdown() war in diesem Branch vergessen worden.
         if (top.getCardValue() >= 12 && currentPenalty != null && currentPenalty == 0 && (currentColor == null || currentColor.isBlank())) {
             if (c.getCardColour().equals("black")) {
                 showColorSelection(c, p);
@@ -114,13 +109,14 @@ public class CardStack {
                 p.setPassive(true);
             }
             getGameTable().updatePlayerHandUI();
+            if (p.getHand().size() == 1) {
+                getGameTable().startUnoCountdown(); // FIX: war hier vergessen
+            }
             getGameTable().getGameLogic().playCard(c, 0);
             return;
         }
 
         if (c.getCardColour().equals("black")) {
-            // Wenn currentColor gesetzt ist, darf der nächste Spieler nur +2 oder +4 spielen
-            // Ein Farbwechsel ist erlaubt, wenn die Penalty schon beglichen wurde
             if (currentColor != null && !currentColor.isBlank() && c.getCardValue() == 13 && currentPenalty != null && currentPenalty > 0) {
                 shakeHandButton(handButton);
                 return;
@@ -136,7 +132,6 @@ public class CardStack {
             effectiveTopColor = top.getChosenColour();
         }
 
-        // check if colour or value matches
         boolean colorMatch = c.getCardColour().equals(effectiveTopColor);
         boolean valueMatch = c.getCardValue() == top.getCardValue();
 
@@ -145,12 +140,10 @@ public class CardStack {
             return;
         }
 
-        // card valid, lay card
+        // Karte ist gültig — legen
         addToStack(c);
-
         p.removeCardFromHand(c);
 
-        // Wenn der Spieler keine Karten mehr hat, setze ihn auf passiv
         if (p.getHand().isEmpty()) {
             p.setPassive(true);
         }
@@ -162,7 +155,6 @@ public class CardStack {
             drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0) + 2;
         }
 
-        // Check if player has only 1 card left - start UNO countdown
         if (p.getHand().size() == 1) {
             getGameTable().startUnoCountdown();
         }
@@ -198,29 +190,23 @@ public class CardStack {
 
                 StackPane cardTile = new StackPane();
                 cardTile.setPrefSize(120, 160);
-
                 cardTile.setStyle("""
-                -fx-background-radius: 15;
-                -fx-border-radius: 15;
-                -fx-border-color: white;
-                -fx-border-width: 2;
-            """);
-
-                cardTile.setStyle(cardTile.getStyle() + "-fx-background-color: " + color + ";");
+                        -fx-background-radius: 15;
+                        -fx-border-radius: 15;
+                        -fx-border-color: white;
+                        -fx-border-width: 2;
+                        """ + "-fx-background-color: " + color + ";");
 
                 Text label = new Text(name);
                 label.setFill(Color.WHITE);
                 label.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-
                 cardTile.getChildren().add(label);
 
-                // Hover Effekt
                 cardTile.setOnMouseEntered(e -> {
                     cardTile.setScaleX(1.1);
                     cardTile.setScaleY(1.1);
                     cardTile.setOpacity(0.9);
                 });
-
                 cardTile.setOnMouseExited(e -> {
                     cardTile.setScaleX(1);
                     cardTile.setScaleY(1);
@@ -242,7 +228,6 @@ public class CardStack {
 
                     player.removeCardFromHand(card);
                     addToStack(card);
-                    // Check if player has only 1 card left - start UNO countdown
                     if (player.getHand().size() == 1) {
                         getGameTable().startUnoCountdown();
                     }
@@ -257,20 +242,16 @@ public class CardStack {
 
             container.getChildren().addAll(title, cardsBox);
             overlay.getChildren().add(container);
-
             gameTable.getRoot().getChildren().add(overlay);
         });
     }
 
     public void addToStack(Card c) {
-        // save card
         this.topCard = c;
 
-        // update visually
         visual.getChildren().clear();
 
         String path;
-
         if (c.getCardColour().equals("black") && c.getChosenColour() != null && !c.getChosenColour().isBlank()) {
             path = "/htl/steyr/uno/Uno_Cards/black/black" + c.getCardValue() + "-" + c.getChosenColour() + ".png";
         } else {
@@ -284,7 +265,6 @@ public class CardStack {
         UiStyleUtil.applyRoundedCardClip(iv, 137, 192, 18);
         visual.getChildren().add(iv);
 
-        // small pop animation
         ScaleTransition st = new ScaleTransition(Duration.millis(200), visual);
         st.setFromX(0.8);
         st.setFromY(0.8);
@@ -293,7 +273,6 @@ public class CardStack {
         st.play();
     }
 
-    // makes the button that is currently clicked shake if it is layable
     public void shakeHandButton(Button cardBtn) {
         TranslateTransition tt = new TranslateTransition(Duration.millis(50), cardBtn);
         tt.setFromX(0f);
@@ -302,7 +281,6 @@ public class CardStack {
         tt.setAutoReverse(true);
         tt.playFromStart();
     }
-
 
     public Card getTopCard() {
         return topCard;
