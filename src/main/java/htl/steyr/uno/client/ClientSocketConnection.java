@@ -86,6 +86,7 @@ public class ClientSocketConnection implements Closeable {
      */
     public void startReceiving() {
         running = true;
+        startHeartbeat();
         receiveThread = new Thread(() -> {
             try {
                 while (running) {
@@ -115,6 +116,7 @@ public class ClientSocketConnection implements Closeable {
                         case UpdateEnemyResponse msg -> updateEnemyResponse(msg);
                         case GameTurnResponse msg -> gameTurnResponse(msg);
                         case GameOverResponse msg -> gameOverResponse(msg);
+                        case HeartbeatPongResponse msg -> heartbeatPongResponse(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
                 }
@@ -289,7 +291,8 @@ public class ClientSocketConnection implements Closeable {
         sendMessage(msg);
     }
 
-
+    private void heartbeatPongResponse(HeartbeatPongResponse msg) {
+    }
 
 
 
@@ -301,6 +304,41 @@ public class ClientSocketConnection implements Closeable {
 
 
 
+
+
+    /**
+     * Starts a periodic heartbeat/ping thread to keep the connection alive.
+     * This prevents socket timeout on the server when the client is idle (e.g., waiting in lobby).
+     *
+     * The heartbeat mechanism works as follows:
+     * 1. Sleeps for 30 seconds (HEARTBEAT_INTERVAL)
+     * 2. Sends a HeartbeatPingRequest to the server
+     * 3. The server responds with a HeartbeatPongResponse
+     * 4. This keeps the connection active and resets the socket timeout counter
+     */
+    private void startHeartbeat() {
+        Thread heartbeatThread = new Thread(() -> {
+            final long HEARTBEAT_INTERVAL = 30000;
+
+            while (running) {
+                try {
+                    Thread.sleep(HEARTBEAT_INTERVAL);
+
+                    if (running && socket != null && !socket.isClosed()) {
+                        sendMessage(new HeartbeatPingRequest(new java.sql.Timestamp(System.currentTimeMillis())));
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    break;
+                }
+            }
+        });
+        heartbeatThread.setDaemon(true);
+        heartbeatThread.setName("Heartbeat-Client");
+        heartbeatThread.start();
+    }
 
 
     /**

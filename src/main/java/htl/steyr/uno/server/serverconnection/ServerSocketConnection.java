@@ -6,6 +6,8 @@ import htl.steyr.uno.requests.server.*;
 import htl.steyr.uno.server.database.DatabaseLog;
 import htl.steyr.uno.server.database.DatabaseUser;
 import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
+import htl.steyr.uno.requests.client.HeartbeatPingRequest;
+import htl.steyr.uno.requests.server.HeartbeatPongResponse;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -44,7 +46,7 @@ public class ServerSocketConnection {
         this.socket = socket;
         try {
             socket.setKeepAlive(true);
-            socket.setSoTimeout(45000);
+            socket.setSoTimeout(90000);
             
             out = new ObjectOutputStream(socket.getOutputStream());
             out.flush();
@@ -129,7 +131,7 @@ public class ServerSocketConnection {
      */
     public void startReceiving() {
         running = true;
-        startHeartbeat(); // Start heartbeat monitoring
+        startHeartbeat();
         receivethread = new Thread(() -> {
             try {
                 while (running) {
@@ -156,6 +158,7 @@ public class ServerSocketConnection {
                         case ReadyInGameTableRequest msg -> readyInGameTableRequest(msg);
                         case RequestCardRequest msg -> requestCardRequest(msg);
                         case SetProfileImageRequest msg -> setProfileImageRequest(msg);
+                        case HeartbeatPingRequest msg -> heartbeatPingRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
                     }
                 }
@@ -542,6 +545,17 @@ public class ServerSocketConnection {
         }
     }
 
+    /**
+     * Handles heartbeat ping requests from the client.
+     * The client sends these periodically to keep the connection alive and prevent socket timeout.
+     * The server responds immediately with a pong response to confirm the connection is active.
+     * 
+     * @param msg the heartbeat ping request from the client
+     */
+    private void heartbeatPingRequest(HeartbeatPingRequest msg) {
+        // Respond with pong immediately - this keeps the connection alive
+        sendMessage(new HeartbeatPongResponse());
+    }
 
     /**
      * End of the request handling methods.
