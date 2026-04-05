@@ -152,3 +152,9 @@
     -fx-background-color: #34a34a;
     -fx-cursor: hand;
 }
+
+.yourTurnLabel {
+    -fx-text-fill: #df1414;
+    -fx-font-size: 40px;
+    -fx-font-weight: bold;
+}

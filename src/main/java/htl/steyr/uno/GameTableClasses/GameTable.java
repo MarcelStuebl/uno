@@ -45,7 +45,7 @@ public class GameTable implements Initializable {
     private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
     private boolean gameOverOverlayShown = false;
-    private Label yourTurnLabel;
+    @FXML private Label yourTurnLabel;
 
     // Variables used for the player hand UI.
     private VBox handVBox; // VBox holding multiple rows of cards
@@ -91,13 +91,22 @@ public class GameTable implements Initializable {
             addCloseButton(root, stage);
             createWithdrawalStack(root);
 
-            if (startGameResponse.enemies().getFirst().getUsername().equals(getClient().getConn().getUser())){
-                yourTurnLabel.setText("Your Turn");
+            if (yourTurnLabel != null) {
+                StackPane.setAlignment(yourTurnLabel, Pos.TOP_CENTER);
+                StackPane.setMargin(yourTurnLabel, new Insets(90, 0, 0, 0));
+                yourTurnLabel.toFront();
             }
 
+            if (yourTurnLabel != null && getClient().getConn() != null && getClient().getConn().getUser() != null) {
+                String myUsername = getClient().getConn().getUser().getUsername();
+                if (startGameResponse.enemies().getFirst().getUsername().equals(myUsername)) {
+                    yourTurnLabel.setText("Your Turn!");
+                } else {
+                    yourTurnLabel.setText("");
+                }
+            }
         });
     }
-
 
     private void setupCentralStack() {
         StackPane.setAlignment(cardStack.getVisual(), javafx.geometry.Pos.CENTER);
@@ -502,6 +511,20 @@ public class GameTable implements Initializable {
         });
     }
 
+    public void setCurrentTurneLabel(boolean a) {
+        if (yourTurnLabel == null) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            if (a) {
+                yourTurnLabel.setText("Your Turn!");
+            } else {
+                yourTurnLabel.setText("");
+            }
+        });
+    }
+
 
     /**
      * Shows the player ranking once the game has ended.
@@ -602,19 +625,7 @@ public class GameTable implements Initializable {
         }
     }
 
-    public void setCurrentTurneLabel(boolean a) {
-        if (yourTurnLabel == null) {
-            return;
-        }
 
-        Platform.runLater(() -> {
-            if (a) {
-                yourTurnLabel.setText("Your Turn!");
-            } else {
-                yourTurnLabel.setText("");
-            }
-        });
-    }
 
     public GameLogic getGameLogic() {
         return gameLogic;
