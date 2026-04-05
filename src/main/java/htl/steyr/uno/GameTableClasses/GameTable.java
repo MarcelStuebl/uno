@@ -288,6 +288,7 @@ public class GameTable implements Initializable {
         while (index < cards.size()) {
             HBox row = new HBox();
             row.setAlignment(Pos.BOTTOM_CENTER);
+            row.setPickOnBounds(false);
 
             int remaining = cards.size() - index;
             int cardsInThisRow = Math.min(remaining, maxCardsPerRow);
