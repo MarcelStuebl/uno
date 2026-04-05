@@ -9,7 +9,7 @@
             <children>
                 <StackPane translateY="60" StackPane.alignment="CENTER">
                     <children>
-                        <Label fx:id="yourTurnLabel" prefHeight="58.0" prefWidth="269.0" styleClass="yourTurnLabel" StackPane.alignment="CENTER" />
+                        <Label fx:id="yourTurnLabel" prefHeight="58.0" prefWidth="582.0" styleClass="yourTurnLabel" StackPane.alignment="CENTER" />
                     </children>
                 </StackPane>
             </children></StackPane>

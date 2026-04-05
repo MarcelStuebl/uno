@@ -155,6 +155,7 @@
 
 .yourTurnLabel {
     -fx-text-fill: #df1414;
-    -fx-font-size: 40px;
+    -fx-font-size: 30px;
     -fx-font-weight: bold;
+    -fx-alignment: center;
 }
