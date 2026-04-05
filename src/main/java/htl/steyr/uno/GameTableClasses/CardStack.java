@@ -92,6 +92,10 @@ public class CardStack {
                 p.setPassive(true);
             }
             getGameTable().updatePlayerHandUI();
+            // Check if player has only 1 card left - start UNO countdown
+            if (p.getHand().size() == 1) {
+                getGameTable().startUnoCountdown();
+            }
             getGameTable().getGameLogic().playCard(c, 0);
             return;
         }
@@ -156,6 +160,11 @@ public class CardStack {
         Integer drawPenaltyForThisCard = 0;
         if (c.getCardValue() == 12) {
             drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0) + 2;
+        }
+
+        // Check if player has only 1 card left - start UNO countdown
+        if (p.getHand().size() == 1) {
+            getGameTable().startUnoCountdown();
         }
 
         getGameTable().getGameLogic().playCard(c, drawPenaltyForThisCard);
@@ -233,6 +242,10 @@ public class CardStack {
 
                     player.removeCardFromHand(card);
                     addToStack(card);
+                    // Check if player has only 1 card left - start UNO countdown
+                    if (player.getHand().size() == 1) {
+                        getGameTable().startUnoCountdown();
+                    }
                     getGameTable().getGameLogic().playCard(card, drawPenaltyForThisCard);
                     getGameTable().updatePlayerHandUI();
 

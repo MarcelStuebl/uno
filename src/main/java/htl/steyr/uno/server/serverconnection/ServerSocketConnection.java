@@ -157,6 +157,7 @@ public class ServerSocketConnection {
                         case CardPlayedRequest msg -> cardPlayedRequest(msg);
                         case ReadyInGameTableRequest msg -> readyInGameTableRequest(msg);
                         case RequestCardRequest msg -> requestCardRequest(msg);
+                        case SayUnoRequest msg -> sayUnoRequest(msg);
                         case SetProfileImageRequest msg -> setProfileImageRequest(msg);
                         case HeartbeatPingRequest msg -> heartbeatPingRequest(msg);
                         case null, default -> System.out.println("Received unknown message: " + obj);
@@ -531,6 +532,14 @@ public class ServerSocketConnection {
         Lobby lobby = server.getLobbyByConnection(this);
         if (lobby != null) {
             lobby.getGameLogic().requestCard(msg);
+        }
+    }
+
+
+    private void sayUnoRequest(SayUnoRequest msg) {
+        Lobby lobby = server.getLobbyByConnection(this);
+        if (lobby != null) {
+            lobby.getGameLogic().sayUno(msg);
         }
     }
 

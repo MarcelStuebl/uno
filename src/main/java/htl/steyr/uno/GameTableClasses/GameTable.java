@@ -8,6 +8,9 @@ import htl.steyr.uno.requests.server.GameOverResponse;
 import htl.steyr.uno.requests.server.GameTurnResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -57,6 +60,10 @@ public class GameTable implements Initializable {
 
     private final ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
 
+    private Button sayUnoButton; // Button to say "UNO"
+    private boolean unoTimeActive = false; // Indicates if the UNO countdown is active
+    private Timeline unoCountdownTimer; // Timer for the UNO countdown
+
 
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
@@ -90,6 +97,7 @@ public class GameTable implements Initializable {
             setupCentralStack();
             addCloseButton(root, stage);
             createWithdrawalStack(root);
+            createSayUnoButton(root);
 
             if (yourTurnLabel != null) {
                 StackPane.setAlignment(yourTurnLabel, Pos.TOP_CENTER);
@@ -105,21 +113,22 @@ public class GameTable implements Initializable {
                     yourTurnLabel.setText("");
                 }
             }
+
+            if (sayUnoButton != null) {
+                sayUnoButton.toFront();
+            }
         });
     }
 
     private void setupCentralStack() {
         StackPane.setAlignment(cardStack.getVisual(), javafx.geometry.Pos.CENTER);
+        cardStack.getVisual().setPickOnBounds(false);
         root.getChildren().add(cardStack.getVisual());
     }
 
 
     /**
      * Updates the enemy displays based on the current enemy list in the player object.
-     * Enemies are sorted so the player with the lowest relative player index is shown first.
-     * Depending on the number of enemies, they are placed in enemy1, enemy2, and enemy3
-     * so they are distributed evenly around the local player
-     * (e.g., with two enemies one is shown left and one right; with three enemies they form a triangle).
      */
     public void setEnemies() {
         List<Enemy> enemies = player.getEnemies();
@@ -160,8 +169,6 @@ public class GameTable implements Initializable {
 
     /**
      * Updates the highlight state of enemy displays to indicate whose turn it is.
-     *
-     * @param activePlayerIndex
      */
     public void refreshEnemyTurnHighlight(Integer activePlayerIndex) {
         if (player == null) {
@@ -186,7 +193,6 @@ public class GameTable implements Initializable {
                 }
             }
 
-
             ctrl.setTurnActive(isActiveTurn);
         }
     }
@@ -194,13 +200,6 @@ public class GameTable implements Initializable {
 
     /**
      * Adds an enemy display to the specified slot.
-     *
-     * @param slot
-     * @param name
-     * @param imageData
-     * @param cardCount
-     * @param passive
-     * @return
      */
     private EnemyDisplayController addPlayer(StackPane slot, String name, byte[] imageData, int cardCount, boolean passive) {
         Image profileImage;
@@ -239,14 +238,11 @@ public class GameTable implements Initializable {
 
     /**
      * Creates the player's hand card display at the bottom of the scene.
-     * Uses a VBox (handVBox) to support multiple card rows when the player has many cards.
-     * Each row is slightly overlapped so all cards remain visible.
-     * Also ensures the draw stack button stays in front and is not hidden by hand cards.
      */
     public void open() {
         handVBox = new VBox();
         handVBox.setAlignment(Pos.BOTTOM_CENTER);
-        handVBox.setSpacing(-200); // rows slightly overlap each other
+        handVBox.setSpacing(-200);
         handVBox.setMouseTransparent(false);
 
         updatePlayerHandUI();
@@ -258,31 +254,27 @@ public class GameTable implements Initializable {
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
         }
+        if (sayUnoButton != null) {
+            sayUnoButton.toFront();
+        }
     }
 
     /**
-     * Calculating the horizontal spacing between cards based on the number of cards in the row.
-     *
-     * @param cardCount
-     * @return
+     * Calculates the horizontal spacing between cards based on the number of cards in the row.
      */
     private double calculateSpacing(int cardCount) {
-        double minSpacing = -140; // tighter overlap for crowded rows
-        double maxSpacing = -50;  // less overlap for small rows
+        double minSpacing = -140;
+        double maxSpacing = -50;
 
         if (cardCount <= 5) return maxSpacing;
         if (cardCount >= maxCardsPerRow) return minSpacing;
 
-        // Linear interpolation between min and max
         return maxSpacing - ((cardCount - 5) * (Math.abs(maxSpacing - minSpacing) / (maxCardsPerRow - 5)));
     }
 
 
     /**
      * Updates the player's hand card display.
-     * Splits cards into multiple rows if there are more cards than the maximum per row (maxCardsPerRow).
-     * Each row is slightly overlapped so all cards remain visible.
-     * Also ensures the draw stack button always stays in front.
      */
     public void updatePlayerHandUI() {
         if (handVBox == null) return;
@@ -301,38 +293,32 @@ public class GameTable implements Initializable {
             int cardsInThisRow = Math.min(remaining, maxCardsPerRow);
 
             double spacing = calculateSpacing(cardsInThisRow);
-            row.setSpacing(spacing); // negative spacing = cards closer together
+            row.setSpacing(spacing);
 
-            // Add cards to row
             for (int i = 0; i < cardsInThisRow; i++) {
                 Button cardButton = createCardButton(cards.get(index));
-                // Slightly move cards upward for a layered effect
                 cardButton.setTranslateY(40 * rowNumber);
                 row.getChildren().add(cardButton);
                 index++;
             }
 
-            // Slightly shift each row downward so previous rows are visible
             row.setTranslateY(10 * rowNumber);
             rowNumber++;
 
             handVBox.getChildren().add(row);
         }
 
-        // Make sure the withdrawal button is always on top
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
+        }
+        if (sayUnoButton != null) {
+            sayUnoButton.toFront();
         }
     }
 
 
     /**
-     * Creates the card as a button with the corresponding card image.
-     * On hover, the card is slightly enlarged.
-     * On click, the card is played (layCard).
-     *
-     * @param c
-     * @return
+     * Creates a card button for the player's hand.
      */
     private Button createCardButton(Card c) {
         String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
@@ -357,9 +343,7 @@ public class GameTable implements Initializable {
         cardBtn.setPadding(javafx.geometry.Insets.EMPTY);
         cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
-        cardBtn.setOnAction(e -> {
-            cardStack.layCard(c, cardBtn, player);
-        });
+        cardBtn.setOnAction(e -> cardStack.layCard(c, cardBtn, player));
 
         ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), cardPane);
         ScaleTransition stExit = new ScaleTransition(Duration.millis(200), cardPane);
@@ -391,10 +375,7 @@ public class GameTable implements Initializable {
 
 
     /**
-     * Creates the close button "X" in the top-right corner of the scene.
-     *
-     * @param root
-     * @param stage
+     * Creates the close button in the top-right corner.
      */
     public void addCloseButton(StackPane root, Stage stage) {
         Button closeBtn = new Button("X");
@@ -424,11 +405,7 @@ public class GameTable implements Initializable {
 
 
     /**
-     * Creates the draw stack as a button with the backside.png image.
-     * On hover, the stack is slightly enlarged.
-     * On click, a card is drawn (or multiple cards if a penalty is active).
-     *
-     * @param root
+     * Creates the draw stack button.
      */
     public void createWithdrawalStack(StackPane root) {
         withdrawalButton = new Button();
@@ -466,8 +443,7 @@ public class GameTable implements Initializable {
 
         withdrawalButton.setOnAction(e -> {
             if (gameTurnResponse != null && gameTurnResponse.drawPenaltyValue() > 0) {
-                int penaltyValue = gameTurnResponse.drawPenaltyValue();
-                getGameLogic().requestCard(penaltyValue);
+                getGameLogic().requestCard(gameTurnResponse.drawPenaltyValue());
             } else {
                 getGameLogic().requestCard(1);
             }
@@ -475,6 +451,123 @@ public class GameTable implements Initializable {
 
         root.getChildren().add(withdrawalButton);
     }
+
+    /**
+     * Creates the "Say UNO" button.
+     */
+    private void createSayUnoButton(StackPane root) {
+        sayUnoButton = new Button("Say UNO");
+        sayUnoButton.setPrefSize(100, 50);
+        sayUnoButton.setStyle(
+                "-fx-font-size: 14;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-color: #FFC107;" +
+                        "-fx-text-fill: #000000;" +
+                        "-fx-padding: 8px 16px;" +
+                        "-fx-background-radius: 8;"
+        );
+        sayUnoButton.setDisable(true);
+        sayUnoButton.setMouseTransparent(false);
+        sayUnoButton.setFocusTraversable(true);
+        sayUnoButton.setPickOnBounds(true);
+
+        sayUnoButton.setOnMouseEntered(e -> {
+            if (!sayUnoButton.isDisabled()) {
+                new Timeline(new KeyFrame(Duration.millis(150),
+                        new KeyValue(sayUnoButton.scaleXProperty(), 1.15),
+                        new KeyValue(sayUnoButton.scaleYProperty(), 1.15)
+                )).play();
+            }
+        });
+
+        sayUnoButton.setOnMouseExited(e -> new Timeline(new KeyFrame(Duration.millis(150),
+                new KeyValue(sayUnoButton.scaleXProperty(), 1.0),
+                new KeyValue(sayUnoButton.scaleYProperty(), 1.0)
+        )).play());
+
+        sayUnoButton.setOnAction(e -> {
+            if (!unoTimeActive) return;
+
+            new Timeline(
+                    new KeyFrame(Duration.millis(100),
+                            new KeyValue(sayUnoButton.scaleXProperty(), 0.95),
+                            new KeyValue(sayUnoButton.scaleYProperty(), 0.95)
+                    ),
+                    new KeyFrame(Duration.millis(200),
+                            new KeyValue(sayUnoButton.scaleXProperty(), 1.0),
+                            new KeyValue(sayUnoButton.scaleYProperty(), 1.0)
+                    )
+            ).play();
+
+            unoTimeActive = false;
+            if (unoCountdownTimer != null) {
+                unoCountdownTimer.stop();
+            }
+            sayUnoButton.setDisable(true);
+            getGameLogic().sayUno();
+        });
+
+        StackPane.setAlignment(sayUnoButton, Pos.CENTER);
+        StackPane.setMargin(sayUnoButton, new Insets(0, -300, 0, 0));
+
+        root.getChildren().add(sayUnoButton);
+        sayUnoButton.toFront();
+    }
+
+    /**
+     * Activates the UNO countdown and gives the player 3 seconds to say UNO.
+     *
+     * FIX: The entire method is now wrapped in Platform.runLater() because it is
+     * called from CardStack.layCard() which runs on the JavaFX thread via a card
+     * button click — but the UNO countdown involves Timeline and Button.setDisable()
+     * which must always execute on the FX thread. Previously, inconsistent thread
+     * context caused the button to appear enabled but be unresponsive on the first attempt.
+     */
+    public void startUnoCountdown() {
+        Platform.runLater(() -> {
+            if (unoTimeActive || !player.isCurrentTurn()) {
+                return;
+            }
+
+            unoTimeActive = true;
+            sayUnoButton.setDisable(false);
+            sayUnoButton.toFront();
+
+            if (unoCountdownTimer != null) {
+                unoCountdownTimer.stop();
+            }
+
+            // Single KeyFrame fires after exactly 3 seconds — simpler and more reliable
+            // than setCycleCount(3) with a 1-second frame, which had edge cases where
+            // forgotToSayUno() was called in the wrong tick.
+            unoCountdownTimer = new Timeline(
+                    new KeyFrame(Duration.seconds(3), e -> {
+                        unoTimeActive = false;
+                        sayUnoButton.setDisable(true);
+                        getGameLogic().forgotToSayUno();
+                    })
+            );
+            unoCountdownTimer.setCycleCount(1);
+            unoCountdownTimer.play();
+        });
+    }
+
+    public boolean isUnoTimeActive() {
+        return unoTimeActive;
+    }
+
+    public void cancelUnoCountdown() {
+        Platform.runLater(() -> {
+            if (unoCountdownTimer != null) {
+                unoCountdownTimer.stop();
+            }
+            unoTimeActive = false;
+            if (sayUnoButton != null) {
+                sayUnoButton.setDisable(true);
+            }
+        });
+    }
+
 
     /**
      * Indicates that the draw stack is empty by showing the emptyStack.png image.
@@ -516,20 +609,12 @@ public class GameTable implements Initializable {
             return;
         }
 
-        Platform.runLater(() -> {
-            if (a) {
-                yourTurnLabel.setText("Your Turn!");
-            } else {
-                yourTurnLabel.setText("");
-            }
-        });
+        Platform.runLater(() -> yourTurnLabel.setText(a ? "Your Turn!" : ""));
     }
 
 
     /**
      * Shows the player ranking once the game has ended.
-     *
-     * @param msg
      */
     public void showGameOverOverlay(GameOverResponse msg) {
         if (msg == null || gameOverOverlayShown || root == null) {
@@ -588,10 +673,7 @@ public class GameTable implements Initializable {
 
 
     /**
-     * Called when the player wants to return to the lobby after a game ends.
-     * Ensures the connection to the current lobby is left and a new lobby scene is shown.
-     * Also closes the current GameTable scene and updates the client's LobbyController reference
-     * so the player can interact in the lobby again.
+     * Switches back to the lobby after the game ends.
      */
     private void switchBackToLobby() {
         try {
@@ -626,7 +708,6 @@ public class GameTable implements Initializable {
     }
 
 
-
     public GameLogic getGameLogic() {
         return gameLogic;
     }
@@ -650,6 +731,7 @@ public class GameTable implements Initializable {
     public ArrayList<EnemyDisplayController> getEnemyControllers() {
         return enemyControllers;
     }
+
     public void setPlayer(Player player) {
         this.player = player;
     }
@@ -657,7 +739,12 @@ public class GameTable implements Initializable {
     public GameTurnResponse getGameTurnResponse() {
         return gameTurnResponse;
     }
+
     public void setGameTurnResponse(GameTurnResponse gameTurnResponse) {
         this.gameTurnResponse = gameTurnResponse;
+    }
+
+    public Label getYourTurnLabel() {
+        return yourTurnLabel;
     }
 }
