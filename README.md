@@ -90,11 +90,6 @@ uno/
 │   │   ├── GameTable.java
 │   │   └── Player.java
 │   │
-│   ├── Lobby/
-│   │   ├── LobbyTestApplication.java
-│   │   ├── LobbyTestLauncher.java
-│   │   └── LobbyWaitController.java
-│   │
 │   ├── requests/
 │   │   ├── client/
 │   │   │   ├── CardPlayedRequest.java
@@ -104,11 +99,13 @@ uno/
 │   │   │   ├── CreateLobbyRequest.java
 │   │   │   ├── ForgotPasswordRequest.java
 │   │   │   ├── ForgotPasswordSendCodeRequest.java
+│   │   │   ├── HeartbeatPingRequest.java
 │   │   │   ├── JoinLobbyRequest.java
 │   │   │   ├── LeaveLobbyRequest.java
 │   │   │   ├── LoginRequest.java
 │   │   │   ├── ReadyInGameTableRequest.java
 │   │   │   ├── RequestCardRequest.java
+│   │   │   ├── SayUnoRequest.java
 │   │   │   ├── SendChatMessageRequest.java
 │   │   │   ├── SetProfileImageRequest.java
 │   │   │   └── StartGameRequest.java
@@ -120,7 +117,9 @@ uno/
 │   │       ├── CreateAccountSuccessResponse.java
 │   │       ├── EnemyDrawnCardsResponse.java
 │   │       ├── ForgotPasswordResponse.java
+│   │       ├── GameOverResponse.java
 │   │       ├── GameTurnResponse.java
+│   │       ├── HeartbeatPongResponse.java
 │   │       ├── LobbyInfoResponse.java
 │   │       ├── LobbyJoinRefusedResponse.java
 │   │       ├── LobbyNotFoundResponse.java
@@ -130,6 +129,7 @@ uno/
 │   │       ├── ReceiveChatMessageResponse.java
 │   │       ├── StackInfoResponse.java
 │   │       ├── StartGameResponse.java
+│   │       ├── UnoNotificationResponse.java
 │   │       └── UpdateEnemyResponse.java
 │   │
 │   └── server/
@@ -152,6 +152,7 @@ uno/
 │       ├── HelloApplication.java
 │       ├── Launcher.java
 │       ├── LobbyController.java
+│       ├── LobbyWaitController.java
 │       ├── LoginController.java
 │       ├── PasswordUtil.java
 │       ├── UiStyleUtil.java
@@ -159,6 +160,8 @@ uno/
 │
 ├── src/main/resources/htl.steyr.uno/
 │   ├── img/
+│   │   ├── logo.ico
+│   │   ├── logo.png
 │   │   └── profile.png
 │   ├── style/
 │   │   ├── enemy.css
@@ -173,7 +176,8 @@ uno/
 │   │   ├── green/
 │   │   ├── red/
 │   │   ├── yellow/
-│   │   └── backside.png
+│   │   ├── backside.png
+│   │   └── emptyStack.png
 │   ├── enemy.fxml
 │   ├── gameTable.fxml
 │   ├── lobby.fxml
