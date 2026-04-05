@@ -223,6 +223,19 @@ public class DatabaseUser {
     }
 
 
+    public void updateUserStats(String username, boolean won) throws SQLException {
+        String query = "UPDATE user SET games_won = games_won + ?, games_lost = games_lost + ? WHERE username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, won ? 1 : 0);
+            pstmt.setInt(2, won ? 0 : 1);
+            pstmt.setString(3, username);
+            pstmt.executeUpdate();
+        }
+    }
+
+
 }
 
 

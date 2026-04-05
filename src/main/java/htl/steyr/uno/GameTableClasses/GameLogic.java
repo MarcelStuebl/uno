@@ -2,6 +2,7 @@ package htl.steyr.uno.GameTableClasses;
 
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
+import htl.steyr.uno.server.database.DatabaseUser;
 import javafx.application.Platform;
 
 public class GameLogic {
@@ -195,6 +196,17 @@ public class GameLogic {
 
 
     public void gameOverResponse(GameOverResponse msg) {
+        // Update personal win state
+        for (int i = 0; i < msg.getPlayers().size(); i++) {
+            Player player = msg.getPlayers().get(i);
+            if (player.getUsername().equals(getGameTable().getPlayer().getUsername())) {
+                boolean won = (i == 0);
+                getGameTable().getClient().getConn().getUser().setGamesWon(getGameTable().getClient().getConn().getUser().getGamesWon() + (won ? 1 : 0));
+                getGameTable().getClient().getConn().getUser().setGamesLost(getGameTable().getClient().getConn().getUser().getGamesLost() + (won ? 0 : 1));
+            }
+        }
+
+
         Platform.runLater(() -> {
             if (getGameTable() != null) {
                 getGameTable().showGameOverOverlay(msg);

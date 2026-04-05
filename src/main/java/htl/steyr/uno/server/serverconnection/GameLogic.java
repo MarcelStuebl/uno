@@ -5,6 +5,7 @@ import htl.steyr.uno.GameTableClasses.*;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
+import htl.steyr.uno.server.database.DatabaseUser;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -484,10 +485,30 @@ public class GameLogic {
         }
 
         ArrayList<Player> ranking = buildRankingForGameOver();
-        lobby.sendInfoToAll(new GameOverResponse(ranking, new ArrayList<>(leftPlayers)));
+        GameOverResponse msg = new GameOverResponse(ranking, new ArrayList<>(leftPlayers));
+        lobby.sendInfoToAll(msg);
+        updateGameStats(msg);
         gameOverSent = true;
         return true;
     }
+
+
+    private void updateGameStats(GameOverResponse msg) {
+        for (int i = 0; i < msg.getPlayers().size(); i++) {
+            Player player = msg.getPlayers().get(i);
+            if (player != null && player.getUsername() != null) {
+                boolean won = (i == 0);
+                try {
+                    DatabaseUser dbUser = new DatabaseUser();
+                    dbUser.updateUserStats(player.getUsername(), won);
+                } catch (Exception e) {
+                    System.err.println("Failed to update stats for user " + player.getUsername() + ": " + e.getMessage());
+                }
+            }
+        }
+    }
+
+
 
     private ArrayList<Player> buildRankingForGameOver() {
         ArrayList<Player> ranking = new ArrayList<>();
