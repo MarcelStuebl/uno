@@ -46,7 +46,6 @@ public class Server {
 
                     ServerSocketConnection client = new ServerSocketConnection(s, this);
                     client.startReceiving();
-                    client.startHeartbeat();
 
                     connections.add(client);
                     System.out.println("[" + s.getRemoteSocketAddress() + "] New connection");

@@ -66,7 +66,7 @@ public class ServerSocketConnection {
      *
      * @param message
      */
-    public void sendMessage(Object message) {
+    public synchronized void sendMessage(Object message) {
         if (!running) {
             return;
         }

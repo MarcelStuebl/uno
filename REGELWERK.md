@@ -52,8 +52,8 @@ Eine spielende Person muss:
 
 Ist keine passende Karte vorhanden:
 1. Eine Karte vom Nachziehstapel ziehen
-2. Ist diese spielbar, darf sie sofort gelegt werden
-3. Andernfalls endet der Zug
+2. Die Karte darf NICHT gespielt werden
+3. Der nächste Spieler kommt an die Reihe
 
 ---
 

@@ -48,7 +48,7 @@ public class ClientSocketConnection implements Closeable {
      * @param message the message object to send
      * @throws RuntimeException if an I/O error occurs while sending the message
      */
-    public void sendMessage(Object message) {
+    public synchronized void sendMessage(Object message) {
         try {
             out.writeObject(message);
             out.flush();

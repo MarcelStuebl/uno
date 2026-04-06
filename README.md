@@ -212,8 +212,9 @@ uno/
       <br />
       <h3>Marcel STÜBL</h3>
       <img src="https://img.shields.io/badge/Server-2D2D2D?style=for-the-badge&logo=serverfault&logoColor=white" alt="Server"/>
-      <img src="https://img.shields.io/badge/Backend-007396?style=for-the-badge&logo=java&logoColor=white" alt="Backend"/>
       <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+      <img src="https://img.shields.io/badge/Backend-007396?style=for-the-badge&logo=java&logoColor=white" alt="Backend"/>
+<img src="https://img.shields.io/badge/Logic-0CA678?style=for-the-badge&logo=codeforces&logoColor=white" alt="Logic"/>
       <img src="https://img.shields.io/badge/Docs-7048E8?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Docs"/>
       <br /><br />
       <a href="mailto:mstuebl@htl-steyr.ac.at">mstuebl@htl-steyr.ac.at</a>
