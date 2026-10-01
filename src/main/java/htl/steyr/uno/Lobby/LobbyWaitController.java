@@ -89,6 +89,9 @@ public class LobbyWaitController implements Initializable {
     /** Die aktuellen Lobby-Informationen vom Server. */
     private LobbyInfoResponse lobby;
 
+    /** Steuert, ob der Lobby-Code in die Zwischenablage kopiert werden kann. */
+    private boolean copyToClipboardEnabled = true;
+
     /**
      * Erstellt einen neuen {@code LobbyWaitController}.
      *
@@ -339,21 +342,28 @@ public class LobbyWaitController implements Initializable {
      * <p>Der ursprüngliche Text wird nach 2 Sekunden wiederhergestellt.</p>
      */
     private void copyLobbyCodeToClipboard() {
-        String fullText = lobbyCodeLabel.getText();
-        String code = fullText.replace("Lobby Code: ", "").trim();
+        if (!copyToClipboardEnabled) {
+            return;
+        }else {
+            copyToClipboardEnabled = false;
+            String fullText = lobbyCodeLabel.getText();
+            String code = fullText.replace("Lobby Code: ", "").trim();
 
-        StringSelection stringSelection = new StringSelection(code);
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            StringSelection stringSelection = new StringSelection(code);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
 
-        String originalText = lobbyCodeLabel.getText();
-        lobbyCodeLabel.setText("Code in der Zwischenablage gespeichert");
+            String originalText = lobbyCodeLabel.getText();
+            lobbyCodeLabel.setText("Code in der Zwischenablage gespeichert");
 
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(2), event -> {
-                    lobbyCodeLabel.setText(originalText);
-                })
-        );
-        timeline.play();
+            Timeline timeline = new Timeline(
+                    new KeyFrame(Duration.seconds(2), event -> {
+                        lobbyCodeLabel.setText(originalText);
+                        copyToClipboardEnabled = true;
+                    })
+            );
+            timeline.play();
+        }
+
     }
 
     /**
