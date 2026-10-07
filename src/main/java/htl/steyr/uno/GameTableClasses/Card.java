@@ -1,5 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -21,11 +23,20 @@ public class Card implements Serializable {
     private final String cardId;
 
     public Card(int value, String colour) {
+        this(value, colour, null, UUID.randomUUID().toString());
+    }
+
+    @JsonCreator
+    public Card(@JsonProperty("cardValue") int value,
+                @JsonProperty("cardColour") String colour,
+                @JsonProperty("chosenColour") String chosenColour,
+                @JsonProperty("cardId") String cardId) {
         colour = colour.toLowerCase();
 
         this.CardValue = value;
         this.CardColour = colour;
-        this.cardId = UUID.randomUUID().toString();
+        this.chosenColour = chosenColour;
+        this.cardId = cardId == null ? UUID.randomUUID().toString() : cardId;
     }
 
     @Override

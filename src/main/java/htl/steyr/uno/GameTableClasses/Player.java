@@ -1,5 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import htl.steyr.uno.User;
 
 import java.io.Serializable;
@@ -15,7 +17,20 @@ public class Player implements Serializable {
     private boolean isPassive;
     private byte[] imageBytes;
 
-    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, boolean isPassive, byte[] imageBytes) {
+    public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies,
+                  Integer playerIndex, boolean isPassive, byte[] imageBytes) {
+        this(username, isCurrentTurn, hand, enemies, playerIndex, isPassive, imageBytes, false);
+    }
+
+    @JsonCreator
+    public Player(@JsonProperty("username") String username,
+                  @JsonProperty("currentTurn") boolean isCurrentTurn,
+                  @JsonProperty("hand") ArrayList<Card> hand,
+                  @JsonProperty("enemies") ArrayList<Enemy> enemies,
+                  @JsonProperty("playerIndex") Integer playerIndex,
+                  @JsonProperty("passive") boolean isPassive,
+                  @JsonProperty("imageBytes") byte[] imageBytes,
+                  @JsonProperty("ready") boolean isReady) {
         setUsername(username);
         setCurrentTurn(isCurrentTurn);
         getHand().addAll(hand);
@@ -24,6 +39,7 @@ public class Player implements Serializable {
         setPassive(isPassive);
         sortHand();
         setImageBytes(imageBytes);
+        setReady(isReady);
     }
 
     public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies, Integer playerIndex, byte[] imageBytes) {

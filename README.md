@@ -10,9 +10,49 @@ UNO ist eine digitale Umsetzung des gleichnamigen Kartenspiels, entwickelt von 4
 
 Das Spiel ist **rein auf Multiplayer ausgelegt**: Ein **Singleplayer-Modus ist nicht verfügbar**. Eine Runde kann nur gestartet werden, wenn **mindestens 2 und maximal 4 Spieler** in einer Lobby sind.
 
-Die Kommunikation zwischen Client und Server erfolgt über eine Socket-Verbindung. Als Server dient ein Docker-Container, der auf einem Raspberry Pi betrieben wird — dadurch ist das Spiel jederzeit erreichbar, ohne dass ein eigener Rechner laufen muss.
+Die Kommunikation zwischen Client und Server erfolgt über eine WebSocket-Verbindung. Als Server dient ein Docker-Container, der auf einem Raspberry Pi betrieben wird — dadurch ist das Spiel jederzeit erreichbar, ohne dass ein eigener Rechner laufen muss.
 
 Das Projekt wurde innerhalb einer Zeitvorgabe von 2 Monaten gestartet und wird seither laufend weiterentwickelt. Der Fokus liegt auf einer stabilen Serverarchitektur, einer benutzerfreundlichen JavaFX-Oberfläche sowie einer sauberen Umsetzung der UNO-Spielregeln.
+
+## WebSocket-Protokoll und Client-Integration
+
+Der Server lauscht weiterhin auf **Port 59362**, verwendet jetzt aber WebSockets
+(`ws://<server>:59362`) statt Java-`ObjectInputStream`/`ObjectOutputStream`.
+Damit können auch Browser- und Android-Clients direkt verbunden werden. Jede
+Nachricht ist ein UTF-8-JSON-Objekt mit einer stabilen Typbezeichnung und einem
+JSON-Payload:
+
+```json
+{
+  "version": 1,
+  "type": "LoginRequest",
+  "payload": {
+    "username": "alice",
+    "password": "secret"
+  }
+}
+```
+
+`version` ist die Version des öffentlichen Netzwerkprotokolls. Clients sollten
+Nachrichten mit einer unbekannten Version ablehnen; neue optionale Felder
+können innerhalb derselben Version ergänzt werden.
+
+`type` entspricht dem Namen der bestehenden Request-/Response-Klasse (zum
+Beispiel `LoginSuccessResponse`, `LobbyInfoResponse`, `CardPlayedRequest` oder
+`HeartbeatPingRequest`). Die Payload-Felder entsprechen deren bisherigen
+Record-/Getter-Namen. Verschachtelte Spielobjekte (`User`, `Card`, `Player`,
+`Enemy`, Listen und Lobby-Antworten) werden als normale JSON-Objekte übertragen;
+`byte[]`-Profilbilder werden als Base64-Strings codiert. Ein Web-Client kann
+beispielsweise mit `new WebSocket("ws://server:59362")` verbinden und
+`JSON.stringify({type: "JoinLobbyRequest", payload: {lobbyId: 12}})` senden.
+
+Die JavaFX-Windows-App und der Server verwenden beide dieselbe JSON-Schicht.
+Die bestehenden Java-Records bleiben dabei interne, typsichere DTOs der
+Server-/Windows-Implementierung; sie sind keine Voraussetzung für Web- oder
+Android-Clients und werden nicht über das Netzwerk serialisiert. Verbindungen
+müssen regelmäßig
+`HeartbeatPingRequest` senden; der Server antwortet mit
+`HeartbeatPongResponse`.
 
 ---
 
@@ -267,4 +307,3 @@ uno/
 Dieses Projekt steht unter der [MIT License](LICENSE).
 
 ---
-
