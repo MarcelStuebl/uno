@@ -16,8 +16,12 @@ Das Projekt wurde innerhalb einer Zeitvorgabe von 2 Monaten gestartet und wird s
 
 ## WebSocket-Protokoll und Client-Integration
 
-Der Server lauscht weiterhin auf **Port 59362**, verwendet jetzt aber WebSockets
-(`ws://<server>:59362`) statt Java-`ObjectInputStream`/`ObjectOutputStream`.
+Die vollständige Protokollspezifikation mit Nachrichtenübersichten und
+Ablaufdiagramm steht in [protocol.md](PROTOCOL.md).
+
+Der Server lauscht weiterhin auf **Port 59362**, verwendet jetzt aber
+WebSockets (`ws://<server>:59362`) statt Java-`ObjectInputStream`/
+`ObjectOutputStream`.
 Damit können auch Browser- und Android-Clients direkt verbunden werden. Jede
 Nachricht ist ein UTF-8-JSON-Objekt mit einer stabilen Typbezeichnung und einem
 JSON-Payload:
