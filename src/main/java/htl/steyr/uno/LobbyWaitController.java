@@ -246,6 +246,13 @@ public class LobbyWaitController implements Initializable {
                 nameLabel.setPrefWidth(180);
                 nameLabel.setAlignment(Pos.CENTER_LEFT);
 
+                kickButton.setPrefWidth(100);
+                kickButton.setMinWidth(100);
+                kickButton.setMaxWidth(100);
+                kickButton.setAlignment(Pos.CENTER);
+
+                buttonBox.getChildren().add(kickButton);
+
                 rootPane.setPadding(new Insets(6, 10, 6, 10));
                 BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
                 rootPane.getStyleClass().add("playerCellRoot");
@@ -399,6 +406,11 @@ public class LobbyWaitController implements Initializable {
             return;
         }
         client.getConn().startGame();
+    }
+
+
+    private void kickButtonClicked(ActionEvent actionEvent) {
+
     }
 
     /**
