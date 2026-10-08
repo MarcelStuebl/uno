@@ -31,10 +31,7 @@ public class CardStack {
         this.visual.setPrefSize(137, 192);
         this.visual.setMaxSize(137, 192);
         this.visual.setStyle("-fx-background-color: transparent;" +
-                "-fx-border-color: green;" +
-                "-fx-border-width: 6;" +
-                "-fx-border-radius: 5;" +
-                "-fx-background-radius: 5;");
+                "-fx-border-color: transparent;");
         this.gameTable = gameTable;
     }
 
