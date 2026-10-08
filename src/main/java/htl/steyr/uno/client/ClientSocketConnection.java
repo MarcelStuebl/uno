@@ -202,6 +202,8 @@ public class ClientSocketConnection implements Closeable {
             client.getLobbyWaitController().receiveChatMessage(msg);
         } else if (client.getLobbyController() != null) {
             client.getLobbyController().receiveChatMessage(msg);
+        } else if (client.getGameTable() != null) {
+            client.getGameTable().receiveChatMessage(msg);
         }
     }
 

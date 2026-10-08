@@ -6,11 +6,9 @@ import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.GameOverResponse;
 import htl.steyr.uno.requests.server.GameTurnResponse;
+import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
-import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +19,9 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -30,7 +31,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -64,6 +67,13 @@ public class GameTable implements Initializable {
     private boolean unoTimeActive = false; // Indicates if the UNO countdown is active
     private Timeline unoCountdownTimer; // Timer for the UNO countdown
 
+    private StackPane chatBubbleButton;
+    private VBox chatPanel;
+    private ListView<ChatMessage> chatListView;
+    private TextField chatInput;
+    private boolean chatOpen = false;
+    private StackPane overlayLayer;
+
 
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
@@ -95,6 +105,45 @@ public class GameTable implements Initializable {
             stage.setResizable(true);
 
             setupCentralStack();
+
+            overlayLayer = new StackPane();
+            overlayLayer.setPickOnBounds(false);
+            overlayLayer.setMouseTransparent(false);
+            root.getChildren().add(overlayLayer);
+            overlayLayer.toFront();
+
+            chatBubbleButton = createChatBubble();
+            overlayLayer.getChildren().add(chatBubbleButton);
+            chatBubbleButton.toFront();
+
+            chatPanel = createChatPanel();
+            overlayLayer.getChildren().add(chatPanel);
+            chatPanel.toFront();
+
+            root.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+                if (!chatOpen) {
+                    return;
+                }
+
+                Object target = event.getTarget();
+                if (target instanceof Node node && isInsideChatInteraction(node)) {
+                    return;
+                }
+
+                closeChatPanel();
+            });
+
+            // Key-Listener für 'T'
+            stage.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                if (event.getCode() == KeyCode.T && !event.isConsumed()) {
+                    if (chatInput != null && chatInput.isFocused()) {
+                        return;
+                    }
+                    animateBubbleClick(chatBubbleButton);
+                    toggleChatPanel();
+                }
+            });
+
             addCloseButton(root, stage);
             createWithdrawalStack(root);
             createSayUnoButton(root);
@@ -118,6 +167,188 @@ public class GameTable implements Initializable {
                 sayUnoButton.toFront();
             }
         });
+    }
+
+    private StackPane createChatBubble() {
+        Label chatIcon = new Label("💬");
+        chatIcon.setStyle("-fx-font-size: 22px;");
+
+        Label keyHint = new Label("[T]");
+        keyHint.getStyleClass().add("game-chat-key");
+
+        VBox bubbleContent = new VBox(2, chatIcon, keyHint);
+        bubbleContent.setAlignment(Pos.CENTER);
+
+        StackPane chatBubbleButton = new StackPane(bubbleContent);
+        chatBubbleButton.setPrefSize(76, 76);
+        chatBubbleButton.setMaxSize(76, 76);
+        chatBubbleButton.getStyleClass().add("game-chat-bubble");
+
+        chatBubbleButton.setOnMouseClicked(e -> {
+            animateBubbleClick(chatBubbleButton);
+            toggleChatPanel();
+        });
+
+        StackPane.setAlignment(chatBubbleButton, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(chatBubbleButton, new Insets(0, -8, 18, 0));
+
+        return chatBubbleButton;
+    }
+
+    private VBox createChatPanel() {
+        chatListView = new ListView<>();
+        chatListView.getStyleClass().add("game-chat-list");
+        chatListView.setPrefSize(320, 260);
+        chatListView.setMaxSize(320, 260);
+        chatListView.setMinSize(320, 260);
+        chatListView.setCellFactory(list -> new ListCell<ChatMessage>() {
+            @Override
+            protected void updateItem(ChatMessage item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+
+                String currentUser = client.getConn() != null && client.getConn().getUser() != null
+                        ? client.getConn().getUser().getUsername() : "";
+                boolean mine = currentUser.equals(item.sender());
+
+                Label senderLabel = new Label(item.sender());
+                senderLabel.getStyleClass().add("game-chat-sender");
+
+                Label bubble = new Label(item.text());
+                bubble.setWrapText(true);
+                bubble.setMaxWidth(220);
+                bubble.getStyleClass().add(mine ? "game-chat-bubble-mine" : "game-chat-bubble-other");
+
+                VBox body = new VBox(3, senderLabel, bubble);
+                body.setFillWidth(false);
+                body.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+                HBox row = new HBox(body);
+                row.setPadding(new Insets(4, 8, 4, 8));
+                row.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+                setText(null);
+                setGraphic(row);
+            }
+        });
+
+        chatInput = new TextField();
+        chatInput.setPromptText("Nachricht senden...");
+        chatInput.getStyleClass().add("game-chat-input");
+        chatInput.setOnAction(event -> sendCurrentChatMessage());
+
+        VBox panel = new VBox(8, chatListView, chatInput);
+        panel.setPadding(new Insets(10));
+        panel.setPrefSize(340, 320);
+        panel.setMaxSize(340, 320);
+        panel.getStyleClass().add("game-chat-panel");
+
+        panel.setVisible(false);
+        panel.setManaged(false);
+        panel.setOpacity(0.0);
+        StackPane.setAlignment(panel, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(panel, new Insets(0, -20, 90, 0));
+
+        return panel;
+    }
+
+    private boolean isInsideChatInteraction(Node node) {
+        for (Node current = node; current != null; current = current.getParent()) {
+            if (current == chatPanel || current == chatBubbleButton || current == chatInput || current == chatListView) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void toggleChatPanel() {
+        if (chatPanel == null) {
+            return;
+        }
+
+        if (chatOpen) {
+            closeChatPanel();
+            return;
+        }
+
+        chatOpen = true;
+        chatPanel.setVisible(true);
+        chatPanel.setManaged(true);
+
+        FadeTransition fade = new FadeTransition(Duration.millis(150), chatPanel);
+        fade.setFromValue(0.0);
+        fade.setToValue(1.0);
+        fade.setOnFinished(event -> {
+            chatInput.requestFocus();
+        });
+        fade.play();
+    }
+
+    private void closeChatPanel() {
+        if (chatPanel == null || !chatOpen) {
+            return;
+        }
+
+        chatOpen = false;
+        FadeTransition fade = new FadeTransition(Duration.millis(120), chatPanel);
+        fade.setFromValue(1.0);
+        fade.setToValue(0.0);
+        fade.setOnFinished(event -> {
+            chatPanel.setVisible(false);
+            chatPanel.setManaged(false);
+        });
+        fade.play();
+    }
+
+    private void sendCurrentChatMessage() {
+        if (chatInput == null) {
+            return;
+        }
+
+        String text = chatInput.getText();
+        if (text == null || text.isBlank()) {
+            return;
+        }
+
+        String trimmed = text.trim();
+        chatInput.clear();
+
+        if (client.getConn() != null && client.getConn().getUser() != null) {
+            client.sendChatMessage(trimmed);
+        }
+    }
+
+    public void receiveChatMessage(ReceiveChatMessageResponse msg) {
+        if (chatListView == null) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            chatListView.getItems().add(new ChatMessage(msg.user().getUsername(), msg.message()));
+            chatListView.scrollTo(chatListView.getItems().size() - 1);
+
+            if (!chatOpen) {
+                toggleChatPanel();
+            }
+        });
+    }
+
+    private void animateBubbleClick(Node node) {
+        ScaleTransition scaleDown = new ScaleTransition(Duration.millis(80), node);
+        scaleDown.setToX(0.85);
+        scaleDown.setToY(0.85);
+
+        ScaleTransition scaleUp = new ScaleTransition(Duration.millis(80), node);
+        scaleUp.setToX(1.0);
+        scaleUp.setToY(1.0);
+
+        SequentialTransition bounce = new SequentialTransition(scaleDown, scaleUp);
+        bounce.play();
     }
 
     private void setupCentralStack() {
@@ -747,5 +978,8 @@ public class GameTable implements Initializable {
 
     public Label getYourTurnLabel() {
         return yourTurnLabel;
+    }
+
+    public record ChatMessage(String sender, String text) {
     }
 }

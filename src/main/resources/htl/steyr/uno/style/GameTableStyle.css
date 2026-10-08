@@ -158,3 +158,84 @@
     -fx-font-size: 40px;
     -fx-font-weight: bold;
 }
+
+.game-chat-bubble {
+    -fx-background-color: linear-gradient(to bottom, rgba(88, 160, 255, 0.98), rgba(46, 103, 205, 0.95));
+    -fx-background-radius: 38px;
+    -fx-border-radius: 38px;
+    -fx-border-color: rgba(255, 255, 255, 0.35);
+    -fx-border-width: 1.2;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(8, 20, 36, 0.35), 12, 0.2, 0, 6);
+}
+
+.game-chat-key {
+    -fx-font-size: 10px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(7, 12, 22, 0.42);
+    -fx-background-radius: 6px;
+    -fx-padding: 2 5 2 5;
+}
+
+.game-chat-panel {
+    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.92), rgba(10, 15, 25, 0.9));
+    -fx-background-radius: 18px;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-width: 1;
+    -fx-border-radius: 18px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.42), 14, 0.2, 0, 8);
+}
+
+.game-chat-list {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-control-inner-background-alt: transparent;
+    -fx-padding: 0;
+}
+
+.game-chat-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.game-chat-list .list-cell:selected,
+.game-chat-list .list-cell:filled:selected:hover {
+    -fx-background-color: transparent;
+}
+
+.game-chat-input {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: rgba(255,255,255,0.55);
+    -fx-padding: 8 10 8 10;
+}
+
+.game-chat-sender {
+    -fx-text-fill: rgba(255, 255, 255, 0.72);
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.game-chat-bubble-mine {
+    -fx-background-color: linear-gradient(to bottom, rgba(89, 162, 255, 0.95), rgba(53, 104, 227, 0.95));
+    -fx-text-fill: white;
+    -fx-padding: 9 12 9 12;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 0.8;
+}
+
+.game-chat-bubble-other {
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+    -fx-text-fill: white;
+    -fx-padding: 9 12 9 12;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-width: 0.8;
+}
