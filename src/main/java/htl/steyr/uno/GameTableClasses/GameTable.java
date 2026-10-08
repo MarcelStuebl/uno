@@ -325,10 +325,8 @@ public class GameTable implements Initializable {
         cardPane.setPrefSize(137, 192);
         cardPane.setStyle(
                 "-fx-background-color: transparent;" +
-                        "-fx-border-color: green;" +
-                        "-fx-border-width: 6;" +
-                        "-fx-border-radius: 6;" +
-                        "-fx-background-radius: 6;"
+                        "-fx-border-color: transparent;" +
+                        "-fx-padding: 0;"
         );
 
         Button cardBtn = new Button();
