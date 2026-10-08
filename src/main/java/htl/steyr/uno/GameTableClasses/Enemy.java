@@ -1,5 +1,7 @@
 package htl.steyr.uno.GameTableClasses;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import htl.steyr.uno.UiStyleUtil;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
@@ -20,7 +22,13 @@ public class Enemy implements Serializable {
     private byte[] imageBytes;
 
 
-    public Enemy(String username, boolean isCurrentTurn, int cardCount, Integer playerIndex, boolean isPassive, byte[] imageBytes) {
+    @JsonCreator
+    public Enemy(@JsonProperty("username") String username,
+                 @JsonProperty("currentTurn") boolean isCurrentTurn,
+                 @JsonProperty("handSize") int cardCount,
+                 @JsonProperty("playerIndex") Integer playerIndex,
+                 @JsonProperty("passive") boolean isPassive,
+                 @JsonProperty("imageBytes") byte[] imageBytes) {
         setUsername(username);
         setCurrentTurn(isCurrentTurn);
         setHandSize(cardCount);
@@ -107,7 +115,6 @@ public class Enemy implements Serializable {
     }
 
 }
-
 
 
 

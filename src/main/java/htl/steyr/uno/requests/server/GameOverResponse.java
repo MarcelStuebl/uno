@@ -1,5 +1,7 @@
 package htl.steyr.uno.requests.server;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import htl.steyr.uno.GameTableClasses.Player;
 
 import java.io.Serializable;
@@ -12,7 +14,9 @@ public class GameOverResponse implements Serializable {
     private ArrayList<Player> players;
     private final Set<String> leftPlayers = new HashSet<>();
     
-    public GameOverResponse(ArrayList<Player> players, ArrayList<String> leftPlayers) {
+    @JsonCreator
+    public GameOverResponse(@JsonProperty("players") ArrayList<Player> players,
+                            @JsonProperty("leftPlayers") ArrayList<String> leftPlayers) {
         setPlayers(players);
         if (leftPlayers != null) {
             this.leftPlayers.addAll(leftPlayers);

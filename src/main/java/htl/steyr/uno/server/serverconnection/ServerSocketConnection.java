@@ -6,14 +6,10 @@ import htl.steyr.uno.requests.server.*;
 import htl.steyr.uno.server.database.DatabaseLog;
 import htl.steyr.uno.server.database.DatabaseUser;
 import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
-import htl.steyr.uno.requests.client.HeartbeatPingRequest;
-import htl.steyr.uno.requests.server.HeartbeatPongResponse;
+import htl.steyr.uno.protocol.JsonMessageCodec;
+import org.java_websocket.WebSocket;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -22,58 +18,32 @@ public class ServerSocketConnection {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private final Server server;
-    private final Socket socket;
-    private ObjectInputStream in;
-    private ObjectOutputStream out;
-    private Thread receivethread;
-    private boolean running;
+    private final WebSocket webSocket;
+    private volatile boolean running;
     private User user;
     private PasswordForgotten passwordForgotten;
     private Integer createAccountCode;
 
 
     /**
-     * The constructor for the ServerSocketConnection class initializes the connection with the client by setting up input and output streams for communication.
-     * It takes a Socket object representing the client's connection and a reference to the Server instance as parameters.
-     * The constructor creates an ObjectOutputStream for sending messages to the client and an ObjectInputStream for receiving messages from the client.
-     * If an IOException occurs during the setup of the streams, it throws a RuntimeException.
+     * Attaches a WebSocket connection to the server-side request dispatcher.
      *
-     * @param socket
-     * @param server
+     * @param webSocket client WebSocket
+     * @param server server instance
      */
-    public ServerSocketConnection(Socket socket, Server server) {
+    public ServerSocketConnection(WebSocket webSocket, Server server) {
         this.server = server;
-        this.socket = socket;
-        try {
-            socket.setKeepAlive(true);
-            socket.setSoTimeout(90000);
-            
-            out = new ObjectOutputStream(socket.getOutputStream());
-            out.flush();
-            in = new ObjectInputStream(socket.getInputStream());
-        } catch (IOException e) {
-            System.out.println("Error setting up connection: " + e.getMessage());
-            throw new RuntimeException("Failed to initialize ServerSocketConnection: " + e.getMessage(), e);
-        }
+        this.webSocket = webSocket;
     }
 
 
-    /**
-     * The sendMessage method is responsible for sending a message to the client through the output stream.
-     * It takes an Object as a parameter, which represents the message to be sent.
-     * The method first resets the output stream to ensure that any previous messages are cleared, then it writes the message object to the stream and flushes it to ensure that the message is sent immediately
-     * If an IOException occurs during the process of sending the message, the connection is closed and cleaned up.
-     *
-     * @param message
-     */
+    /** Sends an encoded JSON message to the client. */
     public synchronized void sendMessage(Object message) {
         if (!running) {
             return;
         }
         try {
-            out.reset();
-            out.writeObject(message);
-            out.flush();
+            webSocket.send(JsonMessageCodec.encode(message));
         } catch (IOException e) {
             handleDisconnection("Send error: " + e.getMessage());
         }
@@ -103,9 +73,8 @@ public class ServerSocketConnection {
             System.out.println("Error during removeConnection: " + e.getMessage());
         }
         
-        try {
-            socket.close();
-        } catch (IOException ignored) {
+        if (webSocket.isOpen()) {
+            webSocket.close();
         }
     }
 
@@ -119,7 +88,7 @@ public class ServerSocketConnection {
      * @param msg the message object to be logged
      */
     private void sendLogMessage(Object msg) {
-        server.sendLogMessage("[" + socket.getRemoteSocketAddress() + "] " + msg);
+        server.sendLogMessage("[" + remoteAddress() + "] " + msg);
     }
 
 
@@ -132,60 +101,43 @@ public class ServerSocketConnection {
     public void startReceiving() {
         running = true;
         startHeartbeat();
-        receivethread = new Thread(() -> {
-            try {
-                while (running) {
-                    Object obj = in.readObject();
-                    
-                    if (obj == null) {
-                        System.out.println("Received null object from " + socket.getRemoteSocketAddress());
-                        break;
-                    }
+    }
 
-                    switch (obj) {
-                        case LoginRequest msg -> loginRequest(msg);
-                        case CreateAccountRequest msg -> createAccountRequest(msg);
-                        case CreateLobbyRequest msg -> createLobbyRequest(msg);
-                        case JoinLobbyRequest msg -> joinLobbyRequest(msg);
-                        case LeaveLobbyRequest msg -> leftLobbyRequest(msg);
-                        case SendChatMessageRequest msg -> sendChatMessageRequest(msg);
-                        case ForgotPasswordRequest msg -> forgotPasswordRequest(msg);
-                        case ForgotPasswordSendCodeRequest msg -> forgotPasswordSendCodeRequest(msg);
-                        case ChangePasswordRequest msg -> changePasswordRequest(msg);
-                        case CheckIfUserAlreadyExistsRequest msg -> checkIfUserAlreadyExistsRequest(msg);
-                        case StartGameRequest msg -> startGameRequest(msg);
-                        case CardPlayedRequest msg -> cardPlayedRequest(msg);
-                        case ReadyInGameTableRequest msg -> readyInGameTableRequest(msg);
-                        case RequestCardRequest msg -> requestCardRequest(msg);
-                        case SayUnoRequest msg -> sayUnoRequest(msg);
-                        case SetProfileImageRequest msg -> setProfileImageRequest(msg);
-                        case HeartbeatPingRequest msg -> heartbeatPingRequest(msg);
-                        case null, default -> System.out.println("Received unknown message: " + obj);
-                    }
-                }
-            } catch (EOFException e) {
-                System.out.println("Client disconnected (EOF): " + socket.getRemoteSocketAddress());
-            } catch (java.net.SocketException e) {
-                System.out.println("Socket error (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
-            } catch (java.net.SocketTimeoutException e) {
-                System.out.println("Socket timeout (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
-            } catch (java.io.InvalidClassException e) {
-                System.out.println("Invalid class received (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
-            } catch (java.io.StreamCorruptedException e) {
-                System.out.println("Stream corrupted (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
-            } catch (ClassNotFoundException e) {
-                System.out.println("Class not found (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
-            } catch (IOException e) {
-                System.out.println("IO error (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
-            } catch (Exception e) {
-                System.out.println("Unexpected error (" + socket.getRemoteSocketAddress() + "): " + e.getMessage());
-                e.printStackTrace();
-            } finally {
-                cleanupConnection();
+    /**
+     * Decodes one WebSocket text frame and dispatches it to the existing
+     * request handlers. No Java class names or serialized object bytes cross
+     * the network.
+     */
+    public void onMessage(String json) {
+        if (!running) {
+            return;
+        }
+        try {
+            JsonMessageCodec.DecodedMessage message = JsonMessageCodec.decode(json);
+            switch (message.type()) {
+                case "LoginRequest" -> loginRequest(JsonMessageCodec.convert(message, LoginRequest.class));
+                case "CreateAccountRequest" -> createAccountRequest(JsonMessageCodec.convert(message, CreateAccountRequest.class));
+                case "CreateLobbyRequest" -> createLobbyRequest(JsonMessageCodec.convert(message, CreateLobbyRequest.class));
+                case "JoinLobbyRequest" -> joinLobbyRequest(JsonMessageCodec.convert(message, JoinLobbyRequest.class));
+                case "LeaveLobbyRequest" -> leftLobbyRequest(JsonMessageCodec.convert(message, LeaveLobbyRequest.class));
+                case "SendChatMessageRequest" -> sendChatMessageRequest(JsonMessageCodec.convert(message, SendChatMessageRequest.class));
+                case "ForgotPasswordRequest" -> forgotPasswordRequest(JsonMessageCodec.convert(message, ForgotPasswordRequest.class));
+                case "ForgotPasswordSendCodeRequest" -> forgotPasswordSendCodeRequest(JsonMessageCodec.convert(message, ForgotPasswordSendCodeRequest.class));
+                case "ChangePasswordRequest" -> changePasswordRequest(JsonMessageCodec.convert(message, ChangePasswordRequest.class));
+                case "CheckIfUserAlreadyExistsRequest" -> checkIfUserAlreadyExistsRequest(JsonMessageCodec.convert(message, CheckIfUserAlreadyExistsRequest.class));
+                case "StartGameRequest" -> startGameRequest(JsonMessageCodec.convert(message, StartGameRequest.class));
+                case "CardPlayedRequest" -> cardPlayedRequest(JsonMessageCodec.convert(message, CardPlayedRequest.class));
+                case "ReadyInGameTableRequest" -> readyInGameTableRequest(JsonMessageCodec.convert(message, ReadyInGameTableRequest.class));
+                case "RequestCardRequest" -> requestCardRequest(JsonMessageCodec.convert(message, RequestCardRequest.class));
+                case "SayUnoRequest" -> sayUnoRequest(JsonMessageCodec.convert(message, SayUnoRequest.class));
+                case "SetProfileImageRequest" -> setProfileImageRequest(JsonMessageCodec.convert(message, SetProfileImageRequest.class));
+                case "HeartbeatPingRequest" -> heartbeatPingRequest(JsonMessageCodec.convert(message, HeartbeatPingRequest.class));
+                default -> System.out.println("Unknown UNO message type from " + remoteAddress() + ": " + message.type());
             }
-        });
-        receivethread.setDaemon(false);
-        receivethread.start();
+        } catch (Exception e) {
+            System.out.println("Invalid UNO message from " + remoteAddress() + ": " + e.getMessage());
+            closeWithReason("Invalid message");
+        }
     }
     
     /**
@@ -211,12 +163,8 @@ public class ServerSocketConnection {
             e.printStackTrace();
         }
         
-        try {
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
-            }
-        } catch (IOException e) {
-            System.out.println("Error closing socket: " + e.getMessage());
+        if (webSocket.isOpen()) {
+            webSocket.close();
         }
     }
 
@@ -244,17 +192,17 @@ public class ServerSocketConnection {
     private void loginRequest(LoginRequest request) throws SQLException {
         sendLogMessage(request);
 
-        server.getConnections().removeIf(c -> {
+        server.getClientConnections().removeIf(c -> {
             try {
                 return c.getUser() != null && c.getUser().getUsername() != null &&
                        c.getUser().getUsername().equals(request.username()) &&
-                       (c.getSocket() == null || c.getSocket().isClosed() || !c.isRunning());
+                       (c.getWebSocket() == null || !c.getWebSocket().isOpen() || !c.isRunning());
             } catch (Exception e) {
                 return false;
             }
         });
 
-        if (server.getConnections().stream().filter(c -> c.getUser() != null).anyMatch(c -> c.getUser().getUsername().equals(request.username()))) {
+        if (server.getClientConnections().stream().filter(c -> c.getUser() != null).anyMatch(c -> c.getUser().getUsername().equals(request.username()))) {
             LoginFailedResponse msg = new LoginFailedResponse(2);
             sendMessage(msg);
             sendLogMessage(msg);
@@ -267,10 +215,10 @@ public class ServerSocketConnection {
         DatabaseLog dbLog = new DatabaseLog();
         if (user == null) {
             msg = new LoginFailedResponse(1);
-            dbLog.logUserLogin(null, request.username(), socket.getRemoteSocketAddress().toString(), false);
+            dbLog.logUserLogin(null, request.username(), remoteAddress(), false);
         } else {
             msg = new LoginSuccessResponse(user);
-            dbLog.logUserLogin(user.getId(), request.username(), socket.getRemoteSocketAddress().toString(), true);
+            dbLog.logUserLogin(user.getId(), request.username(), remoteAddress(), true);
         }
         sendMessage(msg);
         sendLogMessage(msg);
@@ -603,12 +551,11 @@ public class ServerSocketConnection {
                 try {
                     Thread.sleep(HEARTBEAT_INTERVAL);
                     
-                    if (!running || socket.isClosed()) {
+                    if (!running || !webSocket.isOpen()) {
                         break;
                     }
                     
-                    // Check if socket is still connected
-                    if (!socket.isConnected() || socket.isClosed()) {
+                    if (!webSocket.isOpen()) {
                         handleDisconnection("Heartbeat detected closed socket");
                         break;
                     }
@@ -623,7 +570,7 @@ public class ServerSocketConnection {
             }
         });
         heartbeatThread.setDaemon(true);
-        heartbeatThread.setName("Heartbeat-" + socket.getRemoteSocketAddress());
+        heartbeatThread.setName("Heartbeat-" + remoteAddress());
         heartbeatThread.start();
     }
 
@@ -631,7 +578,19 @@ public class ServerSocketConnection {
         return running;
     }
 
-    public Socket getSocket() {
-        return socket;
+    public WebSocket getWebSocket() {
+        return webSocket;
+    }
+
+    public void close() {
+        cleanupConnection();
+    }
+
+    public void closeWithReason(String reason) {
+        handleDisconnection(reason);
+    }
+
+    private String remoteAddress() {
+        return String.valueOf(webSocket.getRemoteSocketAddress());
     }
 }
