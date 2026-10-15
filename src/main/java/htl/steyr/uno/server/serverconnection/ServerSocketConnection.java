@@ -121,6 +121,7 @@ public class ServerSocketConnection {
                 case "JoinLobbyRequest" -> joinLobbyRequest(JsonMessageCodec.convert(message, JoinLobbyRequest.class));
                 case "LeaveLobbyRequest" -> leftLobbyRequest(JsonMessageCodec.convert(message, LeaveLobbyRequest.class));
                 case "SendChatMessageRequest" -> sendChatMessageRequest(JsonMessageCodec.convert(message, SendChatMessageRequest.class));
+                case "SendEmojiReactionRequest" -> sendEmojiReactionRequest(JsonMessageCodec.convert(message, SendEmojiReactionRequest.class));
                 case "ForgotPasswordRequest" -> forgotPasswordRequest(JsonMessageCodec.convert(message, ForgotPasswordRequest.class));
                 case "ForgotPasswordSendCodeRequest" -> forgotPasswordSendCodeRequest(JsonMessageCodec.convert(message, ForgotPasswordSendCodeRequest.class));
                 case "ChangePasswordRequest" -> changePasswordRequest(JsonMessageCodec.convert(message, ChangePasswordRequest.class));
@@ -324,6 +325,17 @@ public class ServerSocketConnection {
         Lobby lobby = server.getLobbies().stream().filter(l -> l.getConnections().contains(this)).findFirst().orElse(null);
         if (lobby != null) {
             lobby.sendChatMessage(msg);
+        }
+    }
+
+    private void sendEmojiReactionRequest(SendEmojiReactionRequest msg) {
+        if (user == null || msg.emoji() == null) {
+            return;
+        }
+
+        Lobby lobby = server.getLobbyByConnection(this);
+        if (lobby != null && lobby.getStatus() == 2) {
+            lobby.sendEmojiReaction(this, msg.emoji());
         }
     }
 
