@@ -170,6 +170,15 @@
     -fx-effect: dropshadow(three-pass-box, rgba(8, 20, 36, 0.35), 12, 0.2, 0, 6);
 }
 
+.game-chat-unread-badge {
+    -fx-background-color: #e53935;
+    -fx-background-radius: 50%;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 4, 0.2, 0, 1);
+}
+
 .game-chat-key {
     -fx-font-size: 10px;
     -fx-text-fill: white;
@@ -180,7 +189,7 @@
 }
 
 .game-chat-panel {
-    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.92), rgba(10, 15, 25, 0.9));
+    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.76), rgba(10, 15, 25, 0.72));
     -fx-background-radius: 18px;
     -fx-border-color: rgba(255, 255, 255, 0.12);
     -fx-border-width: 1;
@@ -203,6 +212,10 @@
 .game-chat-list .list-cell:selected,
 .game-chat-list .list-cell:filled:selected:hover {
     -fx-background-color: transparent;
+}
+
+.game-chat-list .scroll-bar:vertical {
+    -fx-opacity: 0;
 }
 
 .game-chat-input {
@@ -261,7 +274,7 @@
 }
 
 .game-chat-panel {
-    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.92), rgba(10, 15, 25, 0.9));
+    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.76), rgba(10, 15, 25, 0.72));
     -fx-background-radius: 18px;
     -fx-border-color: rgba(255, 255, 255, 0.12);
     -fx-border-width: 1;
