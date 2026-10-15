@@ -9,10 +9,14 @@ import javafx.scene.layout.Pane;
 
 public class EnemyDisplayController {
 
-    @FXML private HBox rootPanel;
-    @FXML private Label usernameLabel;
-    @FXML private ImageView profileImageView;
-    @FXML private Pane cardPane;
+    @FXML
+    private HBox rootPanel;
+    @FXML
+    private Label usernameLabel;
+    @FXML
+    private ImageView profileImageView;
+    @FXML
+    private Pane cardPane;
 
     private static final double CARD_W = 28.0;
     private static final double CARD_H = 44.0;
@@ -102,7 +106,7 @@ public class EnemyDisplayController {
         try {
             var stream = EnemyDisplayController.class.getResourceAsStream(CARD_IMAGE_PATH);
             if (stream != null) {
-                cachedCardImage = new Image(stream, (int)(CARD_W * 4), (int)(CARD_H * 4), true, true);
+                cachedCardImage = new Image(stream, (int) (CARD_W * 4), (int) (CARD_H * 4), true, true);
             } else {
                 System.err.println("backside.png nicht gefunden: " + CARD_IMAGE_PATH);
             }

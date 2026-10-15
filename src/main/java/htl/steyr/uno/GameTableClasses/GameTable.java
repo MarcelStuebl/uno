@@ -41,6 +41,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -49,25 +50,29 @@ import java.util.*;
 public class GameTable implements Initializable {
 
     private final Client client;
-    @FXML private StackPane root;
+    @FXML
+    private StackPane root;
     CardStack cardStack = new CardStack(this);
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
     private Player player;
-    private HBox handBox;
     private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
     private boolean gameOverOverlayShown = false;
     private boolean withdrawalButtonCooldown = false;
-    @FXML private Label yourTurnLabel;
+    @FXML
+    private Label yourTurnLabel;
 
     // Variables used for the player hand UI.
     private VBox handVBox; // VBox holding multiple rows of cards
     private int maxCardsPerRow = 30; // maximum cards in one row
 
-    @FXML private StackPane enemy1;
-    @FXML private StackPane enemy2;
-    @FXML private StackPane enemy3;
+    @FXML
+    private StackPane enemy1;
+    @FXML
+    private StackPane enemy2;
+    @FXML
+    private StackPane enemy3;
 
     private final ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
 
@@ -152,17 +157,11 @@ public class GameTable implements Initializable {
             });
 
             root.addEventFilter(ScrollEvent.SCROLL, event -> {
-                if (!chatOpen || chatListView == null
-                        || !chatListView.localToScene(chatListView.getBoundsInLocal())
-                        .contains(event.getSceneX(), event.getSceneY())) {
+                if (!chatOpen || chatListView == null || !chatListView.localToScene(chatListView.getBoundsInLocal()).contains(event.getSceneX(), event.getSceneY())) {
                     return;
                 }
 
-                Optional<ScrollBar> verticalScrollBar = chatListView.lookupAll(".scroll-bar").stream()
-                        .filter(ScrollBar.class::isInstance)
-                        .map(ScrollBar.class::cast)
-                        .filter(scrollBar -> scrollBar.getOrientation() == javafx.geometry.Orientation.VERTICAL)
-                        .findFirst();
+                Optional<ScrollBar> verticalScrollBar = chatListView.lookupAll(".scroll-bar").stream().filter(ScrollBar.class::isInstance).map(ScrollBar.class::cast).filter(scrollBar -> scrollBar.getOrientation() == javafx.geometry.Orientation.VERTICAL).findFirst();
                 if (verticalScrollBar.isPresent()) {
                     int scrollSteps = (int) Math.max(1, Math.abs(event.getDeltaY()) / 40);
                     ScrollBar scrollBar = verticalScrollBar.get();
@@ -267,8 +266,7 @@ public class GameTable implements Initializable {
                     return;
                 }
 
-                String currentUser = client.getConn() != null && client.getConn().getUser() != null
-                        ? client.getConn().getUser().getUsername() : "";
+                String currentUser = client.getConn() != null && client.getConn().getUser() != null ? client.getConn().getUser().getUsername() : "";
                 boolean mine = currentUser.equals(item.sender());
 
                 Label senderLabel = new Label(item.sender());
@@ -447,7 +445,7 @@ public class GameTable implements Initializable {
             return Integer.compare(ai, bi);
         });
 
-        StackPane[] slotOrder = { enemy3, enemy1, enemy2 };
+        StackPane[] slotOrder = {enemy3, enemy1, enemy2};
 
         int[] slotIndices = switch (sorted.size()) {
             case 1 -> new int[]{1};
@@ -485,10 +483,7 @@ public class GameTable implements Initializable {
             boolean isActiveTurn = false;
             if (activePlayerIndex != null) {
                 for (Enemy enemy : player.getEnemies()) {
-                    if (enemy != null
-                            && enemy.getUsername() != null
-                            && enemy.getUsername().equals(ctrl.getUsername())
-                            && activePlayerIndex.equals(enemy.getPlayerIndex())) {
+                    if (enemy != null && enemy.getUsername() != null && enemy.getUsername().equals(ctrl.getUsername()) && activePlayerIndex.equals(enemy.getPlayerIndex())) {
                         isActiveTurn = true;
                         break;
                     }
@@ -507,10 +502,7 @@ public class GameTable implements Initializable {
         if (imageData != null && imageData.length > 0) {
             profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
         } else {
-            profileImage = new Image(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
-                    50, 50, true, true
-            );
+            profileImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")), 50, 50, true, true);
         }
 
         URL url = GameTable.class.getResource("/htl/steyr/uno/enemy.fxml");
@@ -629,11 +621,7 @@ public class GameTable implements Initializable {
 
         StackPane cardPane = new StackPane(iv);
         cardPane.setPrefSize(137, 192);
-        cardPane.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-border-color: transparent;" +
-                        "-fx-padding: 0;"
-        );
+        cardPane.setStyle("-fx-background-color: transparent;" + "-fx-border-color: transparent;" + "-fx-padding: 0;");
 
         Button cardBtn = new Button();
         cardBtn.setGraphic(cardPane);
@@ -679,13 +667,7 @@ public class GameTable implements Initializable {
         closeBtn.setPadding(javafx.geometry.Insets.EMPTY);
         closeBtn.setAlignment(Pos.CENTER);
 
-        closeBtn.setStyle(
-                "-fx-background-color: #d32f2f;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-size: 18;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 20;"
-        );
+        closeBtn.setStyle("-fx-background-color: #d32f2f;" + "-fx-text-fill: white;" + "-fx-font-size: 18;" + "-fx-font-weight: bold;" + "-fx-background-radius: 20;");
 
         closeBtn.setOnAction(e -> onSceneClose());
         stage.setOnCloseRequest(ev -> {
@@ -731,7 +713,7 @@ public class GameTable implements Initializable {
             hoverOut.stop();
             hoverIn.playFromStart();
         });
-         withdrawalButton.setOnMouseExited(e -> {
+        withdrawalButton.setOnMouseExited(e -> {
             hoverIn.stop();
             hoverOut.playFromStart();
         });
@@ -752,9 +734,7 @@ public class GameTable implements Initializable {
             }
 
             // Re-enable button after 1 second
-            Timeline cooldownTimer = new Timeline(
-                    new KeyFrame(Duration.seconds(1), event -> withdrawalButtonCooldown = false)
-            );
+            Timeline cooldownTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> withdrawalButtonCooldown = false));
             cooldownTimer.play();
         });
 
@@ -769,15 +749,7 @@ public class GameTable implements Initializable {
         sayUnoButton.setPrefSize(100, 50);
         sayUnoButton.setAlignment(Pos.CENTER_LEFT);
         sayUnoButton.setPadding(new Insets(8, 18, 8, 14));
-        sayUnoButton.setStyle(
-                "-fx-font-size: 14;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-color: #FFC107;" +
-                        "-fx-text-fill: #000000;" +
-                        "-fx-padding: 8px 16px;" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-alignment: center"
-        );
+        sayUnoButton.setStyle("-fx-font-size: 14;" + "-fx-font-weight: bold;" + "-fx-background-color: #FFC107;" + "-fx-text-fill: #000000;" + "-fx-padding: 8px 16px;" + "-fx-background-radius: 8;" + "-fx-alignment: center");
         sayUnoButton.setDisable(true);
         sayUnoButton.setMouseTransparent(false);
         sayUnoButton.setFocusTraversable(true);
@@ -785,31 +757,16 @@ public class GameTable implements Initializable {
 
         sayUnoButton.setOnMouseEntered(e -> {
             if (!sayUnoButton.isDisabled()) {
-                new Timeline(new KeyFrame(Duration.millis(150),
-                        new KeyValue(sayUnoButton.scaleXProperty(), 1.15),
-                        new KeyValue(sayUnoButton.scaleYProperty(), 1.15)
-                )).play();
+                new Timeline(new KeyFrame(Duration.millis(150), new KeyValue(sayUnoButton.scaleXProperty(), 1.15), new KeyValue(sayUnoButton.scaleYProperty(), 1.15))).play();
             }
         });
 
-        sayUnoButton.setOnMouseExited(e -> new Timeline(new KeyFrame(Duration.millis(150),
-                new KeyValue(sayUnoButton.scaleXProperty(), 1.0),
-                new KeyValue(sayUnoButton.scaleYProperty(), 1.0)
-        )).play());
+        sayUnoButton.setOnMouseExited(e -> new Timeline(new KeyFrame(Duration.millis(150), new KeyValue(sayUnoButton.scaleXProperty(), 1.0), new KeyValue(sayUnoButton.scaleYProperty(), 1.0))).play());
 
         sayUnoButton.setOnAction(e -> {
             if (!unoTimeActive) return;
 
-            new Timeline(
-                    new KeyFrame(Duration.millis(100),
-                            new KeyValue(sayUnoButton.scaleXProperty(), 0.95),
-                            new KeyValue(sayUnoButton.scaleYProperty(), 0.95)
-                    ),
-                    new KeyFrame(Duration.millis(200),
-                            new KeyValue(sayUnoButton.scaleXProperty(), 1.0),
-                            new KeyValue(sayUnoButton.scaleYProperty(), 1.0)
-                    )
-            ).play();
+            new Timeline(new KeyFrame(Duration.millis(100), new KeyValue(sayUnoButton.scaleXProperty(), 0.95), new KeyValue(sayUnoButton.scaleYProperty(), 0.95)), new KeyFrame(Duration.millis(200), new KeyValue(sayUnoButton.scaleXProperty(), 1.0), new KeyValue(sayUnoButton.scaleYProperty(), 1.0))).play();
 
             unoTimeActive = false;
             if (unoCountdownTimer != null) {
@@ -828,7 +785,7 @@ public class GameTable implements Initializable {
 
     /**
      * Activates the UNO countdown and gives the player 3 seconds to say UNO.
-     *
+     * <p>
      * FIX: The entire method is now wrapped in Platform.runLater() because it is
      * called from CardStack.layCard() which runs on the JavaFX thread via a card
      * button click — but the UNO countdown involves Timeline and Button.setDisable()
@@ -852,13 +809,10 @@ public class GameTable implements Initializable {
             // Single KeyFrame fires after exactly 3 seconds — simpler and more reliable
             // than setCycleCount(3) with a 1-second frame, which had edge cases where
             // forgotToSayUno() was called in the wrong tick.
-            unoCountdownTimer = new Timeline(
-                    new KeyFrame(Duration.seconds(3), e -> {
-                        unoTimeActive = false;
-                        sayUnoButton.setDisable(true);
-                        getGameLogic().forgotToSayUno();
-                    })
-            );
+            unoCountdownTimer = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
+                unoTimeActive = false;
+                sayUnoButton.setDisable(true);
+            }));
             unoCountdownTimer.setCycleCount(1);
             unoCountdownTimer.play();
         });
