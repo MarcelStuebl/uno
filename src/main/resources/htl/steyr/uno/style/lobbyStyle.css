@@ -22,12 +22,12 @@
     -fx-background-radius: 18;
     -fx-border-color: rgba(255, 255, 255, 0.08);
     -fx-border-radius: 18;
-    -fx-padding: 12 16 12 16;
+    -fx-padding: 20 24 20 24;
 }
 
 .welcomeLable {
     -fx-text-fill: white;
-    -fx-font-size: 20px;
+    -fx-font-size: 30px;
     -fx-font-weight: bold;
 }
 
@@ -39,13 +39,13 @@
 
 .partyLable {
     -fx-text-fill: white;
-    -fx-font-size: 14px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
 }
 
 .subtitle {
     -fx-text-fill: #8f93a3;
-    -fx-font-size: 11px;
+    -fx-font-size: 14px;
 }
 
 .partyCodeLable {
@@ -55,7 +55,8 @@
     -fx-border-color: rgba(255, 255, 255, 0.15);
     -fx-border-radius: 12;
     -fx-background-radius: 12;
-    -fx-padding: 8 10 8 10;
+    -fx-font-size: 17px;
+    -fx-padding: 12 14 12 14;
 }
 
 .createPartyButton,
@@ -70,6 +71,8 @@
 .createPartyButton,
 .joinLobbyButton {
     -fx-background-color: rgba(255, 90, 90, 0.95);
+    -fx-font-size: 16px;
+    -fx-padding: 13 24 13 24;
 }
 
 .logoutButton {
@@ -94,4 +97,66 @@
     -fx-text-alignment: center;
     -fx-alignment: center;
     -fx-effect: dropshadow(gaussian, rgba(255, 60, 60, 0.3), 6, 0.2, 0, 0);
+}
+
+.lobbyPlayerList {
+    -fx-background-color:
+            linear-gradient(to bottom,
+            rgba(26, 29, 50, 0.92),
+            rgba(18, 20, 38, 0.96));
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-control-inner-background: transparent;
+    -fx-control-inner-background-alt: transparent;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.28), 18, 0.12, 0, 4);
+}
+
+.lobbyPlayerList .viewport {
+    -fx-background-color: transparent;
+}
+
+.lobbyPlayerList .list-cell {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 12;
+    -fx-padding: 11 14;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.lobbyPlayerList .list-cell:filled:hover {
+    -fx-background-color: rgba(86, 145, 255, 0.2);
+    -fx-border-color: rgba(100, 180, 255, 0.4);
+}
+
+.lobbyPlayerList .list-cell:filled:selected,
+.lobbyPlayerList .list-cell:filled:selected:hover {
+    -fx-background-color: rgba(86, 145, 255, 0.3);
+    -fx-text-fill: white;
+}
+
+.lobbyPlayerList .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-padding: 2 0 2 6;
+}
+
+.lobbyPlayerList .scroll-bar:vertical .track {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 8;
+}
+
+.lobbyPlayerList .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(100, 180, 255, 0.45);
+    -fx-background-radius: 8;
+}
+
+.lobbyPlayerList .scroll-bar .increment-button,
+.lobbyPlayerList .scroll-bar .decrement-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
 }
