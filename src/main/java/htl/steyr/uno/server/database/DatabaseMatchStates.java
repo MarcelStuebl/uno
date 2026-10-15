@@ -88,7 +88,7 @@ public class DatabaseMatchStates {
 
 
     public MatchResult getMatchResultByUserId(int userId) throws SQLException {
-        String query = "SELECT mr.match_id, mr.player_count, mr.first_place_user_id, mr.second_place_user_id, mr.third_place_user_id, mr.fourth_place_user_id, m.created_at " +
+        String query = "SELECT mr.match_id, mr.player_count, mr.first_place_user_id, mr.second_place_user_id, mr.third_place_user_id, mr.fourth_place_user_id, m.match_date " +
                 "FROM match_results mr " +
                 "JOIN matches m ON mr.match_id = m.id " +
                 "WHERE ? IN (mr.first_place_user_id, mr.second_place_user_id, mr.third_place_user_id, mr.fourth_place_user_id)";
@@ -104,7 +104,7 @@ public class DatabaseMatchStates {
                     for (int i = 0; i < playerCount; i++) {
                         playerIds[i] = rs.getInt(3 + i); // 3 + i corresponds to the column index of the player IDs
                     }
-                    Timestamp timestamp = rs.getTimestamp("created_at");
+                    Timestamp timestamp = rs.getTimestamp("match_date");
                     return new MatchResult(matchId, playerIds, timestamp);
                 }
             }
