@@ -3,7 +3,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="root" stylesheets="@style/GameTableStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane fx:id="root" styleClass="root" stylesheets="@style/GameTableStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <StackPane fx:id="table" styleClass="table" StackPane.alignment="CENTER">
             <children>
