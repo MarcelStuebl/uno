@@ -6,6 +6,7 @@ import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.GameOverResponse;
 import htl.steyr.uno.requests.server.GameTurnResponse;
+import htl.steyr.uno.requests.server.EmojiReactionResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.animation.ScaleTransition;
@@ -32,6 +33,8 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -46,6 +49,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GameTable implements Initializable {
 
@@ -88,12 +92,63 @@ public class GameTable implements Initializable {
     private boolean chatOpen = false;
     private int unreadMessageCount = 0;
     private StackPane overlayLayer;
+    private HBox ownProfileDock;
+    private Pane reactionPopupLayer;
+    private boolean keepingChatOnTop;
 
 
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
         this.startGameResponse = msg;
         this.player = new Player(getClient().getConn().getUser());
+    }
+
+    public void receiveEmojiReaction(EmojiReactionResponse msg) {
+        Platform.runLater(() -> {
+            if (msg == null || msg.emoji() == null || msg.emoji().isBlank()) {
+                return;
+            }
+            showFloatingReaction(msg.emoji());
+        });
+    }
+
+    private void showFloatingReaction(String emoji) {
+        if (reactionPopupLayer == null || emoji == null) {
+            return;
+        }
+
+        ImageView popup = createReactionImageView(emoji, 88);
+        popup.setMouseTransparent(true);
+        popup.setManaged(false);
+        reactionPopupLayer.getChildren().add(popup);
+        double maxX = Math.max(0, reactionPopupLayer.getWidth() - 100);
+        double maxY = Math.max(0, reactionPopupLayer.getHeight() - 100);
+        popup.setLayoutX(ThreadLocalRandom.current().nextDouble(maxX + 1));
+        popup.setLayoutY(ThreadLocalRandom.current().nextDouble(maxY + 1));
+        overlayLayer.toFront();
+        reactionPopupLayer.toFront();
+
+        Timeline popIn = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(popup.scaleXProperty(), 0.35),
+                        new KeyValue(popup.scaleYProperty(), 0.35),
+                        new KeyValue(popup.opacityProperty(), 0)),
+                new KeyFrame(Duration.millis(180),
+                        new KeyValue(popup.scaleXProperty(), 1.15),
+                        new KeyValue(popup.scaleYProperty(), 1.15),
+                        new KeyValue(popup.opacityProperty(), 1)),
+                new KeyFrame(Duration.millis(320),
+                        new KeyValue(popup.scaleXProperty(), 1),
+                        new KeyValue(popup.scaleYProperty(), 1))
+        );
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(700), popup);
+        fadeOut.setDelay(Duration.millis(1300));
+        fadeOut.setToValue(0);
+        TranslateTransition floatUp = new TranslateTransition(Duration.seconds(2), popup);
+        floatUp.setByY(-75);
+        ParallelTransition animation = new ParallelTransition(popIn, fadeOut, floatUp);
+        animation.setOnFinished(event -> reactionPopupLayer.getChildren().remove(popup));
+        animation.play();
     }
 
     private void updatePlayerFromStartGameResponse() {
@@ -142,6 +197,14 @@ public class GameTable implements Initializable {
             if (sayUnoButton != null) {
                 sayUnoButton.toFront();
             }
+            reactionPopupLayer = new Pane();
+            reactionPopupLayer.setPickOnBounds(false);
+            reactionPopupLayer.setMouseTransparent(true);
+            overlayLayer.getChildren().add(reactionPopupLayer);
+            root.getChildren().addListener((javafx.collections.ListChangeListener<Node>) change ->
+                    keepChatOnTop());
+            overlayLayer.getChildren().addListener((javafx.collections.ListChangeListener<Node>) change ->
+                    keepChatOnTop());
 
             root.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
                 if (!chatOpen) {
@@ -333,6 +396,7 @@ public class GameTable implements Initializable {
         clearUnreadMessages();
         chatPanel.setVisible(true);
         chatPanel.setManaged(true);
+        keepChatOnTop();
 
         FadeTransition fade = new FadeTransition(Duration.millis(150), chatPanel);
         fade.setFromValue(0.0);
@@ -341,6 +405,26 @@ public class GameTable implements Initializable {
             chatInput.requestFocus();
         });
         fade.play();
+    }
+
+    private void keepChatOnTop() {
+        if (!chatOpen || keepingChatOnTop || root == null || overlayLayer == null || chatPanel == null) {
+            return;
+        }
+
+        keepingChatOnTop = true;
+        try {
+            if (!root.getChildren().isEmpty()
+                    && root.getChildren().get(root.getChildren().size() - 1) != overlayLayer) {
+                overlayLayer.toFront();
+            }
+            if (!overlayLayer.getChildren().isEmpty()
+                    && overlayLayer.getChildren().get(overlayLayer.getChildren().size() - 1) != chatPanel) {
+                chatPanel.toFront();
+            }
+        } finally {
+            keepingChatOnTop = false;
+        }
     }
 
     private void closeChatPanel() {
@@ -541,6 +625,10 @@ public class GameTable implements Initializable {
         StackPane.setAlignment(handVBox, Pos.BOTTOM_CENTER);
         StackPane.setMargin(handVBox, new Insets(40));
         root.getChildren().add(handVBox);
+        if (ownProfileDock == null) {
+            ownProfileDock = createOwnProfileDock();
+            root.getChildren().add(ownProfileDock);
+        }
 
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
@@ -548,6 +636,72 @@ public class GameTable implements Initializable {
         if (sayUnoButton != null) {
             sayUnoButton.toFront();
         }
+        ownProfileDock.toFront();
+    }
+
+    private HBox createOwnProfileDock() {
+        HBox emojiBar = new HBox(4);
+        emojiBar.setAlignment(Pos.CENTER);
+        String[][] reactions = {
+                {"🖕", "Mittelfinger"},
+                {"❤️", "Herz"},
+                {"😠", "Wütend"},
+                {"😭", "Weinen"}
+        };
+        for (String[] reaction : reactions) {
+            Button reactionButton = new Button();
+            reactionButton.setPadding(Insets.EMPTY);
+            reactionButton.getStyleClass().add("game-reaction-button");
+            reactionButton.setMinSize(48, 48);
+            reactionButton.setPrefSize(48, 48);
+            reactionButton.setMaxSize(48, 48);
+            reactionButton.setAlignment(Pos.CENTER);
+            reactionButton.setAccessibleText(reaction[1]);
+            reactionButton.setFocusTraversable(false);
+            reactionButton.setOnAction(event -> client.sendEmojiReaction(reaction[0]));
+
+            ImageView emojiImage = createReactionImageView(reaction[0], 36);
+            emojiImage.setMouseTransparent(true);
+            StackPane reactionButtonStack = new StackPane(reactionButton, emojiImage);
+            reactionButtonStack.setAlignment(Pos.CENTER);
+            reactionButtonStack.setMinSize(48, 48);
+            reactionButtonStack.setPrefSize(48, 48);
+            reactionButtonStack.setMaxSize(48, 48);
+            emojiBar.getChildren().add(reactionButtonStack);
+        }
+
+        HBox dock = new HBox(emojiBar);
+        dock.setAlignment(Pos.CENTER_LEFT);
+        dock.setPickOnBounds(false);
+        dock.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        StackPane.setAlignment(dock, Pos.BOTTOM_LEFT);
+        StackPane.setMargin(dock, new Insets(0, 0, 24, 20));
+        return dock;
+    }
+
+    private ImageView createReactionImageView(String emoji, double size) {
+        String imagePath = switch (emoji) {
+            case "🖕" -> "/htl/steyr/uno/emojis/middlefinger.png";
+            case "❤️" -> "/htl/steyr/uno/emojis/heart.png";
+            case "😠" -> "/htl/steyr/uno/emojis/angry.png";
+            case "😭" -> "/htl/steyr/uno/emojis/crying.png";
+            default -> throw new IllegalArgumentException("Unsupported emoji reaction: " + emoji);
+        };
+
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(size);
+        imageView.setFitHeight(size);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+        switch (emoji) {
+            case "🖕" -> imageView.setTranslateX(size * 11 / 160);
+            case "😠" -> imageView.setTranslateY(size / 160);
+            case "😭" -> imageView.setTranslateY(-size * 1.5 / 96);
+            default -> {
+            }
+        }
+        return imageView;
     }
 
     /**
@@ -605,6 +759,9 @@ public class GameTable implements Initializable {
         }
         if (sayUnoButton != null) {
             sayUnoButton.toFront();
+        }
+        if (ownProfileDock != null) {
+            ownProfileDock.toFront();
         }
     }
 

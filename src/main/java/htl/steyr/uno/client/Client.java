@@ -157,6 +157,11 @@ public class Client {
         getConn().sendMessage(msg);
     }
 
+    public void sendEmojiReaction(String emoji) {
+        if (getConn() == null) return;
+        getConn().sendMessage(new SendEmojiReactionRequest(emoji));
+    }
+
     public ClientSocketConnection getConn() {
         return conn;
     }

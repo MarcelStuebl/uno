@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Lobby {
+    private static final Set<String> ALLOWED_EMOJI_REACTIONS = Set.of("🖕", "❤️", "😠", "😭");
 
     private final Server server;
     private Integer lobbyId;
@@ -56,6 +58,18 @@ public class Lobby {
         sendInfoToAll(new ReceiveChatMessageResponse(obj.message(), obj.user()));
     }
 
+    void sendEmojiReaction(ServerSocketConnection sender, String emoji) {
+        if (sender == null || !connections.contains(sender)) {
+            return;
+        }
+
+        if (!ALLOWED_EMOJI_REACTIONS.contains(emoji)) {
+            return;
+        }
+
+        sendInfoToAll(new EmojiReactionResponse(emoji));
+    }
+
 
     void playerLeft(ServerSocketConnection connection) {
         if (connection == null) {
@@ -82,6 +96,10 @@ public class Lobby {
 
 
     private void checkStatus() {
+        if (Objects.equals(status, 2)) {
+            return;
+        }
+
         if (connections.size() >= 4) {
             setStatus(1);
         } else {
@@ -154,4 +172,3 @@ public class Lobby {
         return gameLogic;
     }
 }
-
