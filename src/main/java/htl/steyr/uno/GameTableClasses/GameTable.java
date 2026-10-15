@@ -26,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -39,6 +40,7 @@ import javafx.util.Duration;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -74,10 +76,12 @@ public class GameTable implements Initializable {
     private Timeline unoCountdownTimer; // Timer for the UNO countdown
 
     private StackPane chatBubbleButton;
+    private Label unreadBadge;
     private VBox chatPanel;
     private ListView<ChatMessage> chatListView;
     private TextField chatInput;
     private boolean chatOpen = false;
+    private int unreadMessageCount = 0;
     private StackPane overlayLayer;
 
 
@@ -124,6 +128,16 @@ public class GameTable implements Initializable {
             overlayLayer.getChildren().add(chatPanel);
             chatPanel.toFront();
 
+            if (handVBox != null) {
+                handVBox.toFront();
+            }
+            if (withdrawalButton != null) {
+                withdrawalButton.toFront();
+            }
+            if (sayUnoButton != null) {
+                sayUnoButton.toFront();
+            }
+
             root.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
                 if (!chatOpen) {
                     return;
@@ -135,6 +149,32 @@ public class GameTable implements Initializable {
                 }
 
                 closeChatPanel();
+            });
+
+            root.addEventFilter(ScrollEvent.SCROLL, event -> {
+                if (!chatOpen || chatListView == null
+                        || !chatListView.localToScene(chatListView.getBoundsInLocal())
+                        .contains(event.getSceneX(), event.getSceneY())) {
+                    return;
+                }
+
+                Optional<ScrollBar> verticalScrollBar = chatListView.lookupAll(".scroll-bar").stream()
+                        .filter(ScrollBar.class::isInstance)
+                        .map(ScrollBar.class::cast)
+                        .filter(scrollBar -> scrollBar.getOrientation() == javafx.geometry.Orientation.VERTICAL)
+                        .findFirst();
+                if (verticalScrollBar.isPresent()) {
+                    int scrollSteps = (int) Math.max(1, Math.abs(event.getDeltaY()) / 40);
+                    ScrollBar scrollBar = verticalScrollBar.get();
+                    for (int i = 0; i < scrollSteps; i++) {
+                        if (event.getDeltaY() > 0) {
+                            scrollBar.decrement();
+                        } else if (event.getDeltaY() < 0) {
+                            scrollBar.increment();
+                        }
+                    }
+                }
+                event.consume();
             });
 
             // Key-Listener für 'T'
@@ -183,10 +223,21 @@ public class GameTable implements Initializable {
         VBox bubbleContent = new VBox(2, chatIcon, keyHint);
         bubbleContent.setAlignment(Pos.CENTER);
 
-        StackPane chatBubbleButton = new StackPane(bubbleContent);
+        unreadBadge = new Label();
+        unreadBadge.getStyleClass().add("game-chat-unread-badge");
+        unreadBadge.setMinSize(22, 22);
+        unreadBadge.setPrefSize(22, 22);
+        unreadBadge.setMaxSize(22, 22);
+        unreadBadge.setAlignment(Pos.CENTER);
+        unreadBadge.setVisible(false);
+        unreadBadge.setManaged(false);
+
+        StackPane chatBubbleButton = new StackPane(bubbleContent, unreadBadge);
         chatBubbleButton.setPrefSize(76, 76);
         chatBubbleButton.setMaxSize(76, 76);
         chatBubbleButton.getStyleClass().add("game-chat-bubble");
+        StackPane.setAlignment(unreadBadge, Pos.TOP_RIGHT);
+        StackPane.setMargin(unreadBadge, new Insets(2, 2, 0, 0));
 
         chatBubbleButton.setOnMouseClicked(e -> {
             animateBubbleClick(chatBubbleButton);
@@ -281,6 +332,7 @@ public class GameTable implements Initializable {
         }
 
         chatOpen = true;
+        clearUnreadMessages();
         chatPanel.setVisible(true);
         chatPanel.setManaged(true);
 
@@ -334,12 +386,29 @@ public class GameTable implements Initializable {
 
         Platform.runLater(() -> {
             chatListView.getItems().add(new ChatMessage(msg.user().getUsername(), msg.message()));
-            chatListView.scrollTo(chatListView.getItems().size() - 1);
 
             if (!chatOpen) {
-                toggleChatPanel();
+                chatListView.scrollTo(chatListView.getItems().size() - 1);
+                unreadMessageCount++;
+                updateUnreadBadge();
             }
         });
+    }
+
+    private void clearUnreadMessages() {
+        unreadMessageCount = 0;
+        updateUnreadBadge();
+    }
+
+    private void updateUnreadBadge() {
+        if (unreadBadge == null) {
+            return;
+        }
+
+        unreadBadge.setText(unreadMessageCount > 9 ? "9+" : Integer.toString(unreadMessageCount));
+        boolean hasUnreadMessages = unreadMessageCount > 0;
+        unreadBadge.setVisible(hasUnreadMessages);
+        unreadBadge.setManaged(hasUnreadMessages);
     }
 
     private void animateBubbleClick(Node node) {
@@ -538,6 +607,7 @@ public class GameTable implements Initializable {
             handVBox.getChildren().add(row);
         }
 
+        handVBox.toFront();
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
         }
