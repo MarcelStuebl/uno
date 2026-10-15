@@ -24,14 +24,12 @@ public class CardStack {
     private Card topCard;
     private StackPane visual;
     private GameTable gameTable;
-    private boolean isEmpty = false;
 
     public CardStack(GameTable gameTable) {
         this.visual = new StackPane();
         this.visual.setPrefSize(137, 192);
         this.visual.setMaxSize(137, 192);
-        this.visual.setStyle("-fx-background-color: transparent;" +
-                "-fx-border-color: transparent;");
+        this.visual.setStyle("-fx-background-color: transparent;" + "-fx-border-color: transparent;");
         this.gameTable = gameTable;
     }
 
@@ -214,8 +212,7 @@ public class CardStack {
                     card.setChosenColour(selectedColor);
 
                     int drawPenaltyForThisCard = 0;
-                    Integer currentPenalty = getGameTable().getGameTurnResponse() != null ?
-                            getGameTable().getGameTurnResponse().drawPenaltyValue() : 0;
+                    Integer currentPenalty = getGameTable().getGameTurnResponse() != null ? getGameTable().getGameTurnResponse().drawPenaltyValue() : 0;
 
                     if (card.getCardValue() == 13) {
                         drawPenaltyForThisCard = 0;

@@ -58,7 +58,6 @@ public class Card implements Serializable {
         return java.util.Objects.hash(cardId);
     }
 
-
     public int getCardValue() {
         return this.CardValue;
     }
@@ -70,6 +69,7 @@ public class Card implements Serializable {
     public String getChosenColour() {
         return this.chosenColour;
     }
+
     public void setChosenColour(String chosenColour) {
         this.chosenColour = chosenColour;
     }

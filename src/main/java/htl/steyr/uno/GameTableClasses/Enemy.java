@@ -2,15 +2,7 @@ package htl.steyr.uno.GameTableClasses;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import htl.steyr.uno.UiStyleUtil;
-import javafx.geometry.Pos;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-
 import java.io.Serializable;
-import java.util.Objects;
 
 public class Enemy implements Serializable {
 
@@ -85,12 +77,6 @@ public class Enemy implements Serializable {
     }
     public void setHandSize(int handSize) {
         this.handSize = handSize;
-    }
-    public void incrementCardCount(int count) {
-        this.handSize += count;
-    }
-    public void decrementCardCount(int count) {
-        this.handSize -= count;
     }
 
     public Integer getPlayerIndex() {

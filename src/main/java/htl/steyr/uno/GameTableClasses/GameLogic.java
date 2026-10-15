@@ -11,6 +11,7 @@ public class GameLogic {
 
     private GameTable gameTable;
 
+
     /**
      * The GameLogic class is responsible for handling the core game mechanics and rules.
      * It processes incoming messages related to card additions and removals, and updates the game state accordingly.
@@ -24,6 +25,7 @@ public class GameLogic {
     void sendReadyToStart() {
         getGameTable().getClient().getConn().sendMessage(new ReadyInGameTableRequest(getGameTable().getPlayer()));
     }
+
 
     /**
      * Handles the logic for when a player receives their initial hand of cards.
@@ -98,18 +100,6 @@ public class GameLogic {
         getGameTable().getClient().getConn().sendMessage(new SayUnoRequest(getGameTable().getPlayer()));
     }
 
-    /**
-     * Called when the player forgets to say UNO within the 3-second timeout.
-     *
-     * NOTE: Nothing is sent to the server here. The server already runs its own
-     * 3-second timeout (checkUnoTimeout) and applies the 2-card penalty automatically.
-     * Sending any request here would cause a double-penalty or corrupt the server's
-     * UNO state — which was the root cause of the original bug where the player
-     * received 2 penalty cards even after correctly saying UNO on a later turn.
-     */
-    public void forgotToSayUno() {
-        // Intentionally empty — the server handles the penalty via its own timeout.
-    }
 
     /**
      * Handles the logic when the player receives a response to their request to draw a card from the central stack.
@@ -242,6 +232,7 @@ public class GameLogic {
             }
         });
     }
+
 
     /**
      * Handles the logic when a UNO notification is received from the server.
