@@ -12,6 +12,7 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -48,6 +49,14 @@ import java.util.ResourceBundle;
  * Spiel starten, sobald mindestens zwei Spieler anwesend sind.</p>
  */
 public class LobbyWaitController implements Initializable {
+
+    @FXML private Button unoClassicButton;
+    @FXML
+    private Button unoDosButton;
+
+    @FXML private Button openLobbyButton;
+    @FXML private Button onRequestLobbyButton;
+    @FXML private Button codeOnlyButton;
 
     /** Zeigt den Lobby-Code an. */
     public Label lobbyCodeLabel;
@@ -572,5 +581,31 @@ public class LobbyWaitController implements Initializable {
      * @param text   der Inhalt der Nachricht
      */
     public record ChatMessage(String sender, String text) {
+    }
+
+    // Schaltet die Spielvarianten um
+    @FXML
+    private void handleGameVariant(ActionEvent event) {
+        Button clickedButton = (Button) event.getSource();
+
+        // Entferne die Klasse bei beiden
+        unoClassicButton.getStyleClass().remove("selectedOption");
+        unoDosButton.getStyleClass().remove("selectedOption");
+
+        // Füge sie dem angeklickten hinzu
+        clickedButton.getStyleClass().add("selectedOption");
+    }
+
+    @FXML
+    private void handleLobbyType(ActionEvent event) {
+        Button clickedButton = (Button) event.getSource();
+
+        // Entferne die Klasse bei allen drei
+        openLobbyButton.getStyleClass().remove("selectedOption");
+        onRequestLobbyButton.getStyleClass().remove("selectedOption");
+        codeOnlyButton.getStyleClass().remove("selectedOption");
+
+        // Füge sie dem angeklickten hinzu
+        clickedButton.getStyleClass().add("selectedOption");
     }
 }
