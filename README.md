@@ -291,8 +291,8 @@ uno/
       <a href="mailto:jfuerlin@htl-steyr.ac.at">jfuerlin@htl-steyr.ac.at</a>
     </td>
     <td align="center">
-      <a href="https://github.com/BR00TManu">
-        <img src="https://github.com/BR00TManu.png" width="100px;" style="border-radius:50%;" alt="Manuel Horeth"/>
+      <a href="https://github.com/ManuelHoreth">
+        <img src="https://github.com/ManuelHoreth.png" width="100px;" style="border-radius:50%;" alt="Manuel Horeth"/>
       </a>
       <br />
       <h3>Manuel HORETH</h3>
