@@ -17,9 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -65,6 +63,9 @@ public class LobbyWaitController implements Initializable {
 
     /** Container für den Chat-Bereich. */
     public StackPane chatBox;
+
+    /** Overlay für das Kick-Pop-up. */
+    public StackPane kickPopupOverlay;
 
     /** Liste aller Spieler in der Lobby. */
     public ListView<String> playerListView = new ListView<>();
@@ -251,10 +252,12 @@ public class LobbyWaitController implements Initializable {
                 nameLabel.setPrefWidth(180);
                 nameLabel.setAlignment(Pos.CENTER_LEFT);
 
-                kickButton.setPrefWidth(100);
-                kickButton.setMinWidth(100);
-                kickButton.setMaxWidth(100);
+                kickButton.setPrefWidth(120);
+                kickButton.setMinWidth(120);
+                kickButton.setMaxWidth(120);
                 kickButton.setAlignment(Pos.CENTER);
+                kickButton.getStyleClass().addAll("playButton", "kickButton");
+                buttonBox.setAlignment(Pos.CENTER);
 
                 buttonBox.getChildren().add(kickButton);
 
@@ -506,15 +509,27 @@ public class LobbyWaitController implements Initializable {
         Platform.runLater(() -> {
             try {
                 intentionalClose = true;
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Aus der Lobby entfernt");
-                alert.setHeaderText("Du Wurdest vom Lobbyleiter geckickt");
-                alert.setContentText(null);
-                alert.getButtonTypes().setAll(new ButtonType("Zurück zur Lobby-auswahl"));
-                alert.showAndWait();
-                showLobbyOverview();
+                FXMLLoader loader = new FXMLLoader(
+                        Objects.requireNonNull(getClass().getResource("/htl/steyr/uno/kickPopup.fxml"))
+                );
+                KickPopupController popupController = new KickPopupController();
+                loader.setController(popupController);
+                StackPane popup = loader.load();
+                popupController.setOnReturn(() -> {
+                    kickPopupOverlay.getChildren().clear();
+                    kickPopupOverlay.setVisible(false);
+                    kickPopupOverlay.setManaged(false);
+                    try {
+                        showLobbyOverview();
+                    } catch (IOException e) {
+                        throw new RuntimeException("Could not return to the lobby overview after being kicked", e);
+                    }
+                });
+                kickPopupOverlay.getChildren().setAll(popup);
+                kickPopupOverlay.setManaged(true);
+                kickPopupOverlay.setVisible(true);
             } catch (IOException e) {
-                throw new RuntimeException("Could not return to the lobby overview after being kicked", e);
+                throw new RuntimeException("Could not load the kick popup", e);
             }
         });
     }

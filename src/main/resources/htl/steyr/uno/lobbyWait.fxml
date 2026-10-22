@@ -6,7 +6,9 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane prefHeight="879.0" prefWidth="1021.0" styleClass="mainPaine" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane prefHeight="879.0" prefWidth="1021.0" styleClass="mainPaine" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <BorderPane>
 
     <center>
         <VBox prefHeight="0.0" prefWidth="705.0" spacing="18" styleClass="centerArea">
@@ -81,4 +83,7 @@
         </VBox>
     </right>
 
-</BorderPane>
+        </BorderPane>
+        <StackPane fx:id="kickPopupOverlay" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pickOnBounds="true" visible="false" managed="false" />
+    </children>
+</StackPane>

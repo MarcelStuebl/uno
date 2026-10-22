@@ -140,6 +140,16 @@
     -fx-opacity: 0.85;
 }
 
+.kickButton {
+    -fx-pref-height: 48;
+    -fx-min-height: 48;
+    -fx-max-height: 48;
+    -fx-padding: 8 14 8 14;
+    -fx-font-size: 20px;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+}
+
 
 /* =========================
    LEAVE BUTTON
@@ -173,6 +183,47 @@
 
     /* etwas heller → Hover Feedback */
     -fx-background-color: rgba(255, 255, 255, 0.13);
+}
+
+.kick-popup-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.62);
+}
+
+.kick-popup-card {
+    -fx-background-color: linear-gradient(to bottom, rgba(23, 38, 62, 1.0), rgba(9, 12, 22, 1.0));
+    -fx-background-radius: 22;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 22;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 28, 0.18, 0, 8);
+}
+
+.kick-popup-title {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(100, 180, 255, 0.3), 10, 0.2, 0, 0);
+}
+
+.kick-popup-button {
+    -fx-min-width: 360;
+    -fx-pref-width: 360;
+    -fx-max-width: 360;
+    -fx-min-height: 52;
+    -fx-pref-height: 52;
+    -fx-max-height: 52;
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 92, 92, 0.98), rgba(214, 54, 54, 0.98));
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-padding: 14 22 14 22;
+    -fx-effect: dropshadow(gaussian, rgba(255, 92, 92, 0.22), 18, 0.15, 0, 4);
+}
+
+.kick-popup-button:hover {
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 110, 110, 1), rgba(230, 70, 70, 1));
 }
 
 

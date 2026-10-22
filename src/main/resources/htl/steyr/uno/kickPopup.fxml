@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane styleClass="kick-popup-overlay" stylesheets="@style/lobbyWaitStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox alignment="CENTER" maxWidth="480.0" spacing="24.0" styleClass="kick-popup-card">
+            <padding>
+                <Insets bottom="36.0" left="40.0" right="40.0" top="36.0" />
+            </padding>
+            <children>
+                <Label styleClass="kick-popup-title" text="Du wurdest vom Lobbyleiter geckickt" wrapText="true" />
+                <Button onAction="#returnToLobbySelection" styleClass="kick-popup-button" text="Zurück zur Lobby-Auswahl" />
+            </children>
+        </VBox>
+    </children>
+</StackPane>

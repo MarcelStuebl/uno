@@ -111,7 +111,7 @@ public class Lobby {
                 playerLeft(target);
                 target.sendMessage(new KickPlayerFromLobbyResponse());
                 sendInfoToAll(new ReceiveChatMessageResponse(
-                        "Spieler ' " + username + " ' hat die Lobby verlassen.",
+                        "Spieler '" + username + "' hat die Lobby verlassen.",
                         requester.getUser()
                 ));
             }
