@@ -94,6 +94,30 @@ public class Lobby {
         updateJoined();
     }
 
+    void kickPlayer(ServerSocketConnection requester, String username) {
+        synchronized (connections) {
+            if (connections.isEmpty() || connections.getFirst() != requester || username == null
+                    || status == null || status == 2) {
+                return;
+            }
+
+            ServerSocketConnection target = connections.stream()
+                    .filter(connection -> connection != requester)
+                    .filter(connection -> connection.getUser() != null)
+                    .filter(connection -> username.equals(connection.getUser().getUsername()))
+                    .findFirst()
+                    .orElse(null);
+            if (target != null) {
+                playerLeft(target);
+                target.sendMessage(new KickPlayerFromLobbyResponse());
+                sendInfoToAll(new ReceiveChatMessageResponse(
+                        "Spieler ' " + username + " ' hat die Lobby verlassen.",
+                        requester.getUser()
+                ));
+            }
+        }
+    }
+
 
     private void checkStatus() {
         if (Objects.equals(status, 2)) {
