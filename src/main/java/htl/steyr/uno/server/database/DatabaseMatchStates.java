@@ -3,6 +3,7 @@ package htl.steyr.uno.server.database;
 import htl.steyr.uno.MatchResult;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class DatabaseMatchStates {
      * @throws SQLException if a database access error occurs.
      * @throws IllegalArgumentException if there are not 2 to 4 players or a player appears more than once.
      */
-    public void addMatchState(List<Integer> playerIds) throws SQLException {
+    public static void addMatchState(List<Integer> playerIds)  {
         int playerCount = playerIds.size();
         if (playerCount < 2 || playerCount > 4) {
             throw new IllegalArgumentException("A match needs 2 to 4 players.");
@@ -35,6 +36,8 @@ public class DatabaseMatchStates {
             } finally {
                 conn.setAutoCommit(true);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to add match state.", e);
         }
     }
 
@@ -45,7 +48,7 @@ public class DatabaseMatchStates {
      * @return The ID of the new match.
      * @throws SQLException if a database access error occurs.
      */
-    private int insertMatch(Connection conn) throws SQLException {
+    private static Integer insertMatch(Connection conn) {
         String query = "INSERT INTO matches () VALUES ()";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -56,8 +59,10 @@ public class DatabaseMatchStates {
                     return rs.getInt(1);
                 }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to insert match.", e);
         }
-        throw new SQLException("Failed to create match: no ID returned.");
+        return null;
     }
 
 
@@ -68,7 +73,7 @@ public class DatabaseMatchStates {
      * @param playerIds The user IDs ordered by placement (index 0 = first place).
      * @throws SQLException if a database access error occurs.
      */
-    private void insertMatchResult(Connection conn, int matchId, List<Integer> playerIds) throws SQLException {
+    private static void insertMatchResult(Connection conn, int matchId, List<Integer> playerIds) {
         String query = "INSERT INTO match_results (match_id, player_count, first_place_user_id, second_place_user_id, third_place_user_id, fourth_place_user_id) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -83,16 +88,19 @@ public class DatabaseMatchStates {
                 }
             }
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to insert match result.", e);
         }
     }
 
 
-    public MatchResult getMatchResultByUserId(int userId) throws SQLException {
+    public static ArrayList<MatchResult> getMatchResultByUserId(int userId) {
         String query = "SELECT mr.match_id, mr.player_count, mr.first_place_user_id, mr.second_place_user_id, mr.third_place_user_id, mr.fourth_place_user_id, m.match_date " +
                 "FROM match_results mr " +
                 "JOIN matches m ON mr.match_id = m.id " +
                 "WHERE ? IN (mr.first_place_user_id, mr.second_place_user_id, mr.third_place_user_id, mr.fourth_place_user_id)";
 
+        ArrayList<MatchResult> matchResults = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, userId);
@@ -105,11 +113,13 @@ public class DatabaseMatchStates {
                         playerIds[i] = rs.getInt(3 + i); // 3 + i corresponds to the column index of the player IDs
                     }
                     Timestamp timestamp = rs.getTimestamp("match_date");
-                    return new MatchResult(matchId, playerIds, timestamp);
+                    matchResults.add(new MatchResult(matchId, playerIds, timestamp));
                 }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve match result for user ID: " + userId, e);
         }
-        return null; // No match found for the given user ID
+        return matchResults;
     }
 }
 

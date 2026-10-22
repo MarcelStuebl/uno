@@ -1,9 +1,11 @@
 package htl.steyr.uno.server.serverconnection;
 
+import htl.steyr.uno.MatchResult;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
 import htl.steyr.uno.server.database.DatabaseLog;
+import htl.steyr.uno.server.database.DatabaseMatchStates;
 import htl.steyr.uno.server.database.DatabaseUser;
 import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
 import htl.steyr.uno.protocol.JsonMessageCodec;
@@ -134,6 +136,7 @@ public class ServerSocketConnection {
                 case "SayUnoRequest" -> sayUnoRequest(JsonMessageCodec.convert(message, SayUnoRequest.class));
                 case "SetProfileImageRequest" -> setProfileImageRequest(JsonMessageCodec.convert(message, SetProfileImageRequest.class));
                 case "HeartbeatPingRequest" -> heartbeatPingRequest(JsonMessageCodec.convert(message, HeartbeatPingRequest.class));
+                case "GetMatchesStatisticsRequest" -> getMatchesStatisticsRequest(JsonMessageCodec.convert(message, GetMatchesStatisticsRequest.class));
                 default -> System.out.println("Unknown UNO message type from " + remoteAddress() + ": " + message.type());
             }
         } catch (Exception e) {
@@ -162,7 +165,6 @@ public class ServerSocketConnection {
             server.removeConnection(this);
         } catch (Exception e) {
             System.out.println("Error removing connection: " + e.getMessage());
-            e.printStackTrace();
         }
         
         if (webSocket.isOpen()) {
@@ -211,16 +213,14 @@ public class ServerSocketConnection {
             return;
         }
 
-        DatabaseUser db = new DatabaseUser();
-        user = db.getUserPerUserName(request.username(), request.password());
+        user = DatabaseUser.getUserPerUserName(request.username(), request.password());
         Object msg;
-        DatabaseLog dbLog = new DatabaseLog();
         if (user == null) {
             msg = new LoginFailedResponse(1);
-            dbLog.logUserLogin(null, request.username(), remoteAddress(), false);
+            DatabaseLog.logUserLogin(null, request.username(), remoteAddress(), false);
         } else {
             msg = new LoginSuccessResponse(user);
-            dbLog.logUserLogin(user.getId(), request.username(), remoteAddress(), true);
+            DatabaseLog.logUserLogin(user.getId(), request.username(), remoteAddress(), true);
         }
         sendMessage(msg);
         sendLogMessage(msg);
@@ -247,20 +247,18 @@ public class ServerSocketConnection {
             ms.sendAuthenticationCode(msg.email(), createAccountCode.toString());
         } else {
             User user = new User(msg.username(), msg.lastName(), msg.firstName(), msg.email(), msg.password());
-            DatabaseUser db1 = new DatabaseUser();
-            if (db1.userExists(user)) {
+            if (DatabaseUser.userExists(user)) {
                 sendMessage(new CreateAccountFailedResponse(1));
             } else {
                 if (!msg.code().equals(createAccountCode)) {
                     sendMessage(new CreateAccountFailedResponse(2));
                 } else {
-                    DatabaseUser db = new DatabaseUser();
                     try {
-                        db.addUser(user);
+                        DatabaseUser.addUser(user);
                     } catch (UserAlreadyExistsException e) {
                         sendMessage(new CreateAccountFailedResponse(1));
                     }
-                    User createdUser = db.getUserPerUserName(msg.username(), msg.password());
+                    User createdUser = DatabaseUser.getUserPerUserName(msg.username(), msg.password());
                     sendMessage(new CreateAccountSuccessResponse(createdUser));
                 }
             }
@@ -359,7 +357,7 @@ public class ServerSocketConnection {
         // Check if there is an existing password reset request for the provided email and if it is still valid (within 1 minute)
         if (passwordForgotten == null || passwordForgotten.getRequestTime().getTime() + 60000 < System.currentTimeMillis()) {
 
-            User user = new DatabaseUser().getUserPerEmail(msg.email());
+            User user = DatabaseUser.getUserPerEmail(msg.email());
             if (user.getUsername() != null) {
                 Integer code = Integer.parseInt(String.format("%06d", new java.util.Random().nextInt(1000000)));
                 passwordForgotten = new PasswordForgotten(code, new Timestamp(System.currentTimeMillis()));
@@ -412,10 +410,8 @@ public class ServerSocketConnection {
     private void changePasswordRequest(ChangePasswordRequest msg) throws SQLException {
         sendLogMessage(msg);
         if (passwordForgotten.getCode().equals(msg.code())) {
-            DatabaseUser db = new DatabaseUser();
-
-            User user = db.getUserPerEmail(msg.email());
-            db.updatePassword(user.getUsername(), msg.newPassword());
+            User user = DatabaseUser.getUserPerEmail(msg.email());
+            DatabaseUser.updatePassword(user.getUsername(), msg.newPassword());
 
             ForgotPasswordResponse response = new ForgotPasswordResponse(4);
             sendMessage(response);
@@ -440,7 +436,6 @@ public class ServerSocketConnection {
      * @throws SQLException
      */
     private void checkIfUserAlreadyExistsRequest(CheckIfUserAlreadyExistsRequest msg) throws SQLException {
-        DatabaseUser db = new DatabaseUser();
         String username = msg.username();
         String email = msg.email();
 
@@ -448,11 +443,11 @@ public class ServerSocketConnection {
         boolean emailAlreadyExists = false;
 
         if (username != null && !username.trim().isEmpty()) {
-            userAlreadyExists = db.getUserPerUserName(username).getUsername() != null;
+            userAlreadyExists = DatabaseUser.getUserPerUserName(username).getUsername() != null;
         }
 
         if (email != null && !email.trim().isEmpty()) {
-            emailAlreadyExists = db.getUserPerEmail(email).getUsername() != null;
+            emailAlreadyExists = DatabaseUser.getUserPerEmail(email).getUsername() != null;
         }
 
         sendMessage(new CheckIfUserAlreadyExistsResponse(username, email, userAlreadyExists, emailAlreadyExists));
@@ -534,6 +529,19 @@ public class ServerSocketConnection {
         // Respond with pong immediately - this keeps the connection alive
         sendMessage(new HeartbeatPongResponse());
     }
+
+
+    /**
+     * Handles requests from the client to retrieve match statistics.
+     * The server queries the database for match results associated with the user's ID and sends back a MatchesStatisticsResponse containing the results.
+     * This allows the client to display the user's match history and statistics in the UI.
+     * @param msg
+     */
+    private void getMatchesStatisticsRequest(GetMatchesStatisticsRequest msg) {
+        sendLogMessage(msg);
+        sendMessage(new MatchesStatisticsResponse(DatabaseMatchStates.getMatchResultByUserId(user.getId())));
+    }
+
 
     /**
      * End of the request handling methods.

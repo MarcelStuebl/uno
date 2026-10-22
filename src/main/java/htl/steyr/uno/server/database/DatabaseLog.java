@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 public class DatabaseLog {
 
 
-    public void logUserLogin(Integer userId, String username, String ipAddress, boolean correctPassword) {
+    public static void logUserLogin(Integer userId, String username, String ipAddress, boolean correctPassword) {
         String query = "INSERT INTO log_login (user_id, username, ip_address, correct_password) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {

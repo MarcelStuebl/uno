@@ -84,6 +84,7 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
                 case "UnoNotificationResponse" -> unoNotificationResponse(JsonMessageCodec.convert(decoded, UnoNotificationResponse.class));
                 case "HeartbeatPongResponse" -> heartbeatPongResponse(JsonMessageCodec.convert(decoded, HeartbeatPongResponse.class));
                 case "EnemyDrawnCardsResponse" -> enemyDrawnCardsResponse(JsonMessageCodec.convert(decoded, EnemyDrawnCardsResponse.class));
+                case "MatchesStatisticsResponse" -> matchesStatisticsResponse(JsonMessageCodec.convert(decoded, MatchesStatisticsResponse.class));
             }
         } catch (Exception e) {
         }
@@ -245,6 +246,14 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
     }
 
     private void heartbeatPongResponse(HeartbeatPongResponse msg) {
+    }
+
+    private void matchesStatisticsResponse(MatchesStatisticsResponse msg) {
+        client.getLoginController().matchesStatisticsResponse(msg);
+    }
+
+    public void requestMatchesStatistics() {
+        sendMessage(new GetMatchesStatisticsRequest(getUser()));
     }
 
     private void startHeartbeat() {
