@@ -65,6 +65,7 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
                 case "LoginSuccessResponse" -> logInSuccessResponse(JsonMessageCodec.convert(decoded, LoginSuccessResponse.class));
                 case "LoginFailedResponse" -> logInFailedResponse(JsonMessageCodec.convert(decoded, LoginFailedResponse.class));
                 case "LobbyInfoResponse" -> lobbyInfoResponse(JsonMessageCodec.convert(decoded, LobbyInfoResponse.class));
+                case "KickPlayerFromLobbyResponse" -> kickedFromLobby();
                 case "LobbyNotFoundResponse" -> lobbyNotFoundResponse(JsonMessageCodec.convert(decoded, LobbyNotFoundResponse.class));
                 case "LobbyJoinRefusedResponse" -> lobbyJoinRefusedResponse(JsonMessageCodec.convert(decoded, LobbyJoinRefusedResponse.class));
                 case "CreateAccountSuccessResponse" -> createAccountSuccessResponse(JsonMessageCodec.convert(decoded, CreateAccountSuccessResponse.class));
@@ -129,6 +130,12 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
             } else if (client.getLobbyController() != null) {
                 client.getLobbyController().createOrJoinPartySuccess(msg);
             }
+        }
+    }
+
+    private void kickedFromLobby() {
+        if (client.getLobbyWaitController() != null) {
+            client.getLobbyWaitController().kickedFromLobby();
         }
     }
 
@@ -256,6 +263,11 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
             lobby = null;
             sendMessage(new LeaveLobbyRequest(getUser()));
         }
+    }
+
+    public void kickPlayerFromLobby(String username) {
+        System.out.println("Sending KickPlayerFromLobbyRequest for username: " + username);
+        sendMessage(new KickPlayerFromLobbyRequest(username));
     }
 
     @Override

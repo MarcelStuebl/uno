@@ -293,13 +293,25 @@ public class LobbyWaitController implements Initializable {
                 rootPane.setLeft(nameAndImage);
 
                 if (item.equals(currentUsername)) {
+                    kickButton.setOnAction(null);
                     rootPane.setRight(null);
                     nameLabel.setText(item);
                 } else {
                     if (isHost) {
+                        kickButton.toFront();
+                        kickButton.setOnAction(e ->{
+                                String usernameToKick = getItem();
+                                    if (usernameToKick != null && !usernameToKick.equals(currentUsername)) {
+
+                                        System.out.println("Kickbutton clickt for: " + usernameToKick);
+                                        client.getConn().kickPlayerFromLobby(usernameToKick);
+                                    }
+                        }); // Setzt die OnAction für den Kick-Button, um den Spieler zu kicken weil man den Player name hier kennt.
+
                         rootPane.setRight(buttonBox);
                         BorderPane.setAlignment(buttonBox, Pos.CENTER);
                     } else {
+                        kickButton.setOnAction(null);
                         rootPane.setRight(null);
                     }
                     nameLabel.setText(item);
@@ -408,11 +420,6 @@ public class LobbyWaitController implements Initializable {
         client.getConn().startGame();
     }
 
-
-    private void kickButtonClicked(ActionEvent actionEvent) {
-
-    }
-
     /**
      * Wechselt zur Spielansicht nachdem der Server den Spielstart bestätigt hat.
      *
@@ -480,7 +487,21 @@ public class LobbyWaitController implements Initializable {
         intentionalClose = true;
 
         client.getConn().leaveLobby();
+        showLobbyOverview();
+    }
 
+    public void kickedFromLobby() {
+        Platform.runLater(() -> {
+            try {
+                intentionalClose = true;
+                showLobbyOverview();
+            } catch (IOException e) {
+                throw new RuntimeException("Could not return to the lobby overview after being kicked", e);
+            }
+        });
+    }
+
+    private void showLobbyOverview() throws IOException {
         Stage stage = new Stage();
         Stage thisStage = (Stage) leaveLobbyButton.getScene().getWindow();
 

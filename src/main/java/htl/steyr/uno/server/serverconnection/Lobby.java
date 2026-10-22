@@ -80,6 +80,26 @@ public class Lobby {
         updateJoined();
     }
 
+    void kickPlayer(ServerSocketConnection requester, String username) {
+        synchronized (connections) {
+            if (connections.isEmpty() || connections.getFirst() != requester || username == null
+                    || status == null || status == 2) {
+                return;
+            }
+
+            ServerSocketConnection target = connections.stream()
+                    .filter(connection -> connection != requester)
+                    .filter(connection -> connection.getUser() != null)
+                    .filter(connection -> username.equals(connection.getUser().getUsername()))
+                    .findFirst()
+                    .orElse(null);
+            if (target != null) {
+                playerLeft(target);
+                target.sendMessage(new KickPlayerFromLobbyResponse());
+            }
+        }
+    }
+
 
     private void checkStatus() {
         if (connections.size() >= 4) {
@@ -154,4 +174,3 @@ public class Lobby {
         return gameLogic;
     }
 }
-

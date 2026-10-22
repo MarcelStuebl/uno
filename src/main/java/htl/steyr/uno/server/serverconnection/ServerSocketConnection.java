@@ -120,6 +120,7 @@ public class ServerSocketConnection {
                 case "CreateLobbyRequest" -> createLobbyRequest(JsonMessageCodec.convert(message, CreateLobbyRequest.class));
                 case "JoinLobbyRequest" -> joinLobbyRequest(JsonMessageCodec.convert(message, JoinLobbyRequest.class));
                 case "LeaveLobbyRequest" -> leftLobbyRequest(JsonMessageCodec.convert(message, LeaveLobbyRequest.class));
+                case "KickPlayerFromLobbyRequest" -> kickPlayerFromLobbyRequest(JsonMessageCodec.convert(message, KickPlayerFromLobbyRequest.class));
                 case "SendChatMessageRequest" -> sendChatMessageRequest(JsonMessageCodec.convert(message, SendChatMessageRequest.class));
                 case "ForgotPasswordRequest" -> forgotPasswordRequest(JsonMessageCodec.convert(message, ForgotPasswordRequest.class));
                 case "ForgotPasswordSendCodeRequest" -> forgotPasswordSendCodeRequest(JsonMessageCodec.convert(message, ForgotPasswordSendCodeRequest.class));
@@ -456,6 +457,14 @@ public class ServerSocketConnection {
     private void leftLobbyRequest(LeaveLobbyRequest msg) {
         sendLogMessage(msg);
         server.leaveLobby(this);
+    }
+
+    private void kickPlayerFromLobbyRequest(KickPlayerFromLobbyRequest msg) {
+        sendLogMessage(msg);
+        Lobby lobby = server.getLobbyByConnection(this);
+        if (lobby != null) {
+            lobby.kickPlayer(this, msg.username());
+        }
     }
 
 
