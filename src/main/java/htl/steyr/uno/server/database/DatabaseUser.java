@@ -14,7 +14,7 @@ public class DatabaseUser {
      * @return A User object representing the user.
      * @throws SQLException if a database access error occurs.
      */
-    public User getUserPerUserName(String username) throws SQLException {
+    public static User getUserPerUserName(String username) throws SQLException {
         String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, password_hash, password_salt, profile_image FROM user WHERE username = ?";
 
         User user = new User();
@@ -52,7 +52,7 @@ public class DatabaseUser {
      * @return A User object representing the user if the password is correct.
      * @throws SQLException if a database access error occurs.
      */
-    public User getUserPerUserName(String username, String password) throws SQLException {
+    public static User getUserPerUserName(String username, String password) throws SQLException {
         User user = getUserPerUserName(username);
             if (verifyPassword(password, user.getPasswordHash(), user.getPasswordSalt())) {
                 updateLastLogin(user.getId());
@@ -69,7 +69,7 @@ public class DatabaseUser {
      * @return A User object representing the user.
      * @throws SQLException if a database access error occurs.
      */
-    public User getUserPerEmail(String email) throws SQLException {
+    public static User getUserPerEmail(String email) throws SQLException {
         String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, profile_image FROM user WHERE email = ?";
 
         User user = new User();
@@ -104,7 +104,7 @@ public class DatabaseUser {
      * @return A User object representing the updated user.
      * @throws SQLException if a database access error occurs.
      */
-    public User updatePassword(String username, String newPassword) throws SQLException {
+    public static User updatePassword(String username, String newPassword) throws SQLException {
         String salt = PasswordUtil.generateSalt();
         String hash = PasswordUtil.hashPassword(newPassword, salt);
 
@@ -129,7 +129,7 @@ public class DatabaseUser {
      * @param storedSalt The stored password salt.
      * @return true if the password is correct, false otherwise.
      */
-    private boolean verifyPassword(String password, String storedHash, String storedSalt) {
+    private static boolean verifyPassword(String password, String storedHash, String storedSalt) {
         String hashToVerify = PasswordUtil.hashPassword(password, storedSalt);
         return hashToVerify.equals(storedHash);
     }
@@ -141,7 +141,7 @@ public class DatabaseUser {
      * @throws SQLException if a database access error occurs.
      * @throws UserAlreadyExistsException if a user with the same username already exists in the database.
      */
-    public void addUser(User user) throws SQLException, UserAlreadyExistsException {
+    public static void addUser(User user) throws SQLException, UserAlreadyExistsException {
         if (userExists(user)) {
             throw new UserAlreadyExistsException(user.getUsername());
         }
@@ -176,7 +176,7 @@ public class DatabaseUser {
      * @return true if the user exists, false otherwise.
      * @throws SQLException if a database access error occurs.
      */
-    public boolean userExists(User user) throws SQLException {
+    public static boolean userExists(User user) throws SQLException {
         String query = "SELECT COUNT(*) FROM user WHERE username = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -197,7 +197,7 @@ public class DatabaseUser {
      * @param userId The ID of the user to update.
      * @throws SQLException if a database access error occurs.
      */
-    private void updateLastLogin(int userId) throws SQLException {
+    private static void updateLastLogin(int userId) throws SQLException {
         String query = "UPDATE user SET last_login = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -209,7 +209,7 @@ public class DatabaseUser {
     }
 
 
-    public void updateProfileImage(User user, byte[] imageData) throws SQLException {
+    public static void updateProfileImage(User user, byte[] imageData) throws SQLException {
         String query = "UPDATE user SET profile_image = ? WHERE username = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -223,7 +223,7 @@ public class DatabaseUser {
     }
 
 
-    public void updateUserStats(String username, boolean won) throws SQLException {
+    public static void updateUserStats(String username, boolean won) throws SQLException {
         String query = "UPDATE user SET games_won = games_won + ?, games_lost = games_lost + ? WHERE username = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();

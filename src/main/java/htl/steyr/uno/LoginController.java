@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
@@ -794,7 +795,24 @@ public class LoginController implements Initializable {
                 errorLabelForgotPassword.setVisible(true);
             });
         }
+    }
 
+    /**
+     * Sendet eine Anfrage an den Server, um die Statistiken der Matches des angemeldeten Benutzers abzurufen.
+     */
+    public void sendGetMatchesStatisticsRequest() {
+        client.getConn().requestMatchesStatistics();
+    }
+
+    /**
+     * Verarbeitet die Antwort des Servers auf die Anfrage nach den Match-Statistiken.
+     * @param msg
+     */
+    public void matchesStatisticsResponse(MatchesStatisticsResponse msg) {
+        ArrayList<MatchResult> matchResults = msg.matches();
+        /**
+         * @TODO: Implement the logic to handle the match results and update the UI accordingly.
+         */
     }
 
     /**
@@ -803,7 +821,7 @@ public class LoginController implements Initializable {
      * <p>Validiert, dass der Code nicht leer ist und genau 6 Ziffern enthält
      * (Regex: {@code \\d+}). Bei ungültiger Eingabe wird {@code errorLabelReset2FA}
      * mit einer Fehlermeldung eingeblendet. Bei gültigem Code wird
-     * {@link htl.steyr.uno.client(int)}
+     *{@link htl.steyr.uno.client(int)}
      * aufgerufen; das Ergebnis kommt über {@link #forgotPasswordResponse(ForgotPasswordResponse)}
      * zurück (Statuscode {@code 2} bei falschem, {@code 3} bei richtigem Code).
      *
