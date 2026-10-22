@@ -17,7 +17,9 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -504,6 +506,12 @@ public class LobbyWaitController implements Initializable {
         Platform.runLater(() -> {
             try {
                 intentionalClose = true;
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Aus der Lobby entfernt");
+                alert.setHeaderText("Du Wurdest vom Lobbyleiter geckickt");
+                alert.setContentText(null);
+                alert.getButtonTypes().setAll(new ButtonType("Zurück zur Lobby-auswahl"));
+                alert.showAndWait();
                 showLobbyOverview();
             } catch (IOException e) {
                 throw new RuntimeException("Could not return to the lobby overview after being kicked", e);
