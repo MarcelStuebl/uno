@@ -1,22 +1,28 @@
 package htl.steyr.uno;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class MatchResult implements Serializable {
     private final int matchId;
-    private final int[] playerIds;
+    private final ArrayList<MatchPlayer> players;
     private final Timestamp timestamp;
 
-    public MatchResult(int matchId, int[] playerIds) {
+    /**
+     * @param matchId   ID des Matches
+     * @param players   die Spieler des Matches, sortiert nach Platzierung (Index 0 = 1. Platz)
+     * @param timestamp Zeitpunkt des Matches
+     */
+    @JsonCreator
+    public MatchResult(@JsonProperty("matchId") int matchId,
+                       @JsonProperty("players") ArrayList<MatchPlayer> players,
+                       @JsonProperty("timestamp") Timestamp timestamp) {
         this.matchId = matchId;
-        this.playerIds = playerIds;
-        this.timestamp = null;
-    }
-
-    public MatchResult(int matchId, int[] playerIds, Timestamp timestamp) {
-        this.matchId = matchId;
-        this.playerIds = playerIds;
+        this.players = players;
         this.timestamp = timestamp;
     }
 
@@ -24,8 +30,8 @@ public class MatchResult implements Serializable {
         return matchId;
     }
 
-    public int[] getPlayerIds() {
-        return playerIds;
+    public ArrayList<MatchPlayer> getPlayers() {
+        return players;
     }
 
     public Timestamp getTimestamp() {

@@ -1,9 +1,11 @@
 package htl.steyr.uno.server.serverconnection;
 
+import htl.steyr.uno.MatchPlayer;
 import htl.steyr.uno.MatchResult;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
+import htl.steyr.uno.server.ProfileImageUtil;
 import htl.steyr.uno.server.database.DatabaseLog;
 import htl.steyr.uno.server.database.DatabaseMatchStates;
 import htl.steyr.uno.server.database.DatabaseUser;
@@ -15,10 +17,15 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ServerSocketConnection {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final int PROFILE_THUMBNAIL_SIZE = 64;
     private final Server server;
     private final WebSocket webSocket;
     private volatile boolean running;
@@ -213,7 +220,7 @@ public class ServerSocketConnection {
             return;
         }
 
-        user = DatabaseUser.getUserPerUserName(request.username(), request.password());
+        user = DatabaseUser.getUserByUserName(request.username(), request.password());
         Object msg;
         if (user == null) {
             msg = new LoginFailedResponse(1);
@@ -258,7 +265,7 @@ public class ServerSocketConnection {
                     } catch (UserAlreadyExistsException e) {
                         sendMessage(new CreateAccountFailedResponse(1));
                     }
-                    User createdUser = DatabaseUser.getUserPerUserName(msg.username(), msg.password());
+                    User createdUser = DatabaseUser.getUserByUserName(msg.username(), msg.password());
                     sendMessage(new CreateAccountSuccessResponse(createdUser));
                 }
             }
@@ -443,7 +450,7 @@ public class ServerSocketConnection {
         boolean emailAlreadyExists = false;
 
         if (username != null && !username.trim().isEmpty()) {
-            userAlreadyExists = DatabaseUser.getUserPerUserName(username).getUsername() != null;
+            userAlreadyExists = DatabaseUser.getUserByUserName(username).getUsername() != null;
         }
 
         if (email != null && !email.trim().isEmpty()) {
@@ -539,7 +546,38 @@ public class ServerSocketConnection {
      */
     private void getMatchesStatisticsRequest(GetMatchesStatisticsRequest msg) {
         sendLogMessage(msg);
-        sendMessage(new MatchesStatisticsResponse(DatabaseMatchStates.getMatchResultByUserId(user.getId())));
+        ArrayList<MatchResult> matches = DatabaseMatchStates.getMatchResultByUserId(user.getId());
+        sendMessage(new MatchesStatisticsResponse(matches, getProfileImageThumbnails(matches)));
+    }
+
+
+    /**
+     * Loads the profile images of all players that appear in the given matches and scales them down to thumbnails.
+     * Every image is only contained once (not once per match) to keep the response small.
+     * If the images cannot be loaded, an empty map is returned so the statistics can still be shown.
+     * @param matches The matches whose players' profile images should be loaded.
+     * @return The thumbnails by user ID.
+     */
+    private HashMap<Integer, byte[]> getProfileImageThumbnails(ArrayList<MatchResult> matches) {
+        Set<Integer> userIds = new HashSet<>();
+        for (MatchResult match : matches) {
+            for (MatchPlayer player : match.getPlayers()) {
+                userIds.add(player.userId());
+            }
+        }
+
+        HashMap<Integer, byte[]> thumbnails = new HashMap<>();
+        try {
+            DatabaseUser.getProfileImagesByUserIds(userIds).forEach((userId, imageData) -> {
+                byte[] thumbnail = ProfileImageUtil.createThumbnail(imageData, PROFILE_THUMBNAIL_SIZE);
+                if (thumbnail != null) {
+                    thumbnails.put(userId, thumbnail);
+                }
+            });
+        } catch (SQLException e) {
+            System.out.println("Failed to load profile images for match statistics: " + e.getMessage());
+        }
+        return thumbnails;
     }
 
 
