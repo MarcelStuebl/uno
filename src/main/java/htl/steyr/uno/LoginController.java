@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
@@ -38,8 +39,8 @@ import java.util.ResourceBundle;
  *
  * <p>Die Kommunikation mit dem Server erfolgt über eine {@link Client}-Instanz,
  * die in einem eigenen Netzwerk-Thread läuft. Alle UI-Aktualisierungen werden
- * deshalb über {@link Platform#runLater(Runnable)} auf den JavaFX Application Thread
- * delegiert.
+ * deshalb bei Bedarf über {@link Platform#runLater(Runnable)} auf den JavaFX
+ * Application Thread delegiert.
  *
  * <p>Nach erfolgreichem Login wechselt der Controller mittels {@link #switchScene()}
  * zur Lobby-Ansicht ({@code lobby.fxml}).
@@ -392,16 +393,16 @@ public class LoginController implements Initializable {
      *   <li>Nachname darf nicht leer sein.</li>
      *   <li>E-Mail darf nicht leer sein.</li>
      *   <li>Benutzername darf nur Kleinbuchstaben enthalten (Regex: {@code [a-z]+}).</li>
-     *   <li>Vorname darf keine Ziffern und Nachname keine Sonderzeichen
+     *   <li>Vorname darf keine Ziffern enthalten.</li>
+     *   <li>Nachname darf weder Ziffern noch Sonderzeichen
      *       ({@code !@#$%^&*()_/}) enthalten.</li>
-     *   <li>Nachname darf weder Ziffern noch Sonderzeichen enthalten.</li>
      *   <li>E-Mail muss mindestens {@code @} und {@code .} enthalten.</li>
      * </ol>
      *
      * <p>Schlägt eine Validierung fehl, wird {@code errorLabelCreateAcc} mit einer
      * entsprechenden Meldung sichtbar gemacht und kein Serverkontakt hergestellt.
      * Sind alle Felder gültig, wird
-     * {@link htl.steyr.uno.client(String, String)}
+     * {@code client.getConn().checkIfUserAlreadyExists(username, email)}
      * aufgerufen; das Ergebnis wird asynchron über
      * {@link #checkIfUserAlreadyExistsResponse(CheckIfUserAlreadyExistsResponse)}
      * zurückgeliefert.
@@ -486,8 +487,8 @@ public class LoginController implements Initializable {
      * der Registrierung.
      *
      * <p>Der Code muss genau 6 Ziffern lang sein ({@code \\d+}). Bei gültigem Code
-     * wird {@link Client#(String, String, String, String, String, int)}
-     * aufgerufen, der Verifizierungsscreen ausgeblendet und der Login-Screen
+     * wird {@code client.verifyNewAccount(...)} aufgerufen, der
+     * Verifizierungsscreen ausgeblendet und der Login-Screen
      * eingeblendet. Zusätzlich wird für 2 Sekunden eine grüne Erfolgsmeldung
      * ({@code "2FA Code Authentifizierung erfolgreich! ✓"}) im Login-Fehlerlabel
      * angezeigt, bevor dieses wieder ausgeblendet und auf den Standardstil
@@ -598,7 +599,6 @@ public class LoginController implements Initializable {
             });
         }
 
-        // @TODO: Check if this is right
     }
 
     /**
@@ -691,8 +691,8 @@ public class LoginController implements Initializable {
      * {@code @} sowie {@code .} enthält. Bei ungültiger Eingabe wird
      * {@code errorLabelForgotPassword} mit einer Fehlermeldung eingeblendet.
      * Bei gültiger Eingabe wird
-     * {@link htl.steyr.uno.client(String)}
-     * aufgerufen; das Ergebnis kommt asynchron über
+     * {@code client.getConn().requestPasswordReset(email)} wird aufgerufen;
+     * das Ergebnis kommt asynchron über
      * {@link #forgotPasswordResponse(ForgotPasswordResponse)} zurück.
      *
      * @param actionEvent das auslösende {@link ActionEvent} der Schaltfläche
@@ -711,9 +711,6 @@ public class LoginController implements Initializable {
             client.getConn().requestPasswordReset(email);
         }
 
-        //@ToDo: Wenn email zu schnell hintereinander eingegeben wird, soll label zeigen "Try again later"
-        // zu verwendendes label: errorLabelForgotPassword.setText("To fast! Try again Later");
-
     }
 
     /**
@@ -725,16 +722,16 @@ public class LoginController implements Initializable {
      *   <li>{@code 0} – E-Mail gefunden; blendet den Passwort-vergessen-Screen
      *       aus und zeigt den 2FA-Screen an.</li>
      *   <li>{@code 1} – Zu viele Anfragen in kurzer Zeit; zeigt die Meldung
-     *       {@code "To fast! Try again later."} in {@code errorLabelForgotPassword}.</li>
-     *   <li>{@code 2} – Eingegebener Code ist falsch; Fehlermeldung in der UI
-     *       noch nicht implementiert ({@code @TODO}).</li>
+     *       {@code "Too fast! Try again later."} in {@code errorLabelForgotPassword}.</li>
+     *   <li>{@code 2} – Eingegebener Code ist falsch; die Meldung wird auf der
+     *       Konsole ausgegeben.</li>
      *   <li>{@code 3} – 2FA-Code korrekt; blendet den 2FA-Screen aus und zeigt
      *       den Neues-Passwort-Screen an.</li>
      *   <li>{@code 4} – Passwort erfolgreich geändert; zeigt eine grüne
      *       Erfolgsmeldung ({@code "Passwort erfolgreich geändert!"}) und
      *       navigiert nach 2 Sekunden automatisch zurück zum Login-Screen.</li>
-     *   <li>{@code 5} – Allgemeiner Serverfehler; Fehlermeldung in der UI
-     *       noch nicht implementiert ({@code @TODO}).</li>
+     *   <li>{@code 5} – Allgemeiner Serverfehler; die Meldung wird auf der
+     *       Konsole ausgegeben.</li>
      *   <li>{@code 6} – E-Mail-Adresse nicht gefunden; zeigt die Meldung
      *       {@code "Email address not found!"} in {@code errorLabelForgotPassword}.</li>
      * </ul>
@@ -760,7 +757,6 @@ public class LoginController implements Initializable {
             System.out.println("Wrong code. Please try again.");
 
 
-            // @TODO: Show error message.
         } else if (msg.status() == 3) {
             Platform.runLater(() -> {
                 showResetPassword2FA.setVisible(false);
@@ -787,14 +783,12 @@ public class LoginController implements Initializable {
         } else if (msg.status() == 5) {
             System.out.println("Something went wrong. Please try again later.");
 
-            // @TODO: Show error message.
         } else if (msg.status() == 6) {
             Platform.runLater(() -> {
                 errorLabelForgotPassword.setText("Email address not found!");
                 errorLabelForgotPassword.setVisible(true);
             });
         }
-
     }
 
     /**
@@ -803,8 +797,9 @@ public class LoginController implements Initializable {
      * <p>Validiert, dass der Code nicht leer ist und genau 6 Ziffern enthält
      * (Regex: {@code \\d+}). Bei ungültiger Eingabe wird {@code errorLabelReset2FA}
      * mit einer Fehlermeldung eingeblendet. Bei gültigem Code wird
-     * {@link htl.steyr.uno.client(int)}
-     * aufgerufen; das Ergebnis kommt über {@link #forgotPasswordResponse(ForgotPasswordResponse)}
+     * {@code client.getConn().verifyPasswordResetCode(Integer.parseInt(code))}
+     * aufgerufen; das Ergebnis kommt über
+     * {@link #forgotPasswordResponse(ForgotPasswordResponse)}
      * zurück (Statuscode {@code 2} bei falschem, {@code 3} bei richtigem Code).
      *
      * @param actionEvent das auslösende {@link ActionEvent} der Schaltfläche
@@ -832,9 +827,9 @@ public class LoginController implements Initializable {
      * nicht leer ist und beide Felder übereinstimmen. Bei Validierungsfehlern
      * wird {@code errorLabelNewPassword} eingeblendet. Bei erfolgreicher
      * Validierung wird
-     * {@link htl.steyr.uno.client(String, int, String)}
-     * mit der gespeicherten E-Mail-Adresse, dem gespeicherten 2FA-Code und dem
-     * neuen Passwort aufgerufen.
+     * {@code client.getConn().setNewPassword(...)} mit der gespeicherten
+     * E-Mail-Adresse, dem gespeicherten 2FA-Code und dem neuen Passwort
+     * aufgerufen.
      *
      * @param actionEvent das auslösende {@link ActionEvent} der Schaltfläche
      */
@@ -895,8 +890,8 @@ public class LoginController implements Initializable {
      * Handler für das Schließen des Login-Fensters.
      *
      * <p>Trennt die bestehende Server-Verbindung sauber, indem
-     * {@link htl.steyr.uno.client()} aufgerufen wird –
-     * sofern eine Verbindung ({@code client.getConn() != null}) vorhanden ist.
+     * {@code client.getConn().close()} aufgerufen wird, sofern eine Verbindung
+     * ({@code client.getConn() != null}) vorhanden ist.
      */
     private void onSceneClose() {
         if (client.getConn() != null) {

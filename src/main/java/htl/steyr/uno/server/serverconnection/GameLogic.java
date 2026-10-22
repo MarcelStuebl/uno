@@ -5,6 +5,7 @@ import htl.steyr.uno.GameTableClasses.*;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
+import htl.steyr.uno.server.database.DatabaseMatchStates;
 import htl.steyr.uno.server.database.DatabaseUser;
 
 import java.util.ArrayList;
@@ -513,19 +514,30 @@ public class GameLogic {
     }
 
 
+    /**
+     * Saves the result of the match. The games won and lost of the users are calculated
+     * from the match results by the database view user_games_stats.
+     */
     private void updateGameStats(GameOverResponse msg) {
-        for (int i = 0; i < msg.getPlayers().size(); i++) {
-            Player player = msg.getPlayers().get(i);
+        try {
+            DatabaseMatchStates.addMatchState(getPlayerIdsFromRanking(msg.getPlayers()));
+        } catch (Exception e) {
+            System.err.println("Failed to save match result: " + e.getMessage());
+        }
+    }
+
+    private List<Integer> getPlayerIdsFromRanking(ArrayList<Player> players) {
+        List<Integer> playerIds = new ArrayList<>();
+        for (Player player : players) {
             if (player != null && player.getUsername() != null) {
-                boolean won = (i == 0);
                 try {
-                    DatabaseUser dbUser = new DatabaseUser();
-                    dbUser.updateUserStats(player.getUsername(), won);
+                    playerIds.add(DatabaseUser.getUserByUserName(player.getUsername()).getId());
                 } catch (Exception e) {
-                    System.err.println("Failed to update stats for user " + player.getUsername() + ": " + e.getMessage());
+                    System.err.println("Failed to retrieve user ID for username " + player.getUsername() + ": " + e.getMessage());
                 }
             }
         }
+        return playerIds;
     }
 
 

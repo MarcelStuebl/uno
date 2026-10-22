@@ -5,17 +5,24 @@ import htl.steyr.uno.User;
 import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
 
 import java.sql.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class DatabaseUser {
 
     /**
      * Retrieves a user by their username from the database.
+     * The games won and lost are calculated from the match results by the view user_games_stats.
      * @param username The username of the user to retrieve.
      * @return A User object representing the user.
      * @throws SQLException if a database access error occurs.
      */
-    public User getUserPerUserName(String username) throws SQLException {
-        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, password_hash, password_salt, profile_image FROM user WHERE username = ?";
+    public static User getUserByUserName(String username) throws SQLException {
+        String query = "SELECT u.id, u.username, u.last_name, u.first_name, u.email, s.games_won, s.games_lost, u.created_at, u.last_login, u.password_hash, u.password_salt, u.profile_image " +
+                "FROM user u " +
+                "JOIN user_games_stats s ON s.user_id = u.id " +
+                "WHERE u.username = ?";
 
         User user = new User();
         try (Connection conn = DatabaseConnection.getConnection();
@@ -52,8 +59,8 @@ public class DatabaseUser {
      * @return A User object representing the user if the password is correct.
      * @throws SQLException if a database access error occurs.
      */
-    public User getUserPerUserName(String username, String password) throws SQLException {
-        User user = getUserPerUserName(username);
+    public static User getUserByUserName(String username, String password) throws SQLException {
+        User user = getUserByUserName(username);
             if (verifyPassword(password, user.getPasswordHash(), user.getPasswordSalt())) {
                 updateLastLogin(user.getId());
                 return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getEmail(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin(), user.getProfileImageData());
@@ -65,12 +72,16 @@ public class DatabaseUser {
 
     /**
      * Retrieves a user by their email from the database.
+     * The games won and lost are calculated from the match results by the view user_games_stats.
      * @param email The email of the user to retrieve.
      * @return A User object representing the user.
      * @throws SQLException if a database access error occurs.
      */
-    public User getUserPerEmail(String email) throws SQLException {
-        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, profile_image FROM user WHERE email = ?";
+    public static User getUserPerEmail(String email) throws SQLException {
+        String query = "SELECT u.id, u.username, u.last_name, u.first_name, u.email, s.games_won, s.games_lost, u.created_at, u.last_login, u.profile_image " +
+                "FROM user u " +
+                "JOIN user_games_stats s ON s.user_id = u.id " +
+                "WHERE u.email = ?";
 
         User user = new User();
         try (Connection conn = DatabaseConnection.getConnection();
@@ -104,7 +115,7 @@ public class DatabaseUser {
      * @return A User object representing the updated user.
      * @throws SQLException if a database access error occurs.
      */
-    public User updatePassword(String username, String newPassword) throws SQLException {
+    public static User updatePassword(String username, String newPassword) throws SQLException {
         String salt = PasswordUtil.generateSalt();
         String hash = PasswordUtil.hashPassword(newPassword, salt);
 
@@ -118,7 +129,7 @@ public class DatabaseUser {
             pstmt.executeUpdate();
         }
 
-        return getUserPerUserName(username, newPassword);
+        return getUserByUserName(username, newPassword);
     }
 
 
@@ -129,7 +140,7 @@ public class DatabaseUser {
      * @param storedSalt The stored password salt.
      * @return true if the password is correct, false otherwise.
      */
-    private boolean verifyPassword(String password, String storedHash, String storedSalt) {
+    private static boolean verifyPassword(String password, String storedHash, String storedSalt) {
         String hashToVerify = PasswordUtil.hashPassword(password, storedSalt);
         return hashToVerify.equals(storedHash);
     }
@@ -141,7 +152,7 @@ public class DatabaseUser {
      * @throws SQLException if a database access error occurs.
      * @throws UserAlreadyExistsException if a user with the same username already exists in the database.
      */
-    public void addUser(User user) throws SQLException, UserAlreadyExistsException {
+    public static void addUser(User user) throws SQLException, UserAlreadyExistsException {
         if (userExists(user)) {
             throw new UserAlreadyExistsException(user.getUsername());
         }
@@ -176,7 +187,7 @@ public class DatabaseUser {
      * @return true if the user exists, false otherwise.
      * @throws SQLException if a database access error occurs.
      */
-    public boolean userExists(User user) throws SQLException {
+    public static boolean userExists(User user) throws SQLException {
         String query = "SELECT COUNT(*) FROM user WHERE username = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -197,7 +208,7 @@ public class DatabaseUser {
      * @param userId The ID of the user to update.
      * @throws SQLException if a database access error occurs.
      */
-    private void updateLastLogin(int userId) throws SQLException {
+    private static void updateLastLogin(int userId) throws SQLException {
         String query = "UPDATE user SET last_login = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -209,7 +220,7 @@ public class DatabaseUser {
     }
 
 
-    public void updateProfileImage(User user, byte[] imageData) throws SQLException {
+    public static void updateProfileImage(User user, byte[] imageData) throws SQLException {
         String query = "UPDATE user SET profile_image = ? WHERE username = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -223,16 +234,34 @@ public class DatabaseUser {
     }
 
 
-    public void updateUserStats(String username, boolean won) throws SQLException {
-        String query = "UPDATE user SET games_won = games_won + ?, games_lost = games_lost + ? WHERE username = ?";
+    /**
+     * Retrieves the profile images of several users with a single query.
+     * @param userIds The IDs of the users.
+     * @return The profile images by user ID. Users without a profile image are not contained.
+     * @throws SQLException if a database access error occurs.
+     */
+    public static HashMap<Integer, byte[]> getProfileImagesByUserIds(Collection<Integer> userIds) throws SQLException {
+        HashMap<Integer, byte[]> profileImages = new HashMap<>();
+        if (userIds.isEmpty()) {
+            return profileImages;
+        }
+
+        String placeholders = String.join(", ", Collections.nCopies(userIds.size(), "?"));
+        String query = "SELECT id, profile_image FROM user WHERE profile_image IS NOT NULL AND id IN (" + placeholders + ")";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, won ? 1 : 0);
-            pstmt.setInt(2, won ? 0 : 1);
-            pstmt.setString(3, username);
-            pstmt.executeUpdate();
+            int index = 1;
+            for (int userId : userIds) {
+                pstmt.setInt(index++, userId);
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    profileImages.put(rs.getInt("id"), rs.getBytes("profile_image"));
+                }
+            }
         }
+        return profileImages;
     }
 
 
