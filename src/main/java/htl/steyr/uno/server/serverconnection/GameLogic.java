@@ -514,18 +514,15 @@ public class GameLogic {
     }
 
 
+    /**
+     * Saves the result of the match. The games won and lost of the users are calculated
+     * from the match results by the database view user_games_stats.
+     */
     private void updateGameStats(GameOverResponse msg) {
-        DatabaseMatchStates.addMatchState(getPlayerIdsFromRanking(msg.getPlayers()));
-        for (int i = 0; i < msg.getPlayers().size(); i++) {
-            Player player = msg.getPlayers().get(i);
-            if (player != null && player.getUsername() != null) {
-                boolean won = (i == 0);
-                try {
-                    DatabaseUser.updateUserStats(player.getUsername(), won);
-                } catch (Exception e) {
-                    System.err.println("Failed to update stats for user " + player.getUsername() + ": " + e.getMessage());
-                }
-            }
+        try {
+            DatabaseMatchStates.addMatchState(getPlayerIdsFromRanking(msg.getPlayers()));
+        } catch (Exception e) {
+            System.err.println("Failed to save match result: " + e.getMessage());
         }
     }
 
