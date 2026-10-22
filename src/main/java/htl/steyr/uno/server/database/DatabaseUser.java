@@ -13,12 +13,16 @@ public class DatabaseUser {
 
     /**
      * Retrieves a user by their username from the database.
+     * The games won and lost are calculated from the match results by the view user_games_stats.
      * @param username The username of the user to retrieve.
      * @return A User object representing the user.
      * @throws SQLException if a database access error occurs.
      */
     public static User getUserByUserName(String username) throws SQLException {
-        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, password_hash, password_salt, profile_image FROM user WHERE username = ?";
+        String query = "SELECT u.id, u.username, u.last_name, u.first_name, u.email, s.games_won, s.games_lost, u.created_at, u.last_login, u.password_hash, u.password_salt, u.profile_image " +
+                "FROM user u " +
+                "JOIN user_games_stats s ON s.user_id = u.id " +
+                "WHERE u.username = ?";
 
         User user = new User();
         try (Connection conn = DatabaseConnection.getConnection();
@@ -68,12 +72,16 @@ public class DatabaseUser {
 
     /**
      * Retrieves a user by their email from the database.
+     * The games won and lost are calculated from the match results by the view user_games_stats.
      * @param email The email of the user to retrieve.
      * @return A User object representing the user.
      * @throws SQLException if a database access error occurs.
      */
     public static User getUserPerEmail(String email) throws SQLException {
-        String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, profile_image FROM user WHERE email = ?";
+        String query = "SELECT u.id, u.username, u.last_name, u.first_name, u.email, s.games_won, s.games_lost, u.created_at, u.last_login, u.profile_image " +
+                "FROM user u " +
+                "JOIN user_games_stats s ON s.user_id = u.id " +
+                "WHERE u.email = ?";
 
         User user = new User();
         try (Connection conn = DatabaseConnection.getConnection();
@@ -254,19 +262,6 @@ public class DatabaseUser {
             }
         }
         return profileImages;
-    }
-
-
-    public static void updateUserStats(String username, boolean won) throws SQLException {
-        String query = "UPDATE user SET games_won = games_won + ?, games_lost = games_lost + ? WHERE username = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, won ? 1 : 0);
-            pstmt.setInt(2, won ? 0 : 1);
-            pstmt.setString(3, username);
-            pstmt.executeUpdate();
-        }
     }
 
 
