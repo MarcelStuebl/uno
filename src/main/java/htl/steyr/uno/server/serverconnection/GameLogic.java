@@ -5,6 +5,7 @@ import htl.steyr.uno.GameTableClasses.*;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
+import htl.steyr.uno.server.database.DatabaseMatchStates;
 import htl.steyr.uno.server.database.DatabaseUser;
 
 import java.util.ArrayList;
@@ -514,18 +515,32 @@ public class GameLogic {
 
 
     private void updateGameStats(GameOverResponse msg) {
+        DatabaseMatchStates.addMatchState(getPlayerIdsFromRanking(msg.getPlayers()));
         for (int i = 0; i < msg.getPlayers().size(); i++) {
             Player player = msg.getPlayers().get(i);
             if (player != null && player.getUsername() != null) {
                 boolean won = (i == 0);
                 try {
-                    DatabaseUser dbUser = new DatabaseUser();
-                    dbUser.updateUserStats(player.getUsername(), won);
+                    DatabaseUser.updateUserStats(player.getUsername(), won);
                 } catch (Exception e) {
                     System.err.println("Failed to update stats for user " + player.getUsername() + ": " + e.getMessage());
                 }
             }
         }
+    }
+
+    private List<Integer> getPlayerIdsFromRanking(ArrayList<Player> players) {
+        List<Integer> playerIds = new ArrayList<>();
+        for (Player player : players) {
+            if (player != null && player.getUsername() != null) {
+                try {
+                    playerIds.add(DatabaseUser.getUserByUserName(player.getUsername()).getId());
+                } catch (Exception e) {
+                    System.err.println("Failed to retrieve user ID for username " + player.getUsername() + ": " + e.getMessage());
+                }
+            }
+        }
+        return playerIds;
     }
 
 

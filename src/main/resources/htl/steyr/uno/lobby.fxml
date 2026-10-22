@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -14,7 +15,7 @@
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style/lobbyStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
 
    <center>
-      <StackPane styleClass="background" BorderPane.alignment="CENTER">
+      <StackPane fx:id="centerPane" styleClass="background" BorderPane.alignment="CENTER">
          <children>
             <VBox alignment="CENTER" maxWidth="800.0" spacing="10.0" styleClass="centerContent">
                <children>
@@ -57,6 +58,28 @@
                   </HBox>
                </children>
             </VBox>
+            <Region fx:id="statsOverlay" onMouseClicked="#onStatsOverlayClicked" styleClass="statsOverlay" visible="false" />
+            <VBox fx:id="statsPanel" maxHeight="-Infinity" maxWidth="680.0" spacing="12.0" styleClass="statsPanel" visible="false" StackPane.alignment="BOTTOM_CENTER">
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="8.0">
+                     <children>
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label styleClass="partyLable" text="Vergangene Spiele" />
+                              <Label fx:id="statsSummaryLabel" styleClass="subtitle" text="Lade Spiele..." />
+                           </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#onCloseStatsClicked" styleClass="closeStatsButton" text="✕" />
+                     </children>
+                  </HBox>
+                  <ScrollPane fx:id="statsScrollPane" fitToWidth="true" hbarPolicy="NEVER" prefViewportHeight="424.0" styleClass="statsScroll">
+                     <content>
+                        <VBox fx:id="matchListBox" spacing="8.0" styleClass="matchList" />
+                     </content>
+                  </ScrollPane>
+               </children>
+            </VBox>
          </children>
       </StackPane>
    </center>
@@ -80,7 +103,11 @@
                   <Label fx:id="gamesPlayedLabel" prefHeight="28.0" prefWidth="70.0" styleClass="stats" text="Spiele:" />
                </children>
             </StackPane>
-            <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS" />
+            <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS">
+               <children>
+                  <Button fx:id="statsButton" mnemonicParsing="false" onAction="#onStatsButtonClicked" styleClass="statsButton" text="Stats" />
+               </children>
+            </StackPane>
             <StackPane prefHeight="45.0" styleClass="stats" HBox.hgrow="ALWAYS">
                <children>
                   <Label fx:id="gamesWonLabel" prefHeight="29.0" prefWidth="73.0" styleClass="stats" text="Siege:" />

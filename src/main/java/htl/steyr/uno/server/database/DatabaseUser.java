@@ -5,6 +5,9 @@ import htl.steyr.uno.User;
 import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
 
 import java.sql.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class DatabaseUser {
 
@@ -14,7 +17,7 @@ public class DatabaseUser {
      * @return A User object representing the user.
      * @throws SQLException if a database access error occurs.
      */
-    public static User getUserPerUserName(String username) throws SQLException {
+    public static User getUserByUserName(String username) throws SQLException {
         String query = "SELECT id, username, last_name, first_name, email, games_won, games_lost, created_at, last_login, password_hash, password_salt, profile_image FROM user WHERE username = ?";
 
         User user = new User();
@@ -52,8 +55,8 @@ public class DatabaseUser {
      * @return A User object representing the user if the password is correct.
      * @throws SQLException if a database access error occurs.
      */
-    public static User getUserPerUserName(String username, String password) throws SQLException {
-        User user = getUserPerUserName(username);
+    public static User getUserByUserName(String username, String password) throws SQLException {
+        User user = getUserByUserName(username);
             if (verifyPassword(password, user.getPasswordHash(), user.getPasswordSalt())) {
                 updateLastLogin(user.getId());
                 return new User(user.getId(), user.getUsername(), user.getLastName(), user.getFirstName(), user.getEmail(), user.getGamesWon(), user.getGamesLost(), user.getCreatedAt(), user.getLastLogin(), user.getProfileImageData());
@@ -118,7 +121,7 @@ public class DatabaseUser {
             pstmt.executeUpdate();
         }
 
-        return getUserPerUserName(username, newPassword);
+        return getUserByUserName(username, newPassword);
     }
 
 
@@ -220,6 +223,37 @@ public class DatabaseUser {
         } catch (Exception e) {
             throw new SQLException("Failed to update profile image: " + e.getMessage());
         }
+    }
+
+
+    /**
+     * Retrieves the profile images of several users with a single query.
+     * @param userIds The IDs of the users.
+     * @return The profile images by user ID. Users without a profile image are not contained.
+     * @throws SQLException if a database access error occurs.
+     */
+    public static HashMap<Integer, byte[]> getProfileImagesByUserIds(Collection<Integer> userIds) throws SQLException {
+        HashMap<Integer, byte[]> profileImages = new HashMap<>();
+        if (userIds.isEmpty()) {
+            return profileImages;
+        }
+
+        String placeholders = String.join(", ", Collections.nCopies(userIds.size(), "?"));
+        String query = "SELECT id, profile_image FROM user WHERE profile_image IS NOT NULL AND id IN (" + placeholders + ")";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            int index = 1;
+            for (int userId : userIds) {
+                pstmt.setInt(index++, userId);
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    profileImages.put(rs.getInt("id"), rs.getBytes("profile_image"));
+                }
+            }
+        }
+        return profileImages;
     }
 
 

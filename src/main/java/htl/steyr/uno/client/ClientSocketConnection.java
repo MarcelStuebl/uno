@@ -235,7 +235,7 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
     }
 
     private void matchesStatisticsResponse(MatchesStatisticsResponse msg) {
-        client.getLoginController().matchesStatisticsResponse(msg);
+        client.getLobbyController().matchesStatisticsResponse(msg);
     }
 
     public void requestMatchesStatistics() {
