@@ -6,6 +6,7 @@ import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.GameOverResponse;
 import htl.steyr.uno.requests.server.GameTurnResponse;
+import htl.steyr.uno.requests.server.EmojiReactionResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
 import javafx.animation.ScaleTransition;
@@ -26,11 +27,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -39,33 +43,40 @@ import javafx.util.Duration;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GameTable implements Initializable {
 
     private final Client client;
-    @FXML private StackPane root;
+    @FXML
+    private StackPane root;
     CardStack cardStack = new CardStack(this);
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
     private Player player;
-    private HBox handBox;
     private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
     private boolean gameOverOverlayShown = false;
     private boolean withdrawalButtonCooldown = false;
-    @FXML private Label yourTurnLabel;
+    @FXML
+    private Label yourTurnLabel;
 
     // Variables used for the player hand UI.
     private VBox handVBox; // VBox holding multiple rows of cards
     private int maxCardsPerRow = 30; // maximum cards in one row
 
-    @FXML private StackPane enemy1;
-    @FXML private StackPane enemy2;
-    @FXML private StackPane enemy3;
+    @FXML
+    private StackPane enemy1;
+    @FXML
+    private StackPane enemy2;
+    @FXML
+    private StackPane enemy3;
 
     private final ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
 
@@ -74,17 +85,70 @@ public class GameTable implements Initializable {
     private Timeline unoCountdownTimer; // Timer for the UNO countdown
 
     private StackPane chatBubbleButton;
+    private Label unreadBadge;
     private VBox chatPanel;
     private ListView<ChatMessage> chatListView;
     private TextField chatInput;
     private boolean chatOpen = false;
+    private int unreadMessageCount = 0;
     private StackPane overlayLayer;
+    private HBox ownProfileDock;
+    private Pane reactionPopupLayer;
+    private boolean keepingChatOnTop;
 
 
     public GameTable(Client client, StartGameResponse msg) {
         this.client = client;
         this.startGameResponse = msg;
         this.player = new Player(getClient().getConn().getUser());
+    }
+
+    public void receiveEmojiReaction(EmojiReactionResponse msg) {
+        Platform.runLater(() -> {
+            if (msg == null || msg.emoji() == null || msg.emoji().isBlank()) {
+                return;
+            }
+            showFloatingReaction(msg.emoji());
+        });
+    }
+
+    private void showFloatingReaction(String emoji) {
+        if (reactionPopupLayer == null || emoji == null) {
+            return;
+        }
+
+        ImageView popup = createReactionImageView(emoji, 88);
+        popup.setMouseTransparent(true);
+        popup.setManaged(false);
+        reactionPopupLayer.getChildren().add(popup);
+        double maxX = Math.max(0, reactionPopupLayer.getWidth() - 100);
+        double maxY = Math.max(0, reactionPopupLayer.getHeight() - 100);
+        popup.setLayoutX(ThreadLocalRandom.current().nextDouble(maxX + 1));
+        popup.setLayoutY(ThreadLocalRandom.current().nextDouble(maxY + 1));
+        overlayLayer.toFront();
+        reactionPopupLayer.toFront();
+
+        Timeline popIn = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(popup.scaleXProperty(), 0.35),
+                        new KeyValue(popup.scaleYProperty(), 0.35),
+                        new KeyValue(popup.opacityProperty(), 0)),
+                new KeyFrame(Duration.millis(180),
+                        new KeyValue(popup.scaleXProperty(), 1.15),
+                        new KeyValue(popup.scaleYProperty(), 1.15),
+                        new KeyValue(popup.opacityProperty(), 1)),
+                new KeyFrame(Duration.millis(320),
+                        new KeyValue(popup.scaleXProperty(), 1),
+                        new KeyValue(popup.scaleYProperty(), 1))
+        );
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(700), popup);
+        fadeOut.setDelay(Duration.millis(1300));
+        fadeOut.setToValue(0);
+        TranslateTransition floatUp = new TranslateTransition(Duration.seconds(2), popup);
+        floatUp.setByY(-75);
+        ParallelTransition animation = new ParallelTransition(popIn, fadeOut, floatUp);
+        animation.setOnFinished(event -> reactionPopupLayer.getChildren().remove(popup));
+        animation.play();
     }
 
     private void updatePlayerFromStartGameResponse() {
@@ -124,6 +188,24 @@ public class GameTable implements Initializable {
             overlayLayer.getChildren().add(chatPanel);
             chatPanel.toFront();
 
+            if (handVBox != null) {
+                handVBox.toFront();
+            }
+            if (withdrawalButton != null) {
+                withdrawalButton.toFront();
+            }
+            if (sayUnoButton != null) {
+                sayUnoButton.toFront();
+            }
+            reactionPopupLayer = new Pane();
+            reactionPopupLayer.setPickOnBounds(false);
+            reactionPopupLayer.setMouseTransparent(true);
+            overlayLayer.getChildren().add(reactionPopupLayer);
+            root.getChildren().addListener((javafx.collections.ListChangeListener<Node>) change ->
+                    keepChatOnTop());
+            overlayLayer.getChildren().addListener((javafx.collections.ListChangeListener<Node>) change ->
+                    keepChatOnTop());
+
             root.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
                 if (!chatOpen) {
                     return;
@@ -135,6 +217,26 @@ public class GameTable implements Initializable {
                 }
 
                 closeChatPanel();
+            });
+
+            root.addEventFilter(ScrollEvent.SCROLL, event -> {
+                if (!chatOpen || chatListView == null || !chatListView.localToScene(chatListView.getBoundsInLocal()).contains(event.getSceneX(), event.getSceneY())) {
+                    return;
+                }
+
+                Optional<ScrollBar> verticalScrollBar = chatListView.lookupAll(".scroll-bar").stream().filter(ScrollBar.class::isInstance).map(ScrollBar.class::cast).filter(scrollBar -> scrollBar.getOrientation() == javafx.geometry.Orientation.VERTICAL).findFirst();
+                if (verticalScrollBar.isPresent()) {
+                    int scrollSteps = (int) Math.max(1, Math.abs(event.getDeltaY()) / 40);
+                    ScrollBar scrollBar = verticalScrollBar.get();
+                    for (int i = 0; i < scrollSteps; i++) {
+                        if (event.getDeltaY() > 0) {
+                            scrollBar.decrement();
+                        } else if (event.getDeltaY() < 0) {
+                            scrollBar.increment();
+                        }
+                    }
+                }
+                event.consume();
             });
 
             // Key-Listener für 'T'
@@ -183,10 +285,21 @@ public class GameTable implements Initializable {
         VBox bubbleContent = new VBox(2, chatIcon, keyHint);
         bubbleContent.setAlignment(Pos.CENTER);
 
-        StackPane chatBubbleButton = new StackPane(bubbleContent);
+        unreadBadge = new Label();
+        unreadBadge.getStyleClass().add("game-chat-unread-badge");
+        unreadBadge.setMinSize(22, 22);
+        unreadBadge.setPrefSize(22, 22);
+        unreadBadge.setMaxSize(22, 22);
+        unreadBadge.setAlignment(Pos.CENTER);
+        unreadBadge.setVisible(false);
+        unreadBadge.setManaged(false);
+
+        StackPane chatBubbleButton = new StackPane(bubbleContent, unreadBadge);
         chatBubbleButton.setPrefSize(76, 76);
         chatBubbleButton.setMaxSize(76, 76);
         chatBubbleButton.getStyleClass().add("game-chat-bubble");
+        StackPane.setAlignment(unreadBadge, Pos.TOP_RIGHT);
+        StackPane.setMargin(unreadBadge, new Insets(2, 2, 0, 0));
 
         chatBubbleButton.setOnMouseClicked(e -> {
             animateBubbleClick(chatBubbleButton);
@@ -216,8 +329,7 @@ public class GameTable implements Initializable {
                     return;
                 }
 
-                String currentUser = client.getConn() != null && client.getConn().getUser() != null
-                        ? client.getConn().getUser().getUsername() : "";
+                String currentUser = client.getConn() != null && client.getConn().getUser() != null ? client.getConn().getUser().getUsername() : "";
                 boolean mine = currentUser.equals(item.sender());
 
                 Label senderLabel = new Label(item.sender());
@@ -281,8 +393,10 @@ public class GameTable implements Initializable {
         }
 
         chatOpen = true;
+        clearUnreadMessages();
         chatPanel.setVisible(true);
         chatPanel.setManaged(true);
+        keepChatOnTop();
 
         FadeTransition fade = new FadeTransition(Duration.millis(150), chatPanel);
         fade.setFromValue(0.0);
@@ -291,6 +405,26 @@ public class GameTable implements Initializable {
             chatInput.requestFocus();
         });
         fade.play();
+    }
+
+    private void keepChatOnTop() {
+        if (!chatOpen || keepingChatOnTop || root == null || overlayLayer == null || chatPanel == null) {
+            return;
+        }
+
+        keepingChatOnTop = true;
+        try {
+            if (!root.getChildren().isEmpty()
+                    && root.getChildren().get(root.getChildren().size() - 1) != overlayLayer) {
+                overlayLayer.toFront();
+            }
+            if (!overlayLayer.getChildren().isEmpty()
+                    && overlayLayer.getChildren().get(overlayLayer.getChildren().size() - 1) != chatPanel) {
+                chatPanel.toFront();
+            }
+        } finally {
+            keepingChatOnTop = false;
+        }
     }
 
     private void closeChatPanel() {
@@ -334,12 +468,29 @@ public class GameTable implements Initializable {
 
         Platform.runLater(() -> {
             chatListView.getItems().add(new ChatMessage(msg.user().getUsername(), msg.message()));
-            chatListView.scrollTo(chatListView.getItems().size() - 1);
 
             if (!chatOpen) {
-                toggleChatPanel();
+                chatListView.scrollTo(chatListView.getItems().size() - 1);
+                unreadMessageCount++;
+                updateUnreadBadge();
             }
         });
+    }
+
+    private void clearUnreadMessages() {
+        unreadMessageCount = 0;
+        updateUnreadBadge();
+    }
+
+    private void updateUnreadBadge() {
+        if (unreadBadge == null) {
+            return;
+        }
+
+        unreadBadge.setText(unreadMessageCount > 9 ? "9+" : Integer.toString(unreadMessageCount));
+        boolean hasUnreadMessages = unreadMessageCount > 0;
+        unreadBadge.setVisible(hasUnreadMessages);
+        unreadBadge.setManaged(hasUnreadMessages);
     }
 
     private void animateBubbleClick(Node node) {
@@ -378,7 +529,7 @@ public class GameTable implements Initializable {
             return Integer.compare(ai, bi);
         });
 
-        StackPane[] slotOrder = { enemy3, enemy1, enemy2 };
+        StackPane[] slotOrder = {enemy3, enemy1, enemy2};
 
         int[] slotIndices = switch (sorted.size()) {
             case 1 -> new int[]{1};
@@ -416,10 +567,7 @@ public class GameTable implements Initializable {
             boolean isActiveTurn = false;
             if (activePlayerIndex != null) {
                 for (Enemy enemy : player.getEnemies()) {
-                    if (enemy != null
-                            && enemy.getUsername() != null
-                            && enemy.getUsername().equals(ctrl.getUsername())
-                            && activePlayerIndex.equals(enemy.getPlayerIndex())) {
+                    if (enemy != null && enemy.getUsername() != null && enemy.getUsername().equals(ctrl.getUsername()) && activePlayerIndex.equals(enemy.getPlayerIndex())) {
                         isActiveTurn = true;
                         break;
                     }
@@ -438,10 +586,7 @@ public class GameTable implements Initializable {
         if (imageData != null && imageData.length > 0) {
             profileImage = new Image(new ByteArrayInputStream(imageData), 50, 50, true, true);
         } else {
-            profileImage = new Image(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")),
-                    50, 50, true, true
-            );
+            profileImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/htl/steyr/uno/img/profile.png")), 50, 50, true, true);
         }
 
         URL url = GameTable.class.getResource("/htl/steyr/uno/enemy.fxml");
@@ -480,6 +625,10 @@ public class GameTable implements Initializable {
         StackPane.setAlignment(handVBox, Pos.BOTTOM_CENTER);
         StackPane.setMargin(handVBox, new Insets(40));
         root.getChildren().add(handVBox);
+        if (ownProfileDock == null) {
+            ownProfileDock = createOwnProfileDock();
+            root.getChildren().add(ownProfileDock);
+        }
 
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
@@ -487,6 +636,72 @@ public class GameTable implements Initializable {
         if (sayUnoButton != null) {
             sayUnoButton.toFront();
         }
+        ownProfileDock.toFront();
+    }
+
+    private HBox createOwnProfileDock() {
+        HBox emojiBar = new HBox(4);
+        emojiBar.setAlignment(Pos.CENTER);
+        String[][] reactions = {
+                {"🖕", "Mittelfinger"},
+                {"❤️", "Herz"},
+                {"😠", "Wütend"},
+                {"😭", "Weinen"}
+        };
+        for (String[] reaction : reactions) {
+            Button reactionButton = new Button();
+            reactionButton.setPadding(Insets.EMPTY);
+            reactionButton.getStyleClass().add("game-reaction-button");
+            reactionButton.setMinSize(48, 48);
+            reactionButton.setPrefSize(48, 48);
+            reactionButton.setMaxSize(48, 48);
+            reactionButton.setAlignment(Pos.CENTER);
+            reactionButton.setAccessibleText(reaction[1]);
+            reactionButton.setFocusTraversable(false);
+            reactionButton.setOnAction(event -> client.sendEmojiReaction(reaction[0]));
+
+            ImageView emojiImage = createReactionImageView(reaction[0], 36);
+            emojiImage.setMouseTransparent(true);
+            StackPane reactionButtonStack = new StackPane(reactionButton, emojiImage);
+            reactionButtonStack.setAlignment(Pos.CENTER);
+            reactionButtonStack.setMinSize(48, 48);
+            reactionButtonStack.setPrefSize(48, 48);
+            reactionButtonStack.setMaxSize(48, 48);
+            emojiBar.getChildren().add(reactionButtonStack);
+        }
+
+        HBox dock = new HBox(emojiBar);
+        dock.setAlignment(Pos.CENTER_LEFT);
+        dock.setPickOnBounds(false);
+        dock.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        StackPane.setAlignment(dock, Pos.BOTTOM_LEFT);
+        StackPane.setMargin(dock, new Insets(0, 0, 24, 20));
+        return dock;
+    }
+
+    private ImageView createReactionImageView(String emoji, double size) {
+        String imagePath = switch (emoji) {
+            case "🖕" -> "/htl/steyr/uno/emojis/middlefinger.png";
+            case "❤️" -> "/htl/steyr/uno/emojis/heart.png";
+            case "😠" -> "/htl/steyr/uno/emojis/angry.png";
+            case "😭" -> "/htl/steyr/uno/emojis/crying.png";
+            default -> throw new IllegalArgumentException("Unsupported emoji reaction: " + emoji);
+        };
+
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(size);
+        imageView.setFitHeight(size);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+        switch (emoji) {
+            case "🖕" -> imageView.setTranslateX(size * 11 / 160);
+            case "😠" -> imageView.setTranslateY(size / 160);
+            case "😭" -> imageView.setTranslateY(-size * 1.5 / 96);
+            default -> {
+            }
+        }
+        return imageView;
     }
 
     /**
@@ -538,11 +753,15 @@ public class GameTable implements Initializable {
             handVBox.getChildren().add(row);
         }
 
+        handVBox.toFront();
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
         }
         if (sayUnoButton != null) {
             sayUnoButton.toFront();
+        }
+        if (ownProfileDock != null) {
+            ownProfileDock.toFront();
         }
     }
 
@@ -559,11 +778,7 @@ public class GameTable implements Initializable {
 
         StackPane cardPane = new StackPane(iv);
         cardPane.setPrefSize(137, 192);
-        cardPane.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-border-color: transparent;" +
-                        "-fx-padding: 0;"
-        );
+        cardPane.setStyle("-fx-background-color: transparent;" + "-fx-border-color: transparent;" + "-fx-padding: 0;");
 
         Button cardBtn = new Button();
         cardBtn.setGraphic(cardPane);
@@ -609,13 +824,7 @@ public class GameTable implements Initializable {
         closeBtn.setPadding(javafx.geometry.Insets.EMPTY);
         closeBtn.setAlignment(Pos.CENTER);
 
-        closeBtn.setStyle(
-                "-fx-background-color: #d32f2f;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-size: 18;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 20;"
-        );
+        closeBtn.setStyle("-fx-background-color: #d32f2f;" + "-fx-text-fill: white;" + "-fx-font-size: 18;" + "-fx-font-weight: bold;" + "-fx-background-radius: 20;");
 
         closeBtn.setOnAction(e -> onSceneClose());
         stage.setOnCloseRequest(ev -> {
@@ -661,7 +870,7 @@ public class GameTable implements Initializable {
             hoverOut.stop();
             hoverIn.playFromStart();
         });
-         withdrawalButton.setOnMouseExited(e -> {
+        withdrawalButton.setOnMouseExited(e -> {
             hoverIn.stop();
             hoverOut.playFromStart();
         });
@@ -682,9 +891,7 @@ public class GameTable implements Initializable {
             }
 
             // Re-enable button after 1 second
-            Timeline cooldownTimer = new Timeline(
-                    new KeyFrame(Duration.seconds(1), event -> withdrawalButtonCooldown = false)
-            );
+            Timeline cooldownTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> withdrawalButtonCooldown = false));
             cooldownTimer.play();
         });
 
@@ -699,15 +906,7 @@ public class GameTable implements Initializable {
         sayUnoButton.setPrefSize(100, 50);
         sayUnoButton.setAlignment(Pos.CENTER_LEFT);
         sayUnoButton.setPadding(new Insets(8, 18, 8, 14));
-        sayUnoButton.setStyle(
-                "-fx-font-size: 14;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-color: #FFC107;" +
-                        "-fx-text-fill: #000000;" +
-                        "-fx-padding: 8px 16px;" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-alignment: center"
-        );
+        sayUnoButton.setStyle("-fx-font-size: 14;" + "-fx-font-weight: bold;" + "-fx-background-color: #FFC107;" + "-fx-text-fill: #000000;" + "-fx-padding: 8px 16px;" + "-fx-background-radius: 8;" + "-fx-alignment: center");
         sayUnoButton.setDisable(true);
         sayUnoButton.setMouseTransparent(false);
         sayUnoButton.setFocusTraversable(true);
@@ -715,31 +914,16 @@ public class GameTable implements Initializable {
 
         sayUnoButton.setOnMouseEntered(e -> {
             if (!sayUnoButton.isDisabled()) {
-                new Timeline(new KeyFrame(Duration.millis(150),
-                        new KeyValue(sayUnoButton.scaleXProperty(), 1.15),
-                        new KeyValue(sayUnoButton.scaleYProperty(), 1.15)
-                )).play();
+                new Timeline(new KeyFrame(Duration.millis(150), new KeyValue(sayUnoButton.scaleXProperty(), 1.15), new KeyValue(sayUnoButton.scaleYProperty(), 1.15))).play();
             }
         });
 
-        sayUnoButton.setOnMouseExited(e -> new Timeline(new KeyFrame(Duration.millis(150),
-                new KeyValue(sayUnoButton.scaleXProperty(), 1.0),
-                new KeyValue(sayUnoButton.scaleYProperty(), 1.0)
-        )).play());
+        sayUnoButton.setOnMouseExited(e -> new Timeline(new KeyFrame(Duration.millis(150), new KeyValue(sayUnoButton.scaleXProperty(), 1.0), new KeyValue(sayUnoButton.scaleYProperty(), 1.0))).play());
 
         sayUnoButton.setOnAction(e -> {
             if (!unoTimeActive) return;
 
-            new Timeline(
-                    new KeyFrame(Duration.millis(100),
-                            new KeyValue(sayUnoButton.scaleXProperty(), 0.95),
-                            new KeyValue(sayUnoButton.scaleYProperty(), 0.95)
-                    ),
-                    new KeyFrame(Duration.millis(200),
-                            new KeyValue(sayUnoButton.scaleXProperty(), 1.0),
-                            new KeyValue(sayUnoButton.scaleYProperty(), 1.0)
-                    )
-            ).play();
+            new Timeline(new KeyFrame(Duration.millis(100), new KeyValue(sayUnoButton.scaleXProperty(), 0.95), new KeyValue(sayUnoButton.scaleYProperty(), 0.95)), new KeyFrame(Duration.millis(200), new KeyValue(sayUnoButton.scaleXProperty(), 1.0), new KeyValue(sayUnoButton.scaleYProperty(), 1.0))).play();
 
             unoTimeActive = false;
             if (unoCountdownTimer != null) {
@@ -758,7 +942,7 @@ public class GameTable implements Initializable {
 
     /**
      * Activates the UNO countdown and gives the player 3 seconds to say UNO.
-     *
+     * <p>
      * FIX: The entire method is now wrapped in Platform.runLater() because it is
      * called from CardStack.layCard() which runs on the JavaFX thread via a card
      * button click — but the UNO countdown involves Timeline and Button.setDisable()
@@ -782,13 +966,10 @@ public class GameTable implements Initializable {
             // Single KeyFrame fires after exactly 3 seconds — simpler and more reliable
             // than setCycleCount(3) with a 1-second frame, which had edge cases where
             // forgotToSayUno() was called in the wrong tick.
-            unoCountdownTimer = new Timeline(
-                    new KeyFrame(Duration.seconds(3), e -> {
-                        unoTimeActive = false;
-                        sayUnoButton.setDisable(true);
-                        getGameLogic().forgotToSayUno();
-                    })
-            );
+            unoCountdownTimer = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
+                unoTimeActive = false;
+                sayUnoButton.setDisable(true);
+            }));
             unoCountdownTimer.setCycleCount(1);
             unoCountdownTimer.play();
         });

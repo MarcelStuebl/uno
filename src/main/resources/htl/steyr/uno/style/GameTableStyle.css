@@ -86,6 +86,43 @@
     -fx-font-family: "Segoe UI";
 }
 
+.game-reaction-button {
+    -fx-background-color: rgba(12, 18, 28, 0.8);
+    -fx-border-color: rgba(255, 255, 255, 0.28);
+    -fx-border-width: 1px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
+    -fx-pref-width: 48px;
+    -fx-pref-height: 48px;
+    -fx-max-width: 48px;
+    -fx-max-height: 48px;
+    -fx-cursor: hand;
+}
+
+.game-reaction-button:hover {
+    -fx-background-color: rgba(65, 85, 110, 0.95);
+    -fx-border-color: rgba(255, 255, 255, 0.7);
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.35), 8, 0.2, 0, 0);
+}
+
+.game-reaction-button:pressed {
+    -fx-scale-x: 0.92;
+    -fx-scale-y: 0.92;
+}
+
+.game-own-profile {
+    -fx-background-color: rgba(0, 0, 0, 0.55);
+    -fx-background-radius: 16px;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 16px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 12, 0, 0, 4);
+}
+
 .uno-card-back {
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 4, 0, 1, 2);
 }
@@ -170,6 +207,15 @@
     -fx-effect: dropshadow(three-pass-box, rgba(8, 20, 36, 0.35), 12, 0.2, 0, 6);
 }
 
+.game-chat-unread-badge {
+    -fx-background-color: #e53935;
+    -fx-background-radius: 50%;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 4, 0.2, 0, 1);
+}
+
 .game-chat-key {
     -fx-font-size: 10px;
     -fx-text-fill: white;
@@ -180,7 +226,7 @@
 }
 
 .game-chat-panel {
-    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.92), rgba(10, 15, 25, 0.9));
+    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.76), rgba(10, 15, 25, 0.72));
     -fx-background-radius: 18px;
     -fx-border-color: rgba(255, 255, 255, 0.12);
     -fx-border-width: 1;
@@ -203,6 +249,10 @@
 .game-chat-list .list-cell:selected,
 .game-chat-list .list-cell:filled:selected:hover {
     -fx-background-color: transparent;
+}
+
+.game-chat-list .scroll-bar:vertical {
+    -fx-opacity: 0;
 }
 
 .game-chat-input {
@@ -261,7 +311,7 @@
 }
 
 .game-chat-panel {
-    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.92), rgba(10, 15, 25, 0.9));
+    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.76), rgba(10, 15, 25, 0.72));
     -fx-background-radius: 18px;
     -fx-border-color: rgba(255, 255, 255, 0.12);
     -fx-border-width: 1;

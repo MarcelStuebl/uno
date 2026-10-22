@@ -69,6 +69,7 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
                 case "LobbyJoinRefusedResponse" -> lobbyJoinRefusedResponse(JsonMessageCodec.convert(decoded, LobbyJoinRefusedResponse.class));
                 case "CreateAccountSuccessResponse" -> createAccountSuccessResponse(JsonMessageCodec.convert(decoded, CreateAccountSuccessResponse.class));
                 case "ReceiveChatMessageResponse" -> receiveChatMessageResponse(JsonMessageCodec.convert(decoded, ReceiveChatMessageResponse.class));
+                case "EmojiReactionResponse" -> emojiReactionResponse(JsonMessageCodec.convert(decoded, EmojiReactionResponse.class));
                 case "ForgotPasswordResponse" -> forgotPasswordResponse(JsonMessageCodec.convert(decoded, ForgotPasswordResponse.class));
                 case "CheckIfUserAlreadyExistsResponse" -> checkIfUserAlreadyExistsResponse(JsonMessageCodec.convert(decoded, CheckIfUserAlreadyExistsResponse.class));
                 case "StartGameResponse" -> startGameResponse(JsonMessageCodec.convert(decoded, StartGameResponse.class));
@@ -155,6 +156,12 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
             client.getLobbyController().receiveChatMessage(msg);
         } else if (client.getGameTable() != null) {
             client.getGameTable().receiveChatMessage(msg);
+        }
+    }
+
+    private void emojiReactionResponse(EmojiReactionResponse msg) {
+        if (client.getGameTable() != null) {
+            client.getGameTable().receiveEmojiReaction(msg);
         }
     }
 
