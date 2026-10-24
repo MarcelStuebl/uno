@@ -164,7 +164,6 @@ public class GameTable implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         updatePlayerFromStartGameResponse();
         gameLogic = new GameLogic(this);
-        gameLogic.sendReadyToStart();
 
         Platform.runLater(() -> {
             Stage stage = (Stage) root.getScene().getWindow();
@@ -272,6 +271,8 @@ public class GameTable implements Initializable {
             if (sayUnoButton != null) {
                 sayUnoButton.toFront();
             }
+
+            gameLogic.sendReadyToStart();
         });
     }
 
