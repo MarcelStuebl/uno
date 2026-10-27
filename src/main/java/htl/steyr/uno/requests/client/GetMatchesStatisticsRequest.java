@@ -8,7 +8,7 @@ public record GetMatchesStatisticsRequest(User user) implements Serializable {
     @Override
     public String toString() {
         return "GetMatchesStatisticsRequest{" +
-                "user=" + user +
+                "username=" + user.getUsername() +
                 '}';
     }
 }
