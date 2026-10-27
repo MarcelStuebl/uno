@@ -77,36 +77,6 @@ public class CardStack {
                 showColorSelection(c, p);
                 return;
             }
-            addToStack(c);
-            p.removeCardFromHand(c);
-            if (p.getHand().isEmpty()) {
-                p.setPassive(true);
-            }
-            getGameTable().updatePlayerHandUI();
-            if (p.getHand().size() == 1) {
-                getGameTable().startUnoCountdown();
-            }
-            getGameTable().getGameLogic().playCard(c, 0);
-            return;
-        }
-
-        // Wenn drawPenaltyValue == 0 und die oberste Karte ist eine Penalty-Karte,
-        // dann hat der vorherige Spieler die Karten bereits abgehoben.
-        // FIX: startUnoCountdown() war in diesem Branch vergessen worden.
-        if (top.getCardValue() >= 12 && currentPenalty != null && currentPenalty == 0 && (currentColor == null || currentColor.isBlank())) {
-            if (c.getCardColour().equals("black")) {
-                showColorSelection(c, p);
-                return;
-            }
-            addToStack(c);
-            p.removeCardFromHand(c);
-            if (p.getHand().isEmpty()) {
-                p.setPassive(true);
-            }
-            getGameTable().updatePlayerHandUI();
-            if (p.getHand().size() == 1) {
-                getGameTable().startUnoCountdown(); // FIX: war hier vergessen
-            }
             getGameTable().getGameLogic().playCard(c, 0);
             return;
         }
@@ -121,10 +91,12 @@ public class CardStack {
         }
 
         String effectiveTopColor = top.getCardColour();
-        if (currentColor != null && !currentColor.isBlank()) {
-            effectiveTopColor = currentColor;
-        } else if (top.getCardColour().equals("black") && top.getChosenColour() != null && !top.getChosenColour().isBlank()) {
-            effectiveTopColor = top.getChosenColour();
+        if (top.getCardColour().equals("black")) {
+            if (currentColor != null && !currentColor.isBlank()) {
+                effectiveTopColor = currentColor;
+            } else if (top.getChosenColour() != null && !top.getChosenColour().isBlank()) {
+                effectiveTopColor = top.getChosenColour();
+            }
         }
 
         boolean colorMatch = c.getCardColour().equals(effectiveTopColor);
@@ -135,23 +107,9 @@ public class CardStack {
             return;
         }
 
-        // Karte ist gültig — legen
-        addToStack(c);
-        p.removeCardFromHand(c);
-
-        if (p.getHand().isEmpty()) {
-            p.setPassive(true);
-        }
-
-        getGameTable().updatePlayerHandUI();
-
         Integer drawPenaltyForThisCard = 0;
         if (c.getCardValue() == 12) {
             drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0) + 2;
-        }
-
-        if (p.getHand().size() == 1) {
-            getGameTable().startUnoCountdown();
         }
 
         getGameTable().getGameLogic().playCard(c, drawPenaltyForThisCard);
@@ -220,13 +178,7 @@ public class CardStack {
                         drawPenaltyForThisCard = (currentPenalty != null ? currentPenalty : 0) + 4;
                     }
 
-                    player.removeCardFromHand(card);
-                    addToStack(card);
-                    if (player.getHand().size() == 1) {
-                        getGameTable().startUnoCountdown();
-                    }
                     getGameTable().getGameLogic().playCard(card, drawPenaltyForThisCard);
-                    getGameTable().updatePlayerHandUI();
 
                     gameTable.getRoot().getChildren().remove(overlay);
                 });

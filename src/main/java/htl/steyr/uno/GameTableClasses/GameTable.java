@@ -47,6 +47,7 @@ import javafx.scene.input.ScrollEvent;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -770,8 +771,8 @@ public class GameTable implements Initializable {
      * Creates a card button for the player's hand.
      */
     private Button createCardButton(Card c) {
-        String path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
-        ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+        Image cardImage = loadCardImage(c);
+        ImageView iv = cardImage == null ? new ImageView() : new ImageView(cardImage);
         iv.setFitWidth(137);
         iv.setFitHeight(192);
         iv.setPreserveRatio(true);
@@ -814,6 +815,30 @@ public class GameTable implements Initializable {
         });
 
         return cardBtn;
+    }
+
+    private Image loadCardImage(Card card) {
+        String path = "/htl/steyr/uno/Uno_Cards/" + card.getCardColour() + "/" + card.getCardColour() + card.getCardValue() + ".png";
+        Image image = readImage(path);
+        if (image != null) {
+            return image;
+        }
+        System.err.println("Warnung: Kartenbild nicht gefunden: " + path);
+        String fallbackPath = "/htl/steyr/uno/Uno_Cards/backside.png";
+        Image fallbackImage = readImage(fallbackPath);
+        if (fallbackImage == null) {
+            System.err.println("Warnung: Kartenrueckseite konnte nicht geladen werden: " + fallbackPath);
+        }
+        return fallbackImage;
+    }
+
+    private Image readImage(String path) {
+        try (InputStream imageStream = getClass().getResourceAsStream(path)) {
+            return imageStream == null ? null : new Image(imageStream);
+        } catch (IOException e) {
+            System.err.println("Warnung: Bild konnte nicht geladen werden: " + path);
+            return null;
+        }
     }
 
     /**

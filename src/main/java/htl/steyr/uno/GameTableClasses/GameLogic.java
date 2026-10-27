@@ -182,6 +182,13 @@ public class GameLogic {
             }
 
             Platform.runLater(() -> {
+                if (getGameTable().getPlayer().getPlayerIndex().equals(msg.enemyIndex())) {
+                    getGameTable().getPlayer().removeCardFromHand(playedCard);
+                    getGameTable().updatePlayerHandUI();
+                    if (getGameTable().getPlayer().getHand().size() == 1) {
+                        getGameTable().startUnoCountdown();
+                    }
+                }
                 getGameTable().getCardStack().addToStack(playedCard);
                 getGameTable().refreshEnemyTurnHighlight(msg.nextPlayerIndex());
             });

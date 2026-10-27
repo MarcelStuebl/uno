@@ -84,8 +84,14 @@ public class CardDeck {
     }
 
     void refill() {
+        if (discardPile.isEmpty()) {
+            return;
+        }
+
+        Card topCard = discardPile.removeLast();
         stack.addAll(discardPile);
         discardPile.clear();
+        discardPile.add(topCard);
         shuffle();
     }
 

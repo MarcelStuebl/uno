@@ -12,9 +12,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class GameLogic {
+
+    private static final Set<String> CARD_COLORS = Set.of("red", "green", "yellow", "blue");
 
     private Lobby lobby;
     private ArrayList<Player> players = new ArrayList<>();
@@ -44,11 +47,13 @@ public class GameLogic {
     }
 
 
-    void createGame(List<User> users) {
+    synchronized void createGame(List<User> users) {
         players.clear();
         currentPlayerIndex = 0;
         directionClockwise = true;
         drawPenaltyValue = 0;
+        currentColor = null;
+        setCurrentCard(null);
         finishOrder.clear();
         leftPlayers.clear();
         gameOverSent = false;
@@ -57,7 +62,7 @@ public class GameLogic {
         while (getCurrentCard() == null || getCurrentCard().getCardValue() >= 10) {
             setCurrentCard(getCardDeck().getCardFromStack());
         }
-        getCardDeck().refill();
+        getCardDeck().returnCardToDiscordPile(getCurrentCard());
 
         int playerIndex = 0;
         for (User user : users) {
@@ -76,7 +81,7 @@ public class GameLogic {
     }
 
 
-    void readyInGameTable(ReadyInGameTableRequest msg) {
+    synchronized void readyInGameTable(ReadyInGameTableRequest msg) {
         for (Player player : players) {
             if (player.getUsername().equals(msg.player().getUsername())) {
                 player.setReady(true);
@@ -132,20 +137,34 @@ public class GameLogic {
     }
 
 
-    void cardPlayed(CardPlayedRequest msg) {
+    synchronized void cardPlayed(ServerSocketConnection requester, CardPlayedRequest msg) {
+        if (requester == null || requester.getUser() == null || msg == null
+                || msg.card() == null || msg.player() == null) {
+            System.out.println("Rejected invalid card play request");
+            return;
+        }
+
+        String username = requester.getUser().getUsername();
+        if (username == null || !username.equals(msg.player().getUsername())) {
+            System.out.println("Rejected card play request with mismatched player identity");
+            return;
+        }
+
         Card card = msg.card();
-        Player msgPlayer = msg.player();
         Integer receivedDrawPenaltyValue = msg.drawPenaltyValue();
 
         Player player = null;
         for (Player p : players) {
-            if (p.getUsername().equals(msgPlayer.getUsername())) {
+            if (p.getUsername().equals(username)) {
                 player = p;
                 break;
             }
         }
 
-        if (player == null) {
+        if (player == null || player.isPassive()
+                || !java.util.Objects.equals(player.getPlayerIndex(), currentPlayerIndex)
+                || !player.getHand().contains(card) || !isLegalCardPlay(card, msg.chosenColor())) {
+            System.out.println("Rejected illegal card play request from " + username);
             return;
         }
 
@@ -189,11 +208,10 @@ public class GameLogic {
             return;
         }
 
+        setCurrentCard(card);
         player.removeCardFromHand(card);
 
         getCardDeck().returnCardToDiscordPile(card);
-
-        getCardDeck().refill();
         checkForEmptyStack();
 
         boolean isSkip = card.getCardValue() == 10;
@@ -218,6 +236,8 @@ public class GameLogic {
             drawPenaltyValue = 0;
         } else if (card.getCardValue() == 14) {
             drawPenaltyValue = (receivedDrawPenaltyValue != null && receivedDrawPenaltyValue > 0) ? receivedDrawPenaltyValue : 4;
+        } else {
+            drawPenaltyValue = 0;
         }
 
         if (card.getCardColour().equals("black") && msg.chosenColor() != null && !msg.chosenColor().isBlank()) {
@@ -296,7 +316,8 @@ public class GameLogic {
 
         Card cardForResponse = card;
         if (card.getCardColour().equals("black")) {
-            cardForResponse = new Card(card.getCardValue(), card.getCardColour());
+            cardForResponse = new Card(card.getCardValue(), card.getCardColour(),
+                    msg.chosenColor(), card.getCardId());
             String colorToSet = (msg.chosenColor() != null && !msg.chosenColor().isBlank()) ? msg.chosenColor() : currentColor;
             if (colorToSet != null && !colorToSet.isBlank()) {
                 cardForResponse.setChosenColour(colorToSet);
@@ -325,6 +346,49 @@ public class GameLogic {
         }
 
         updateEnemy(new Enemy(player));
+    }
+
+    private boolean isLegalCardPlay(Card card, String chosenColor) {
+        if (card.getCardColour().equals("black")) {
+            if (card.getCardValue() != 13 && card.getCardValue() != 14) {
+                return false;
+            }
+            if (chosenColor == null || !CARD_COLORS.contains(chosenColor)) {
+                return false;
+            }
+        } else if (!CARD_COLORS.contains(card.getCardColour())
+                || card.getCardValue() < 0 || card.getCardValue() > 12) {
+            return false;
+        }
+
+        Card topCard = cardDeck.getTopDiscardCard();
+        if (topCard == null) {
+            topCard = currentCard;
+        }
+        if (topCard == null) {
+            return false;
+        }
+
+        if (drawPenaltyValue != null && drawPenaltyValue > 0) {
+            return (card.getCardValue() == 12 || card.getCardValue() == 14)
+                    && !(topCard.getCardValue() == 14 && card.getCardValue() == 12);
+        }
+
+        if (card.getCardColour().equals("black")) {
+            return true;
+        }
+
+        String effectiveColor;
+        if (topCard.getCardColour().equals("black")) {
+            effectiveColor = currentColor;
+            if (effectiveColor == null || effectiveColor.isBlank()) {
+                effectiveColor = topCard.getChosenColour();
+            }
+        } else {
+            effectiveColor = topCard.getCardColour();
+        }
+        return card.getCardColour().equals(effectiveColor)
+                || card.getCardValue() == topCard.getCardValue();
     }
 
 
@@ -364,24 +428,40 @@ public class GameLogic {
     }
 
 
-    void requestCard(RequestCardRequest msg) {
-        Player requestingPlayer = msg.player();
+    synchronized void requestCard(ServerSocketConnection requester, RequestCardRequest msg) {
+        if (requester == null || requester.getUser() == null || msg == null || msg.player() == null) {
+            System.out.println("Rejected invalid card draw request");
+            return;
+        }
+
+        String username = requester.getUser().getUsername();
+        if (username == null || !username.equals(msg.player().getUsername())) {
+            System.out.println("Rejected card draw request with mismatched player identity");
+            return;
+        }
 
         Player player = null;
         for (Player p : players) {
-            if (p.getUsername().equals(requestingPlayer.getUsername())) {
+            if (p.getUsername().equals(username)) {
                 player = p;
                 break;
             }
         }
 
         if (player == null) {
+            System.out.println("Rejected card draw request from a player not in this game");
             return;
         }
 
-        int amount = msg.amount();
+        int expectedAmount = drawPenaltyValue != null && drawPenaltyValue > 0 ? drawPenaltyValue : 1;
+        if (player.isPassive()
+                || !Objects.equals(player.getPlayerIndex(), currentPlayerIndex)
+                || msg.amount() != expectedAmount) {
+            System.out.println("Rejected out-of-turn or invalid card draw request from " + username);
+            return;
+        }
 
-        for (int i = 0; i < amount; i++) {
+        for (int i = 0; i < expectedAmount; i++) {
             Card card = getCardDeck().getCardFromStack();
             addCardsToPlayer(player, card);
         }
@@ -447,7 +527,7 @@ public class GameLogic {
         }
     }
 
-    void handlePlayerLeft(String username) {
+    synchronized void handlePlayerLeft(String username) {
         if (username == null || username.isBlank()) {
             return;
         }
@@ -662,7 +742,7 @@ public class GameLogic {
      * Handles the UNO logic — called when the client sends a SayUnoRequest.
      * Clears the pending UNO penalty if the player said UNO in time.
      */
-    void sayUno(SayUnoRequest msg) {
+    synchronized void sayUno(SayUnoRequest msg) {
         if (msg == null || msg.player() == null) {
             return;
         }
@@ -735,7 +815,7 @@ public class GameLogic {
      * Called from the timeout thread after 3 seconds.
      * Uses the username snapshot taken at the time of the card play to avoid race conditions.
      */
-    private void checkUnoTimeout(String username) {
+    private synchronized void checkUnoTimeout(String username) {
         if (username == null) {
             return;
         }

@@ -485,7 +485,7 @@ public class ServerSocketConnection {
     private void cardPlayedRequest(CardPlayedRequest msg) {
         Lobby lobby = server.getLobbyByConnection(this);
         if (lobby != null) {
-            lobby.getGameLogic().cardPlayed(msg);
+            lobby.getGameLogic().cardPlayed(this, msg);
         }
     }
 
@@ -502,7 +502,7 @@ public class ServerSocketConnection {
     private void requestCardRequest(RequestCardRequest msg) {
         Lobby lobby = server.getLobbyByConnection(this);
         if (lobby != null) {
-            lobby.getGameLogic().requestCard(msg);
+            lobby.getGameLogic().requestCard(this, msg);
         }
     }
 
