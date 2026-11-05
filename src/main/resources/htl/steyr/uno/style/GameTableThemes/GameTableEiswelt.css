@@ -1,0 +1,121 @@
+@import "GameTableClassic.css";
+
+.root {
+    -fx-background-color: linear-gradient(to bottom right, #10243b, #1d3d5a, #315c78);
+}
+
+.table {
+    -fx-background-color:
+            linear-gradient(to bottom, rgba(255,255,255,0.42), rgba(255,255,255,0.08)),
+            linear-gradient(to bottom right, #b9e8f4 0%, #75bfd8 45%, #438cac 100%),
+            radial-gradient(center 35% 28%, radius 80%, rgba(255,255,255,0.34), rgba(255,255,255,0.00) 60%),
+            radial-gradient(center 50% 55%, radius 115%, #5ba6c2 0%, #347b9b 72%, #20536f 100%);
+    -fx-border-color: rgba(224, 249, 255, 0.72), rgba(9, 42, 64, 0.78);
+    -fx-effect: dropshadow(gaussian, rgba(0, 15, 30, 0.62), 65, 0.36, 0, 22);
+}
+
+.button {
+    -fx-background-color: linear-gradient(to bottom, #72c9e2, #3386a8);
+    -fx-text-fill: #f3fcff;
+    -fx-border-color: rgba(213, 246, 255, 0.55);
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to bottom, #91d9ed, #4699b9);
+}
+
+.player-panel,
+.game-own-profile {
+    -fx-background-color: rgba(13, 37, 57, 0.78);
+    -fx-border-color: rgba(185, 231, 245, 0.28);
+}
+
+.player-panel.turn-active {
+    -fx-border-color: #b9f1ff;
+    -fx-effect: dropshadow(gaussian, rgba(147, 226, 246, 0.7), 16, 0.3, 0, 0);
+}
+
+.player-name,
+.game-over-title,
+.game-over-name-label {
+    -fx-text-fill: #effaff;
+}
+
+.game-reaction-button {
+    -fx-background-color: rgba(14, 48, 71, 0.9);
+    -fx-border-color: rgba(184, 232, 247, 0.45);
+}
+
+.game-reaction-button:hover {
+    -fx-background-color: rgba(55, 116, 145, 0.96);
+    -fx-border-color: #c8f3ff;
+}
+
+.game-over-panel {
+    -fx-background-color: rgba(13, 37, 57, 0.94);
+    -fx-border-color: rgba(185, 231, 245, 0.42);
+}
+
+.game-over-rank-label {
+    -fx-text-fill: #aeeaff;
+}
+
+.game-over-back-button {
+    -fx-background-color: linear-gradient(to bottom, #72c9e2, #3386a8);
+    -fx-text-fill: #f3fcff;
+}
+
+.game-over-back-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #91d9ed, #4699b9);
+}
+
+.yourTurnLabel {
+    -fx-text-fill: #b9f1ff;
+}
+
+.game-chat-bubble,
+.game-chat-bubble-mine {
+    -fx-background-color: linear-gradient(to bottom, rgba(87, 181, 211, 0.98), rgba(45, 122, 157, 0.96));
+    -fx-border-color: rgba(220, 248, 255, 0.42);
+}
+
+.game-chat-panel {
+    -fx-background-color: linear-gradient(to bottom, rgba(19, 51, 74, 0.94), rgba(10, 31, 49, 0.94));
+    -fx-border-color: rgba(185, 231, 245, 0.3);
+}
+
+.game-chat-input {
+    -fx-border-color: rgba(185, 231, 245, 0.3);
+}
+
+.game-theme-picker {
+    -fx-background-color: linear-gradient(to bottom, rgba(63, 132, 160, 0.96), rgba(32, 82, 108, 0.97));
+    -fx-border-color: rgba(194, 237, 249, 0.62);
+}
+
+.game-theme-picker:hover {
+    -fx-background-color: linear-gradient(to bottom, rgba(80, 155, 184, 0.98), rgba(40, 101, 129, 0.98));
+    -fx-border-color: rgba(220, 248, 255, 0.82);
+}
+
+.game-theme-picker > .list-cell {
+    -fx-text-fill: #f0fbff;
+}
+
+.game-theme-picker .arrow {
+    -fx-background-color: #c8f3ff;
+}
+
+.game-theme-options {
+    -fx-background-color: #15364d;
+    -fx-border-color: rgba(194, 237, 249, 0.62);
+}
+
+.game-theme-options .game-theme-option {
+    -fx-text-fill: #f0fbff;
+}
+
+.game-theme-options .game-theme-option:hover,
+.game-theme-options .game-theme-option:filled:selected {
+    -fx-background-color: rgba(94, 177, 205, 0.42);
+}
