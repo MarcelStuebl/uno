@@ -1008,6 +1008,56 @@ public class GameTable implements Initializable {
         });
     }
 
+    private void createThemeDropdownList(StackPane root) {
+        ComboBox<String> themeDropdown = new ComboBox<>();
+        themeDropdown.getItems().addAll("Western", "Classic", "Eiswelt");
+        themeDropdown.setValue(theme);
+        themeDropdown.getStyleClass().add("game-theme-picker");
+        themeDropdown.setCellFactory(listView -> {
+            listView.getStyleClass().add("game-theme-options");
+            return new ListCell<>() {
+                {
+                    getStyleClass().add("game-theme-option");
+                }
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : item);
+                }
+            };
+        });
+        themeDropdown.setOnAction(event -> {
+            String selectedTheme = themeDropdown.getValue();
+            if (selectedTheme != null && !selectedTheme.equals(theme)) {
+                theme = selectedTheme;
+                switchGameTableTheme(selectedTheme);
+            }
+        });
+
+        StackPane.setAlignment(themeDropdown, Pos.TOP_LEFT);
+        StackPane.setMargin(themeDropdown, new Insets(10));
+        root.getChildren().add(themeDropdown);
+        themeDropdown.toFront();
+    }
+
+    private void switchGameTableTheme(String newTheme) {
+        if (root == null) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            root.getStylesheets().clear();
+            String themePath = "/htl/steyr/uno/style/GameTableThemes/GameTable" + newTheme + ".css";
+            try {
+                String themeUrl = Objects.requireNonNull(getClass().getResource(themePath)).toExternalForm();
+                root.getStylesheets().add(themeUrl);
+            } catch (NullPointerException e) {
+                System.err.println("Warnung: Theme-Datei nicht gefunden: " + themePath);
+            }
+        });
+    }
+
     public GameLogic getGameLogic() {
         return gameLogic;
     }
