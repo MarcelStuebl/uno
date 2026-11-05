@@ -10,79 +10,123 @@
     <children>
         <BorderPane>
 
-    <center>
-        <VBox prefHeight="0.0" prefWidth="705.0" spacing="18" styleClass="centerArea">
-            <padding>
-                <Insets bottom="18" left="18" right="18" top="18" />
-            </padding>
+            <center>
+                <VBox prefHeight="0.0" prefWidth="705.0" spacing="18" styleClass="centerArea">
+                    <padding>
+                        <Insets bottom="18" left="18" right="18" top="18" />
+                    </padding>
 
-            <children>
-                <!-- Lobby Code Label + Trennlinie, zentriert über "Spieler" -->
-                <VBox alignment="CENTER" spacing="8">
                     <children>
-                        <Label fx:id="lobbyCodeLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="51.0" styleClass="lobbyCodeLabel" text="Lobby Code:" />
-                        <Line endX="200.0" startX="0.0" strokeWidth="2.0" />
-                    </children>
-                </VBox>
-
-                <BorderPane prefHeight="592.0" prefWidth="669.0" styleClass="playerPanel" VBox.vgrow="ALWAYS">
-                    <top>
-                        <HBox alignment="CENTER" prefHeight="33.0" prefWidth="667.0" spacing="12" styleClass="playerHeader">
+                        <!-- Lobby Code Label + Trennlinie, zentriert über "Spieler" -->
+                        <VBox alignment="CENTER" spacing="8">
                             <children>
-                                <Pane HBox.hgrow="ALWAYS" />
-                                <Label styleClass="playerHeaderLabel" text="Spieler" textAlignment="CENTER" />
-                                <Pane HBox.hgrow="ALWAYS" />
-                            </children>
-                        </HBox>
-                    </top>
-
-                    <center>
-                        <VBox BorderPane.alignment="CENTER">
-                            <children>
-                                <ListView fx:id="playerListView" prefHeight="635.0" prefWidth="667.0" styleClass="playerListView" VBox.vgrow="ALWAYS">
-                                    <VBox.margin>
-                                        <Insets />
-                                    </VBox.margin>
-                                </ListView>
+                                <Label fx:id="lobbyCodeLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="51.0" styleClass="lobbyCodeLabel" text="Lobby Code:" />
+                                <Line endX="200.0" startX="0.0" strokeWidth="2.0" />
                             </children>
                         </VBox>
-                    </center>
-                </BorderPane>
 
-                <HBox alignment="CENTER" prefHeight="87.0" prefWidth="669.0" spacing="24">
-                    <children>
-                        <Button fx:id="playButton" onAction="#playButtonClicked" prefHeight="49.0" prefWidth="122.0" styleClass="playButton" text="Spielen" />
-                        <Button fx:id="leaveLobbyButton" onAction="#leaveLobbyButtonClicked" prefHeight="49.0" prefWidth="172.0" styleClass="leaveButton" text="Lobby verlassen" />
+                        <BorderPane prefHeight="592.0" prefWidth="669.0" styleClass="playerPanel" VBox.vgrow="ALWAYS">
+                            <top>
+                                <HBox alignment="CENTER" prefHeight="33.0" prefWidth="667.0" spacing="12" styleClass="playerHeader">
+                                    <children>
+                                        <Pane HBox.hgrow="ALWAYS" />
+                                        <Label styleClass="playerHeaderLabel" text="Spieler" textAlignment="CENTER" />
+                                        <Pane HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                            </top>
+
+                            <center>
+                                <VBox BorderPane.alignment="CENTER">
+                                    <children>
+                                        <ListView fx:id="playerListView" prefHeight="635.0" prefWidth="667.0" styleClass="playerListView" VBox.vgrow="ALWAYS">
+                                            <VBox.margin>
+                                                <Insets />
+                                            </VBox.margin>
+                                        </ListView>
+                                    </children>
+                                </VBox>
+                            </center>
+                        </BorderPane>
+
+                        <HBox alignment="CENTER" prefHeight="87.0" prefWidth="669.0" spacing="24">
+                            <children>
+                                <Button fx:id="playButton" onAction="#playButtonClicked" prefHeight="49.0" prefWidth="122.0" styleClass="playButton" text="Spielen" />
+                                <Button fx:id="leaveLobbyButton" onAction="#leaveLobbyButtonClicked" prefHeight="49.0" prefWidth="172.0" styleClass="leaveButton" text="Lobby verlassen" />
+                            </children>
+                        </HBox>
                     </children>
-                </HBox>
-            </children>
-        </VBox>
-    </center>
+                </VBox>
+            </center>
 
-    <right>
-        <VBox prefHeight="850.0" prefWidth="280.0" spacing="10">
-            <padding>
-                <Insets bottom="18" left="14" right="14" top="18" />
-            </padding>
+            <right>
+                <VBox prefHeight="850.0" prefWidth="280.0" spacing="10">
+                    <padding>
+                        <Insets bottom="18" left="14" right="14" top="18" />
+                    </padding>
 
-            <children>
-                <Label fx:id="AccNameDisplayLabel" maxWidth="1.7976931348623157E308" styleClass="labels" text="Acc Name:">
-                    <font>
-                        <Font size="22.0" />
-                    </font>
-                </Label>
-
-                <StackPane fx:id="chatBox" maxHeight="720.0" minHeight="720.0" prefHeight="720.0" styleClass="chatBox" VBox.vgrow="ALWAYS">
                     <children>
-                        <ListView fx:id="gameChatListView" prefHeight="700.0" prefWidth="356.0" styleClass="gameChatListView" />
+                        <Label fx:id="AccNameDisplayLabel" maxWidth="1.7976931348623157E308" styleClass="labels" text="Acc Name:">
+                            <font>
+                                <Font size="22.0" />
+                            </font>
+                        </Label>
+
+                        <StackPane fx:id="chatBox" maxHeight="720.0" minHeight="720.0" prefHeight="720.0" styleClass="chatBox" VBox.vgrow="ALWAYS">
+                            <children>
+                                <ListView fx:id="gameChatListView" prefHeight="700.0" prefWidth="356.0" styleClass="gameChatListView" />
+                            </children>
+                        </StackPane>
+
+                        <TextField fx:id="gameChatTextField" onAction="#onSendMassage" promptText="Sende eine Nachricht an deine Freunde..." styleClass="gameChatTextField" />
                     </children>
-                </StackPane>
+                </VBox>
+            </right>
 
-                <TextField fx:id="gameChatTextField" onAction="#onSendMassage" promptText="Sende eine Nachricht an deine Freunde..." styleClass="gameChatTextField" />
-            </children>
-        </VBox>
-    </right>
+            <left>
+                <VBox prefWidth="260.0" spacing="14" BorderPane.alignment="CENTER">
+                    <padding>
+                        <Insets bottom="18" left="14" right="14" top="18" />
+                    </padding>
+                    <children>
+                        <Label styleClass="top-title" text="Einstellungen:" />
 
+                        <VBox spacing="16" styleClass="playerPanel">
+                            <padding>
+                                <Insets bottom="16" left="16" right="16" top="16" />
+                            </padding>
+                            <children>
+                                <VBox spacing="10">
+                                    <children>
+                                        <Label styleClass="setting-label" text="Spielvariante:" />
+                                        <VBox spacing="8">
+                                            <children>
+                                                <Button fx:id="unoClassicButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleGameVariant" styleClass="leaveButton" text="UNO Classic" />
+                                                <Button fx:id="unoDosButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleGameVariant" styleClass="leaveButton" text="UNO &quot;Dos&quot;" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+
+                                <Line endX="180.0" stroke="rgba(255, 255, 255, 0.1)" strokeWidth="1.0" />
+
+                                <VBox spacing="10">
+                                    <children>
+                                        <Label styleClass="setting-label" text="Lobby-Typ:" />
+                                        <VBox spacing="8">
+                                            <children>
+                                                <Button fx:id="openLobbyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLobbyType" styleClass="leaveButton" text="🌐 Offene Lobby" />
+                                                <Button fx:id="onRequestLobbyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLobbyType" styleClass="leaveButton" text="✋ Auf Anfrage" />
+                                                <Button fx:id="codeOnlyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLobbyType" styleClass="leaveButton" text="🔒 Nur Code" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </left>
         </BorderPane>
         <StackPane fx:id="kickPopupOverlay" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pickOnBounds="true" visible="false" managed="false" />
     </children>

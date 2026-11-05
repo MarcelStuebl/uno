@@ -471,3 +471,50 @@
             rgba(0, 0, 0, 0.18),
             10, 0.12, 0, 2);
 }
+
+
+/* =========================
+   EINSTELLUNGEN SEKTION (LINKS)
+   ========================= */
+
+/* Stil für die Haupt-Überschrift "Einstellungen" ganz oben in der Mitte */
+.top-title {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 32px;
+    -fx-effect: dropshadow(gaussian, rgba(100, 180, 255, 0.35), 12, 0.2, 0, 0);
+}
+
+/* Stil für die Beschriftungen im Einstellungs-Panel (z.B. "Spielvariante:", "Lobby-Typ:") */
+.setting-label {
+    -fx-text-fill: rgba(255, 255, 255, 0.85);
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* Optionaler Hover-Effekt für die Einstellungs-Buttons,
+   damit sie beim Darüberfahren mit der Maus eine dezente blaue Note bekommen */
+.leaveButton:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* =========================
+   AUSGEWÄHLTE OPTIONEN (LEUCHT-EFFEKT)
+   ========================= */
+.leaveButton.selectedOption {
+    /* Auswahl wird nur durch Rand und Glow hervorgehoben */
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+
+    /* Gelber Rand und Glow */
+    -fx-border-color: rgba(255, 225, 125, 0.95);
+    -fx-border-radius: 14;
+
+    /* Leichter sanfter Glow-Schatten */
+    -fx-effect: dropshadow(gaussian, rgba(255, 205, 70, 0.55), 12, 0.2, 0, 0);
+}
+
+/* Beim Darüberfahren bleibt der normale Hover-Hintergrund erhalten */
+.leaveButton.selectedOption:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+}
