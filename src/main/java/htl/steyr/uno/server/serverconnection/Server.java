@@ -39,7 +39,7 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket connection, String message) {
-        findConnection(connection).ifPresent(client -> client.onMessage(message));
+        findConnection(connection).ifPresent(conn -> conn.onMessage(message));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class Server extends WebSocketServer {
                 + (connection == null ? "" : " (" + connection.getRemoteSocketAddress() + ")")
                 + ": " + exception.getMessage());
         if (connection != null) {
-            findConnection(connection).ifPresent(client -> client.closeWithReason("WebSocket error"));
+            findConnection(connection).ifPresent(conn -> conn.closeWithReason("WebSocket error"));
         }
     }
 
@@ -67,7 +67,7 @@ public class Server extends WebSocketServer {
     private java.util.Optional<ServerSocketConnection> findConnection(WebSocket connection) {
         synchronized (connections) {
             return connections.stream()
-                    .filter(client -> client.getWebSocket() == connection)
+                    .filter(conn -> conn.getWebSocket() == connection)
                     .findFirst();
         }
     }
