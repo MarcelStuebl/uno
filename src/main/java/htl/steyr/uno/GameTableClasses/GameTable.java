@@ -14,7 +14,6 @@ import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.*;
-import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +23,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -57,6 +57,8 @@ public class GameTable implements Initializable {
     private final Client client;
     @FXML
     private StackPane root;
+    // Default theme; can be changed with the theme dropdown.
+    private String theme = "Western";
     CardStack cardStack = new CardStack(this);
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
@@ -104,65 +106,9 @@ public class GameTable implements Initializable {
         this.player = new Player(getClient().getConn().getUser());
     }
 
-    public void receiveEmojiReaction(EmojiReactionResponse msg) {
-        Platform.runLater(() -> {
-            if (msg == null || msg.emoji() == null || msg.emoji().isBlank()) {
-                return;
-            }
-            showFloatingReaction(msg.emoji());
-        });
-    }
-
-    private void showFloatingReaction(String emoji) {
-        if (reactionPopupLayer == null || emoji == null) {
-            return;
-        }
-
-        ImageView popup = createReactionImageView(emoji, 88);
-        popup.setMouseTransparent(true);
-        popup.setManaged(false);
-        reactionPopupLayer.getChildren().add(popup);
-        double maxX = Math.max(0, reactionPopupLayer.getWidth() - 100);
-        double maxY = Math.max(0, reactionPopupLayer.getHeight() - 100);
-        popup.setLayoutX(ThreadLocalRandom.current().nextDouble(maxX + 1));
-        popup.setLayoutY(ThreadLocalRandom.current().nextDouble(maxY + 1));
-        overlayLayer.toFront();
-        reactionPopupLayer.toFront();
-
-        Timeline popIn = new Timeline(
-                new KeyFrame(Duration.ZERO,
-                        new KeyValue(popup.scaleXProperty(), 0.35),
-                        new KeyValue(popup.scaleYProperty(), 0.35),
-                        new KeyValue(popup.opacityProperty(), 0)),
-                new KeyFrame(Duration.millis(180),
-                        new KeyValue(popup.scaleXProperty(), 1.15),
-                        new KeyValue(popup.scaleYProperty(), 1.15),
-                        new KeyValue(popup.opacityProperty(), 1)),
-                new KeyFrame(Duration.millis(320),
-                        new KeyValue(popup.scaleXProperty(), 1),
-                        new KeyValue(popup.scaleYProperty(), 1))
-        );
-        FadeTransition fadeOut = new FadeTransition(Duration.millis(700), popup);
-        fadeOut.setDelay(Duration.millis(1300));
-        fadeOut.setToValue(0);
-        TranslateTransition floatUp = new TranslateTransition(Duration.seconds(2), popup);
-        floatUp.setByY(-75);
-        ParallelTransition animation = new ParallelTransition(popIn, fadeOut, floatUp);
-        animation.setOnFinished(event -> reactionPopupLayer.getChildren().remove(popup));
-        animation.play();
-    }
-
-    private void updatePlayerFromStartGameResponse() {
-        for (Enemy enemy : startGameResponse.enemies()) {
-            if (!Objects.equals(enemy.getUsername(), player.getUsername())) {
-                player.getEnemies().add(enemy);
-                break;
-            }
-        }
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        root.getStylesheets().add(getClass().getResource("/htl/steyr/uno/style/GameTableThemes/GameTable" + theme + ".css").toExternalForm());
         updatePlayerFromStartGameResponse();
         gameLogic = new GameLogic(this);
 
@@ -253,6 +199,7 @@ public class GameTable implements Initializable {
             addCloseButton(root, stage);
             createWithdrawalStack(root);
             createSayUnoButton(root);
+            createThemeDropdownList(root);
 
             if (yourTurnLabel != null) {
                 StackPane.setAlignment(yourTurnLabel, Pos.TOP_CENTER);
@@ -276,6 +223,65 @@ public class GameTable implements Initializable {
             gameLogic.sendReadyToStart();
         });
     }
+
+    public void receiveEmojiReaction(EmojiReactionResponse msg) {
+        Platform.runLater(() -> {
+            if (msg == null || msg.emoji() == null || msg.emoji().isBlank()) {
+                return;
+            }
+            showFloatingReaction(msg.emoji());
+        });
+    }
+
+    private void showFloatingReaction(String emoji) {
+        if (reactionPopupLayer == null || emoji == null) {
+            return;
+        }
+
+        ImageView popup = createReactionImageView(emoji, 88);
+        popup.setMouseTransparent(true);
+        popup.setManaged(false);
+        reactionPopupLayer.getChildren().add(popup);
+        double maxX = Math.max(0, reactionPopupLayer.getWidth() - 100);
+        double maxY = Math.max(0, reactionPopupLayer.getHeight() - 100);
+        popup.setLayoutX(ThreadLocalRandom.current().nextDouble(maxX + 1));
+        popup.setLayoutY(ThreadLocalRandom.current().nextDouble(maxY + 1));
+        overlayLayer.toFront();
+        reactionPopupLayer.toFront();
+
+        Timeline popIn = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(popup.scaleXProperty(), 0.35),
+                        new KeyValue(popup.scaleYProperty(), 0.35),
+                        new KeyValue(popup.opacityProperty(), 0)),
+                new KeyFrame(Duration.millis(180),
+                        new KeyValue(popup.scaleXProperty(), 1.15),
+                        new KeyValue(popup.scaleYProperty(), 1.15),
+                        new KeyValue(popup.opacityProperty(), 1)),
+                new KeyFrame(Duration.millis(320),
+                        new KeyValue(popup.scaleXProperty(), 1),
+                        new KeyValue(popup.scaleYProperty(), 1))
+        );
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(700), popup);
+        fadeOut.setDelay(Duration.millis(1300));
+        fadeOut.setToValue(0);
+        TranslateTransition floatUp = new TranslateTransition(Duration.seconds(2), popup);
+        floatUp.setByY(-75);
+        ParallelTransition animation = new ParallelTransition(popIn, fadeOut, floatUp);
+        animation.setOnFinished(event -> reactionPopupLayer.getChildren().remove(popup));
+        animation.play();
+    }
+
+    private void updatePlayerFromStartGameResponse() {
+        for (Enemy enemy : startGameResponse.enemies()) {
+            if (!Objects.equals(enemy.getUsername(), player.getUsername())) {
+                player.getEnemies().add(enemy);
+                break;
+            }
+        }
+    }
+
+
 
     private StackPane createChatBubble() {
         Label chatIcon = new Label("💬");
@@ -1150,6 +1156,56 @@ public class GameTable implements Initializable {
         } catch (IOException e) {
             System.err.println("Fehler beim Zurueckkehren zur Lobby: " + e.getMessage());
         }
+    }
+
+    private void createThemeDropdownList(StackPane root) {
+        ComboBox<String> themeDropdown = new ComboBox<>();
+        themeDropdown.getItems().addAll("Western", "Classic", "Eiswelt");
+        themeDropdown.setValue(theme);
+        themeDropdown.getStyleClass().add("game-theme-picker");
+        themeDropdown.setCellFactory(listView -> {
+            listView.getStyleClass().add("game-theme-options");
+            return new ListCell<>() {
+                {
+                    getStyleClass().add("game-theme-option");
+                }
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : item);
+                }
+            };
+        });
+        themeDropdown.setOnAction(event -> {
+            String selectedTheme = themeDropdown.getValue();
+            if (selectedTheme != null && !selectedTheme.equals(theme)) {
+                theme = selectedTheme;
+                switchGameTableTheme(selectedTheme);
+            }
+        });
+
+        StackPane.setAlignment(themeDropdown, Pos.TOP_LEFT);
+        StackPane.setMargin(themeDropdown, new Insets(10));
+        root.getChildren().add(themeDropdown);
+        themeDropdown.toFront();
+    }
+
+    private void switchGameTableTheme(String newTheme) {
+        if (root == null) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            root.getStylesheets().clear();
+            String themePath = "/htl/steyr/uno/style/GameTableThemes/GameTable" + newTheme + ".css";
+            try {
+                String themeUrl = Objects.requireNonNull(getClass().getResource(themePath)).toExternalForm();
+                root.getStylesheets().add(themeUrl);
+            } catch (NullPointerException e) {
+                System.err.println("Warnung: Theme-Datei nicht gefunden: " + themePath);
+            }
+        });
     }
 
     public GameLogic getGameLogic() {
