@@ -24,17 +24,33 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -44,6 +60,9 @@ public class GameTable implements Initializable {
     private final Client client;
     @FXML
     private StackPane root;
+    // Default theme; can be changed with the theme dropdown.
+    private String theme = "Western";
+    CardStack cardStack = new CardStack(this);
     private GameThemeController themeController;
     private GameChatController chatController;
     private GameOverController gameOverController;
@@ -207,7 +226,368 @@ public class GameTable implements Initializable {
         }
     }
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        root.getStylesheets().add(getClass().getResource("/htl/steyr/uno/style/GameTableThemes/GameTable" + theme + ".css").toExternalForm());
+        updatePlayerFromStartGameResponse();
+        gameLogic = new GameLogic(this);
 
+        Platform.runLater(() -> {
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setTitle("UNO - Game Table");
+            stage.setMaximized(true);
+            stage.setResizable(true);
+
+            setupCentralStack();
+
+            overlayLayer = new StackPane();
+            overlayLayer.setPickOnBounds(false);
+            overlayLayer.setMouseTransparent(false);
+            root.getChildren().add(overlayLayer);
+            overlayLayer.toFront();
+
+            chatBubbleButton = createChatBubble();
+            overlayLayer.getChildren().add(chatBubbleButton);
+            chatBubbleButton.toFront();
+
+            chatPanel = createChatPanel();
+            overlayLayer.getChildren().add(chatPanel);
+            chatPanel.toFront();
+
+            if (handVBox != null) {
+                handVBox.toFront();
+            }
+            if (withdrawalButton != null) {
+                withdrawalButton.toFront();
+            }
+            if (sayUnoButton != null) {
+                sayUnoButton.toFront();
+            }
+            reactionPopupLayer = new Pane();
+            reactionPopupLayer.setPickOnBounds(false);
+            reactionPopupLayer.setMouseTransparent(true);
+            overlayLayer.getChildren().add(reactionPopupLayer);
+            root.getChildren().addListener((javafx.collections.ListChangeListener<Node>) change ->
+                    keepChatOnTop());
+            overlayLayer.getChildren().addListener((javafx.collections.ListChangeListener<Node>) change ->
+                    keepChatOnTop());
+
+            root.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+                if (!chatOpen) {
+                    return;
+                }
+
+                Object target = event.getTarget();
+                if (target instanceof Node node && isInsideChatInteraction(node)) {
+                    return;
+                }
+
+                closeChatPanel();
+            });
+
+            root.addEventFilter(ScrollEvent.SCROLL, event -> {
+                if (!chatOpen || chatListView == null || !chatListView.localToScene(chatListView.getBoundsInLocal()).contains(event.getSceneX(), event.getSceneY())) {
+                    return;
+                }
+
+                Optional<ScrollBar> verticalScrollBar = chatListView.lookupAll(".scroll-bar").stream().filter(ScrollBar.class::isInstance).map(ScrollBar.class::cast).filter(scrollBar -> scrollBar.getOrientation() == javafx.geometry.Orientation.VERTICAL).findFirst();
+                if (verticalScrollBar.isPresent()) {
+                    int scrollSteps = (int) Math.max(1, Math.abs(event.getDeltaY()) / 40);
+                    ScrollBar scrollBar = verticalScrollBar.get();
+                    for (int i = 0; i < scrollSteps; i++) {
+                        if (event.getDeltaY() > 0) {
+                            scrollBar.decrement();
+                        } else if (event.getDeltaY() < 0) {
+                            scrollBar.increment();
+                        }
+                    }
+                }
+                event.consume();
+            });
+
+            // Key-Listener für 'T'
+            stage.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                if (event.getCode() == KeyCode.T && !event.isConsumed()) {
+                    if (chatInput != null && chatInput.isFocused()) {
+                        return;
+                    }
+                    animateBubbleClick(chatBubbleButton);
+                    toggleChatPanel();
+                }
+            });
+
+            addCloseButton(root, stage);
+            createWithdrawalStack(root);
+            createSayUnoButton(root);
+            createThemeDropdownList(root);
+
+            if (yourTurnLabel != null) {
+                StackPane.setAlignment(yourTurnLabel, Pos.TOP_CENTER);
+                StackPane.setMargin(yourTurnLabel, new Insets(90, 0, 0, 0));
+                yourTurnLabel.toFront();
+            }
+
+            if (yourTurnLabel != null && getClient().getConn() != null && getClient().getConn().getUser() != null) {
+                String myUsername = getClient().getConn().getUser().getUsername();
+                if (startGameResponse.enemies().getFirst().getUsername().equals(myUsername)) {
+                    yourTurnLabel.setText("Your Turn!");
+                } else {
+                    yourTurnLabel.setText("");
+                }
+            }
+
+            if (sayUnoButton != null) {
+                sayUnoButton.toFront();
+            }
+
+            gameLogic.sendReadyToStart();
+        });
+    }
+
+    public void receiveEmojiReaction(EmojiReactionResponse msg) {
+        Platform.runLater(() -> {
+            if (msg == null || msg.emoji() == null || msg.emoji().isBlank()) {
+                return;
+            }
+            showFloatingReaction(msg.emoji());
+        });
+    }
+
+    private void showFloatingReaction(String emoji) {
+        if (reactionPopupLayer == null || emoji == null) {
+            return;
+        }
+
+        ImageView popup = createReactionImageView(emoji, 88);
+        popup.setMouseTransparent(true);
+        popup.setManaged(false);
+        reactionPopupLayer.getChildren().add(popup);
+        double maxX = Math.max(0, reactionPopupLayer.getWidth() - 100);
+        double maxY = Math.max(0, reactionPopupLayer.getHeight() - 100);
+        popup.setLayoutX(ThreadLocalRandom.current().nextDouble(maxX + 1));
+        popup.setLayoutY(ThreadLocalRandom.current().nextDouble(maxY + 1));
+        overlayLayer.toFront();
+        reactionPopupLayer.toFront();
+
+        Timeline popIn = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(popup.scaleXProperty(), 0.35),
+                        new KeyValue(popup.scaleYProperty(), 0.35),
+                        new KeyValue(popup.opacityProperty(), 0)),
+                new KeyFrame(Duration.millis(180),
+                        new KeyValue(popup.scaleXProperty(), 1.15),
+                        new KeyValue(popup.scaleYProperty(), 1.15),
+                        new KeyValue(popup.opacityProperty(), 1)),
+                new KeyFrame(Duration.millis(320),
+                        new KeyValue(popup.scaleXProperty(), 1),
+                        new KeyValue(popup.scaleYProperty(), 1))
+        );
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(700), popup);
+        fadeOut.setDelay(Duration.millis(1300));
+        fadeOut.setToValue(0);
+        TranslateTransition floatUp = new TranslateTransition(Duration.seconds(2), popup);
+        floatUp.setByY(-75);
+        ParallelTransition animation = new ParallelTransition(popIn, fadeOut, floatUp);
+        animation.setOnFinished(event -> reactionPopupLayer.getChildren().remove(popup));
+        animation.play();
+    }
+
+    private void updatePlayerFromStartGameResponse() {
+        for (Enemy enemy : startGameResponse.enemies()) {
+            if (!Objects.equals(enemy.getUsername(), player.getUsername())) {
+                player.getEnemies().add(enemy);
+                break;
+            }
+        }
+    }
+
+
+
+    private StackPane createChatBubble() {
+        Label chatIcon = new Label("💬");
+        chatIcon.setStyle("-fx-font-size: 22px;");
+
+        Label keyHint = new Label("[T]");
+        keyHint.getStyleClass().add("game-chat-key");
+
+        VBox bubbleContent = new VBox(2, chatIcon, keyHint);
+        bubbleContent.setAlignment(Pos.CENTER);
+
+        unreadBadge = new Label();
+        unreadBadge.getStyleClass().add("game-chat-unread-badge");
+        unreadBadge.setMinSize(22, 22);
+        unreadBadge.setPrefSize(22, 22);
+        unreadBadge.setMaxSize(22, 22);
+        unreadBadge.setAlignment(Pos.CENTER);
+        unreadBadge.setVisible(false);
+        unreadBadge.setManaged(false);
+
+        StackPane chatBubbleButton = new StackPane(bubbleContent, unreadBadge);
+        chatBubbleButton.setPrefSize(76, 76);
+        chatBubbleButton.setMaxSize(76, 76);
+        chatBubbleButton.getStyleClass().add("game-chat-bubble");
+        StackPane.setAlignment(unreadBadge, Pos.TOP_RIGHT);
+        StackPane.setMargin(unreadBadge, new Insets(2, 2, 0, 0));
+
+        chatBubbleButton.setOnMouseClicked(e -> {
+            animateBubbleClick(chatBubbleButton);
+            toggleChatPanel();
+        });
+
+        StackPane.setAlignment(chatBubbleButton, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(chatBubbleButton, new Insets(0, -8, 18, 0));
+
+        return chatBubbleButton;
+    }
+
+    private VBox createChatPanel() {
+        chatListView = new ListView<>();
+        chatListView.getStyleClass().add("game-chat-list");
+        chatListView.setPrefSize(320, 260);
+        chatListView.setMaxSize(320, 260);
+        chatListView.setMinSize(320, 260);
+        chatListView.setCellFactory(list -> new ListCell<ChatMessage>() {
+            @Override
+            protected void updateItem(ChatMessage item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+
+                String currentUser = client.getConn() != null && client.getConn().getUser() != null ? client.getConn().getUser().getUsername() : "";
+                boolean mine = currentUser.equals(item.sender());
+
+                Label senderLabel = new Label(item.sender());
+                senderLabel.getStyleClass().add("game-chat-sender");
+
+                Label bubble = new Label(item.text());
+                bubble.setWrapText(true);
+                bubble.setMaxWidth(220);
+                bubble.getStyleClass().add(mine ? "game-chat-bubble-mine" : "game-chat-bubble-other");
+
+                VBox body = new VBox(3, senderLabel, bubble);
+                body.setFillWidth(false);
+                body.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+                HBox row = new HBox(body);
+                row.setPadding(new Insets(4, 8, 4, 8));
+                row.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+                setText(null);
+                setGraphic(row);
+            }
+        });
+
+        chatInput = new TextField();
+        chatInput.setPromptText("Nachricht senden...");
+        chatInput.getStyleClass().add("game-chat-input");
+        chatInput.setOnAction(event -> sendCurrentChatMessage());
+
+        VBox panel = new VBox(8, chatListView, chatInput);
+        panel.setPadding(new Insets(10));
+        panel.setPrefSize(340, 320);
+        panel.setMaxSize(340, 320);
+        panel.getStyleClass().add("game-chat-panel");
+
+        panel.setVisible(false);
+        panel.setManaged(false);
+        panel.setOpacity(0.0);
+        StackPane.setAlignment(panel, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(panel, new Insets(0, -20, 90, 0));
+
+        return panel;
+    }
+
+    private boolean isInsideChatInteraction(Node node) {
+        for (Node current = node; current != null; current = current.getParent()) {
+            if (current == chatPanel || current == chatBubbleButton || current == chatInput || current == chatListView) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void toggleChatPanel() {
+        if (chatPanel == null) {
+            return;
+        }
+
+        if (chatOpen) {
+            closeChatPanel();
+            return;
+        }
+
+        chatOpen = true;
+        clearUnreadMessages();
+        chatPanel.setVisible(true);
+        chatPanel.setManaged(true);
+        keepChatOnTop();
+
+        FadeTransition fade = new FadeTransition(Duration.millis(150), chatPanel);
+        fade.setFromValue(0.0);
+        fade.setToValue(1.0);
+        fade.setOnFinished(event -> {
+            chatInput.requestFocus();
+        });
+        fade.play();
+    }
+
+    private void keepChatOnTop() {
+        if (!chatOpen || keepingChatOnTop || root == null || overlayLayer == null || chatPanel == null) {
+            return;
+        }
+
+        keepingChatOnTop = true;
+        try {
+            if (!root.getChildren().isEmpty()
+                    && root.getChildren().get(root.getChildren().size() - 1) != overlayLayer) {
+                overlayLayer.toFront();
+            }
+            if (!overlayLayer.getChildren().isEmpty()
+                    && overlayLayer.getChildren().get(overlayLayer.getChildren().size() - 1) != chatPanel) {
+                chatPanel.toFront();
+            }
+        } finally {
+            keepingChatOnTop = false;
+        }
+    }
+
+    private void closeChatPanel() {
+        if (chatPanel == null || !chatOpen) {
+            return;
+        }
+
+        chatOpen = false;
+        FadeTransition fade = new FadeTransition(Duration.millis(120), chatPanel);
+        fade.setFromValue(1.0);
+        fade.setToValue(0.0);
+        fade.setOnFinished(event -> {
+            chatPanel.setVisible(false);
+            chatPanel.setManaged(false);
+        });
+        fade.play();
+    }
+
+    private void sendCurrentChatMessage() {
+        if (chatInput == null) {
+            return;
+        }
+
+        String text = chatInput.getText();
+        if (text == null || text.isBlank()) {
+            return;
+        }
+
+        String trimmed = text.trim();
+        chatInput.clear();
+
+        if (client.getConn() != null && client.getConn().getUser() != null) {
+            client.sendChatMessage(trimmed);
+        }
+    }
 
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {
         if (chatController != null) {
@@ -576,6 +956,56 @@ public class GameTable implements Initializable {
      */
     public void showGameOverOverlay(GameOverResponse msg) {
         gameOverController.showOverlay(msg);
+    }
+
+    private void createThemeDropdownList(StackPane root) {
+        ComboBox<String> themeDropdown = new ComboBox<>();
+        themeDropdown.getItems().addAll("Western", "Classic", "Eiswelt");
+        themeDropdown.setValue(theme);
+        themeDropdown.getStyleClass().add("game-theme-picker");
+        themeDropdown.setCellFactory(listView -> {
+            listView.getStyleClass().add("game-theme-options");
+            return new ListCell<>() {
+                {
+                    getStyleClass().add("game-theme-option");
+                }
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : item);
+                }
+            };
+        });
+        themeDropdown.setOnAction(event -> {
+            String selectedTheme = themeDropdown.getValue();
+            if (selectedTheme != null && !selectedTheme.equals(theme)) {
+                theme = selectedTheme;
+                switchGameTableTheme(selectedTheme);
+            }
+        });
+
+        StackPane.setAlignment(themeDropdown, Pos.TOP_LEFT);
+        StackPane.setMargin(themeDropdown, new Insets(10));
+        root.getChildren().add(themeDropdown);
+        themeDropdown.toFront();
+    }
+
+    private void switchGameTableTheme(String newTheme) {
+        if (root == null) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            root.getStylesheets().clear();
+            String themePath = "/htl/steyr/uno/style/GameTableThemes/GameTable" + newTheme + ".css";
+            try {
+                String themeUrl = Objects.requireNonNull(getClass().getResource(themePath)).toExternalForm();
+                root.getStylesheets().add(themeUrl);
+            } catch (NullPointerException e) {
+                System.err.println("Warnung: Theme-Datei nicht gefunden: " + themePath);
+            }
+        });
     }
 
     public GameLogic getGameLogic() {

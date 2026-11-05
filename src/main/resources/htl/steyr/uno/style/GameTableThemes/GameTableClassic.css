@@ -288,9 +288,9 @@
 }
 
 .game-theme-picker {
-    -fx-background-color: linear-gradient(to bottom, rgba(39, 105, 57, 0.97), rgba(19, 66, 36, 0.98));
+    -fx-background-color: linear-gradient(to bottom, rgba(39, 73, 91, 0.96), rgba(20, 45, 59, 0.96));
     -fx-background-radius: 9;
-    -fx-border-color: rgba(166, 224, 168, 0.58);
+    -fx-border-color: rgba(142, 204, 218, 0.55);
     -fx-border-radius: 9;
     -fx-border-width: 1;
     -fx-padding: 2 6 2 10;
@@ -300,36 +300,36 @@
 }
 
 .game-theme-picker:hover {
-    -fx-background-color: linear-gradient(to bottom, rgba(51, 132, 72, 0.98), rgba(25, 81, 44, 0.98));
-    -fx-border-color: rgba(198, 245, 184, 0.82);
+    -fx-background-color: linear-gradient(to bottom, rgba(49, 91, 111, 0.98), rgba(25, 55, 71, 0.98));
+    -fx-border-color: rgba(177, 225, 235, 0.8);
 }
 
 .game-theme-picker > .list-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: #f0fff2;
+    -fx-text-fill: #effaff;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
 }
 
 .game-theme-options {
-    -fx-background-color: #123722;
+    -fx-background-color: #142b39;
     -fx-background-insets: 0;
     -fx-padding: 4;
-    -fx-border-color: rgba(166, 224, 168, 0.58);
+    -fx-border-color: rgba(142, 204, 218, 0.55);
     -fx-border-radius: 8;
     -fx-background-radius: 8;
 }
 
 .game-theme-options .game-theme-option {
     -fx-background-color: transparent;
-    -fx-text-fill: #f0fff2;
+    -fx-text-fill: #effaff;
     -fx-padding: 8 12 8 12;
     -fx-font-size: 13px;
 }
 
 .game-theme-options .game-theme-option:hover,
 .game-theme-options .game-theme-option:filled:selected {
-    -fx-background-color: rgba(79, 169, 97, 0.45);
+    -fx-background-color: rgba(90, 163, 183, 0.36);
     -fx-text-fill: white;
 }
 
@@ -338,7 +338,7 @@
 }
 
 .game-theme-picker .arrow {
-    -fx-background-color: #c6efb9;
+    -fx-background-color: #b6e3ec;
 }
 
 
