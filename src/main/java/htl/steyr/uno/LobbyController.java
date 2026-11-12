@@ -1,10 +1,7 @@
 package htl.steyr.uno;
 
 import htl.steyr.uno.client.Client;
-import htl.steyr.uno.requests.server.LobbyInfoResponse;
-import htl.steyr.uno.requests.server.LobbyJoinRefusedResponse;
-import htl.steyr.uno.requests.server.MatchesStatisticsResponse;
-import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
+import htl.steyr.uno.requests.server.*;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
@@ -300,7 +297,7 @@ public class LobbyController implements Initializable {
                 errorLabel.setText("Invalid lobby ID. Please try again.");
                 errorLabel.setVisible(true);
             } else {
-                client.joinLobby(lobbyId);
+                client.joinLobbyWithCode(lobbyId);
             }
 
         } catch (NumberFormatException e) {
