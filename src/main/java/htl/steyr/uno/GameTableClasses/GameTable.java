@@ -58,7 +58,7 @@ public class GameTable implements Initializable {
     @FXML
     private StackPane root;
     // Default theme; can be changed with the theme dropdown.
-    private String theme = "Western";
+    private String theme = "Classic";
     CardStack cardStack = new CardStack(this);
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
@@ -108,7 +108,8 @@ public class GameTable implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        root.getStylesheets().add(getClass().getResource("/htl/steyr/uno/style/GameTableThemes/GameTable" + theme + ".css").toExternalForm());
+        initBackground(root);
+        switchGameTableTheme(theme);
         updatePlayerFromStartGameResponse();
         gameLogic = new GameLogic(this);
 
@@ -1160,7 +1161,7 @@ public class GameTable implements Initializable {
 
     private void createThemeDropdownList(StackPane root) {
         ComboBox<String> themeDropdown = new ComboBox<>();
-        themeDropdown.getItems().addAll("Western", "Classic", "Eiswelt");
+        themeDropdown.getItems().addAll("Western", "Classic", "Aurora");
         themeDropdown.setValue(theme);
         themeDropdown.getStyleClass().add("game-theme-picker");
         themeDropdown.setCellFactory(listView -> {
@@ -1197,15 +1198,50 @@ public class GameTable implements Initializable {
         }
 
         Platform.runLater(() -> {
-            root.getStylesheets().clear();
-            String themePath = "/htl/steyr/uno/style/GameTableThemes/GameTable" + newTheme + ".css";
+            loadThemeStylesheet(newTheme);
+            if ("Classic".equals(newTheme)) {
+                backgroundImageView.setImage(null);
+                return;
+            }
+
+            String imagePath = "/htl/steyr/uno/img/table/" + newTheme.toLowerCase(Locale.ROOT) + ".jpg";
+
             try {
-                String themeUrl = Objects.requireNonNull(getClass().getResource(themePath)).toExternalForm();
-                root.getStylesheets().add(themeUrl);
-            } catch (NullPointerException e) {
-                System.err.println("Warnung: Theme-Datei nicht gefunden: " + themePath);
+                var resource = getClass().getResource(imagePath);
+                if (resource != null) {
+                    Image themeImage = new Image(resource.toExternalForm());
+                    backgroundImageView.setImage(themeImage);
+                } else {
+                    System.err.println("Warnung: Bild-Datei nicht gefunden: " + imagePath);
+                }
+            } catch (Exception e) {
+                System.err.println("Fehler beim Laden des Themes: " + e.getMessage());
             }
         });
+    }
+
+    private void loadThemeStylesheet(String selectedTheme) {
+        String themePath = "/htl/steyr/uno/style/GameTableThemes/GameTable" + selectedTheme + ".css";
+        var themeResource = getClass().getResource(themePath);
+        if (themeResource == null) {
+            System.err.println("Warnung: Theme-Datei nicht gefunden: " + themePath);
+            return;
+        }
+
+        root.getStylesheets().setAll(themeResource.toExternalForm());
+    }
+
+    private ImageView backgroundImageView; // Als Klassenvariable deklariert
+
+    private void initBackground(StackPane root) {
+        backgroundImageView = new ImageView();
+        backgroundImageView.setPreserveRatio(false);
+        // An die Größe des StackPanes binden, damit es immer skaliert
+        backgroundImageView.fitWidthProperty().bind(root.widthProperty());
+        backgroundImageView.fitHeightProperty().bind(root.heightProperty());
+
+        // Ganz nach hinten in den StackPane legen (Index 0)
+        root.getChildren().add(0, backgroundImageView);
     }
 
     public GameLogic getGameLogic() {

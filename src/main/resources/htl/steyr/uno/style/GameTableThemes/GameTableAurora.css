@@ -1,17 +1,11 @@
 @import "GameTableClassic.css";
 
-.root {
-    -fx-background-color: linear-gradient(to bottom right, #10243b, #1d3d5a, #315c78);
-}
-
 .table {
-    -fx-background-color:
-            linear-gradient(to bottom, rgba(255,255,255,0.42), rgba(255,255,255,0.08)),
-            linear-gradient(to bottom right, #b9e8f4 0%, #75bfd8 45%, #438cac 100%),
-            radial-gradient(center 35% 28%, radius 80%, rgba(255,255,255,0.34), rgba(255,255,255,0.00) 60%),
-            radial-gradient(center 50% 55%, radius 115%, #5ba6c2 0%, #347b9b 72%, #20536f 100%);
-    -fx-border-color: rgba(224, 249, 255, 0.72), rgba(9, 42, 64, 0.78);
-    -fx-effect: dropshadow(gaussian, rgba(0, 15, 30, 0.62), 65, 0.36, 0, 22);
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: none;
 }
 
 .button {
@@ -49,6 +43,23 @@
 .game-reaction-button:hover {
     -fx-background-color: rgba(55, 116, 145, 0.96);
     -fx-border-color: #c8f3ff;
+}
+
+.game-chat-key {
+    -fx-text-fill: #effaff;
+    -fx-background-color: rgba(12, 39, 54, 0.78);
+}
+
+.game-chat-bubble-other {
+    -fx-background-color: linear-gradient(to bottom, rgba(220, 248, 255, 0.12), rgba(220, 248, 255, 0.05));
+    -fx-text-fill: #effaff;
+    -fx-border-color: rgba(220, 248, 255, 0.16);
+}
+
+.game-chat-input {
+    -fx-background-color: rgba(220, 248, 255, 0.08);
+    -fx-text-fill: #effaff;
+    -fx-prompt-text-fill: rgba(239, 250, 255, 0.55);
 }
 
 .game-over-panel {
@@ -118,4 +129,13 @@
 .game-theme-options .game-theme-option:hover,
 .game-theme-options .game-theme-option:filled:selected {
     -fx-background-color: rgba(94, 177, 205, 0.42);
+}
+
+.game-theme-options .game-theme-option {
+    -fx-background-color: transparent;
+    -fx-text-fill: #f0fbff;
+}
+
+.game-theme-picker .arrow-button {
+    -fx-background-color: transparent;
 }
