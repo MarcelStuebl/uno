@@ -11,7 +11,6 @@
 
 /* Tisch in der Mitte */
 .table {
-    /* Mehrschichtiger, moderner Filz-Look mit subtiler Lichtkante */
     -fx-background-color:
             linear-gradient(to bottom, rgba(255,255,255,0.16), rgba(255,255,255,0.03)),
             linear-gradient(to bottom right, #2f8f4f 0%, #267947 45%, #1d643b 100%),
@@ -19,13 +18,10 @@
             radial-gradient(center 50% 55%, radius 115%, #1b6039 0%, #12492c 72%, #0d341f 100%);
     -fx-background-insets: 0, 8, 20, 32;
     -fx-background-radius: 520, 500, 480, 455;
-
-    /* Aussenring + dunklere Kante fuer mehr Materialtiefe */
     -fx-border-color: rgba(255,255,255,0.24), rgba(0,0,0,0.34);
     -fx-border-width: 2, 10;
     -fx-border-insets: 4, 0;
     -fx-border-radius: 500, 520;
-
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.62), 65, 0.36, 0, 22);
 
     /* Tischgröße */
@@ -87,8 +83,8 @@
 }
 
 .game-reaction-button {
-    -fx-background-color: rgba(12, 18, 28, 0.8);
-    -fx-border-color: rgba(255, 255, 255, 0.28);
+    -fx-background-color: rgba(12, 38, 25, 0.88);
+    -fx-border-color: rgba(142, 214, 162, 0.35);
     -fx-border-width: 1px;
     -fx-background-radius: 10px;
     -fx-border-radius: 10px;
@@ -102,11 +98,11 @@
 }
 
 .game-reaction-button:hover {
-    -fx-background-color: rgba(65, 85, 110, 0.95);
-    -fx-border-color: rgba(255, 255, 255, 0.7);
+    -fx-background-color: rgba(38, 112, 62, 0.95);
+    -fx-border-color: rgba(181, 240, 168, 0.8);
     -fx-scale-x: 1.12;
     -fx-scale-y: 1.12;
-    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.35), 8, 0.2, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(181, 240, 168, 0.4), 8, 0.2, 0, 0);
 }
 
 .game-reaction-button:pressed {
@@ -132,9 +128,9 @@
 }
 
 .game-over-panel {
-    -fx-background-color: rgba(18, 28, 40, 0.82);
+    -fx-background-color: rgba(13, 37, 25, 0.92);
     -fx-background-radius: 18;
-    -fx-border-color: rgba(255, 255, 255, 0.22);
+    -fx-border-color: rgba(143, 204, 151, 0.3);
     -fx-border-width: 1.5;
     -fx-border-radius: 18;
     -fx-padding: 22 28 22 28;
@@ -198,10 +194,10 @@
 }
 
 .game-chat-bubble {
-    -fx-background-color: linear-gradient(to bottom, rgba(88, 160, 255, 0.98), rgba(46, 103, 205, 0.95));
+    -fx-background-color: linear-gradient(to bottom, rgba(55, 153, 82, 0.98), rgba(31, 105, 54, 0.96));
     -fx-background-radius: 38px;
     -fx-border-radius: 38px;
-    -fx-border-color: rgba(255, 255, 255, 0.35);
+    -fx-border-color: rgba(181, 240, 168, 0.42);
     -fx-border-width: 1.2;
     -fx-cursor: hand;
     -fx-effect: dropshadow(three-pass-box, rgba(8, 20, 36, 0.35), 12, 0.2, 0, 6);
@@ -226,9 +222,9 @@
 }
 
 .game-chat-panel {
-    -fx-background-color: linear-gradient(to bottom, rgba(16, 22, 32, 0.76), rgba(10, 15, 25, 0.72));
+    -fx-background-color: linear-gradient(to bottom, rgba(18, 48, 30, 0.94), rgba(10, 31, 19, 0.94));
     -fx-background-radius: 18px;
-    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(143, 204, 151, 0.28);
     -fx-border-width: 1;
     -fx-border-radius: 18px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.42), 14, 0.2, 0, 8);
@@ -256,12 +252,12 @@
 }
 
 .game-chat-input {
-    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-color: rgba(220, 255, 225, 0.08);
     -fx-background-radius: 12px;
     -fx-border-radius: 12px;
-    -fx-border-color: rgba(255, 255, 255, 0.12);
-    -fx-text-fill: white;
-    -fx-prompt-text-fill: rgba(255,255,255,0.55);
+    -fx-border-color: rgba(143, 204, 151, 0.32);
+    -fx-text-fill: #f0fff2;
+    -fx-prompt-text-fill: rgba(240, 255, 242, 0.55);
     -fx-padding: 8 10 8 10;
 }
 
@@ -272,29 +268,29 @@
 }
 
 .game-chat-bubble-mine {
-    -fx-background-color: linear-gradient(to bottom, rgba(89, 162, 255, 0.95), rgba(53, 104, 227, 0.95));
-    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to bottom, rgba(55, 153, 82, 0.96), rgba(31, 105, 54, 0.96));
+    -fx-text-fill: #f0fff2;
     -fx-padding: 9 12 9 12;
     -fx-background-radius: 14px;
     -fx-border-radius: 14px;
-    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-color: rgba(181, 240, 168, 0.3);
     -fx-border-width: 0.8;
 }
 
 .game-chat-bubble-other {
-    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to bottom, rgba(220, 255, 225, 0.1), rgba(220, 255, 225, 0.05));
+    -fx-text-fill: #f0fff2;
     -fx-padding: 9 12 9 12;
     -fx-background-radius: 14px;
     -fx-border-radius: 14px;
-    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(220, 255, 225, 0.16);
     -fx-border-width: 0.8;
 }
 
 .game-theme-picker {
-    -fx-background-color: linear-gradient(to bottom, rgba(39, 73, 91, 0.96), rgba(20, 45, 59, 0.96));
+    -fx-background-color: linear-gradient(to bottom, rgba(39, 105, 57, 0.97), rgba(19, 66, 36, 0.98));
     -fx-background-radius: 9;
-    -fx-border-color: rgba(142, 204, 218, 0.55);
+    -fx-border-color: rgba(166, 224, 168, 0.58);
     -fx-border-radius: 9;
     -fx-border-width: 1;
     -fx-padding: 2 6 2 10;
@@ -304,36 +300,36 @@
 }
 
 .game-theme-picker:hover {
-    -fx-background-color: linear-gradient(to bottom, rgba(49, 91, 111, 0.98), rgba(25, 55, 71, 0.98));
-    -fx-border-color: rgba(177, 225, 235, 0.8);
+    -fx-background-color: linear-gradient(to bottom, rgba(51, 132, 72, 0.98), rgba(25, 81, 44, 0.98));
+    -fx-border-color: rgba(198, 245, 184, 0.82);
 }
 
 .game-theme-picker > .list-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: #effaff;
+    -fx-text-fill: #f0fff2;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
 }
 
 .game-theme-options {
-    -fx-background-color: #142b39;
+    -fx-background-color: #123722;
     -fx-background-insets: 0;
     -fx-padding: 4;
-    -fx-border-color: rgba(142, 204, 218, 0.55);
+    -fx-border-color: rgba(166, 224, 168, 0.58);
     -fx-border-radius: 8;
     -fx-background-radius: 8;
 }
 
 .game-theme-options .game-theme-option {
     -fx-background-color: transparent;
-    -fx-text-fill: #effaff;
+    -fx-text-fill: #f0fff2;
     -fx-padding: 8 12 8 12;
     -fx-font-size: 13px;
 }
 
 .game-theme-options .game-theme-option:hover,
 .game-theme-options .game-theme-option:filled:selected {
-    -fx-background-color: rgba(90, 163, 183, 0.36);
+    -fx-background-color: rgba(79, 169, 97, 0.45);
     -fx-text-fill: white;
 }
 
@@ -342,7 +338,7 @@
 }
 
 .game-theme-picker .arrow {
-    -fx-background-color: #b6e3ec;
+    -fx-background-color: #c6efb9;
 }
 
 
