@@ -67,11 +67,6 @@ public final class GameThemeController {
     private void switchTheme(String newTheme) {
         Platform.runLater(() -> {
             loadThemeStylesheet(newTheme);
-            if ("Classic".equals(newTheme)) {
-                backgroundImageView.setImage(null);
-                return;
-            }
-
             String imagePath = "/htl/steyr/uno/img/table/" + newTheme.toLowerCase(Locale.ROOT) + ".jpg";
             try {
                 var resource = getClass().getResource(imagePath);

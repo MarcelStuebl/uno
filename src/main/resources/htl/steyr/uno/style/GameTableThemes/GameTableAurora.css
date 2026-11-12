@@ -1,13 +1,5 @@
 @import "GameTableClassic.css";
 
-.table {
-    -fx-background-color: transparent;
-    -fx-background-insets: 0;
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
-    -fx-effect: none;
-}
-
 .button {
     -fx-background-color: linear-gradient(to bottom, #72c9e2, #3386a8);
     -fx-text-fill: #f3fcff;

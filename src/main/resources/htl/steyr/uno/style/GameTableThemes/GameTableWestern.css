@@ -1,288 +1,110 @@
-.root {
-    -fx-padding: 75px 190px 75px 190px;
-    -fx-alignment: center;
-}
+@import "GameTableClassic.css";
 
-.table {
-    -fx-background-color: transparent;
-    -fx-background-insets: 0;
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
-    -fx-effect: none;
-    -fx-pref-width: 600px;
-    -fx-pref-height: 400px;
-}
-
-.button {
+.button,
+.game-over-back-button {
     -fx-background-color: linear-gradient(to bottom, #c28e38, #8c581e);
     -fx-text-fill: #fff8e8;
-    -fx-font-weight: bold;
-    -fx-font-family: "Segoe UI";
-    -fx-padding: 10 20 10 20;
-    -fx-background-radius: 20;
     -fx-border-color: rgba(255, 220, 150, 0.4);
-    -fx-border-radius: 20;
-    -fx-border-width: 1;
-    -fx-alignment: top-right;
-    -fx-margin: 0 0 0 0;
 }
 
-.button:hover {
+.button:hover,
+.game-over-back-button:hover {
     -fx-background-color: linear-gradient(to bottom, #d49f45, #9e6424);
-    -fx-cursor: hand;
 }
 
-.player-panel {
+.player-panel,
+.game-own-profile {
     -fx-background-color: rgba(30, 18, 10, 0.78);
-    -fx-background-radius: 16;
     -fx-border-color: rgba(212, 160, 23, 0.22);
-    -fx-border-radius: 16;
-    -fx-border-width: 1.2;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 12, 0, 0, 4);
 }
 
 .player-panel.turn-active {
     -fx-border-color: #f1c40f;
-    -fx-border-width: 2.2;
     -fx-effect: dropshadow(gaussian, rgba(241, 196, 15, 0.75), 16, 0.35, 0, 0);
 }
 
-.player-panel.passive {
-    -fx-opacity: 0.45;
-    -fx-border-color: rgba(140, 120, 100, 0.3);
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0, 0, 2);
-}
-
+.player-panel.passive,
 .player-panel.passive.turn-active {
     -fx-border-color: rgba(140, 120, 100, 0.3);
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0, 0, 2);
 }
 
-.player-name {
+.player-name,
+.game-over-title,
+.game-over-name-label {
     -fx-text-fill: #f5eedc;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-font-family: "Segoe UI";
 }
 
 .game-reaction-button {
     -fx-background-color: rgba(40, 25, 14, 0.88);
     -fx-border-color: rgba(212, 160, 23, 0.35);
-    -fx-border-width: 1px;
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-min-width: 48px;
-    -fx-min-height: 48px;
-    -fx-pref-width: 48px;
-    -fx-pref-height: 48px;
-    -fx-max-width: 48px;
-    -fx-max-height: 48px;
-    -fx-cursor: hand;
 }
 
 .game-reaction-button:hover {
     -fx-background-color: rgba(90, 60, 35, 0.95);
     -fx-border-color: rgba(241, 196, 15, 0.8);
-    -fx-scale-x: 1.12;
-    -fx-scale-y: 1.12;
-    -fx-effect: dropshadow(gaussian, rgba(241, 196, 15, 0.4), 8, 0.2, 0, 0);
 }
 
-.game-reaction-button:pressed {
-    -fx-scale-x: 0.92;
-    -fx-scale-y: 0.92;
+.game-chat-bubble,
+.game-chat-bubble-mine {
+    -fx-background-color: linear-gradient(to bottom, rgba(160, 105, 52, 0.98), rgba(115, 68, 28, 0.95));
+    -fx-border-color: rgba(255, 215, 130, 0.45);
 }
 
-.game-own-profile {
-    -fx-background-color: rgba(30, 18, 10, 0.78);
-    -fx-background-radius: 16px;
-    -fx-border-color: rgba(212, 160, 23, 0.22);
-    -fx-border-radius: 16px;
-    -fx-border-width: 1px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 12, 0, 0, 4);
+.game-chat-bubble-mine {
+    -fx-text-fill: #f5eedc;
 }
 
-.uno-card-back {
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 5, 0, 1, 2);
+.game-chat-bubble-other {
+    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    -fx-text-fill: #f5eedc;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+}
+
+.game-chat-key {
+    -fx-text-fill: #f5eedc;
+    -fx-background-color: rgba(30, 16, 8, 0.62);
+}
+
+.game-chat-sender {
+    -fx-text-fill: rgba(245, 238, 222, 0.72);
+}
+
+.game-chat-panel {
+    -fx-background-color: linear-gradient(to bottom, rgba(38, 23, 14, 0.88), rgba(24, 14, 8, 0.85));
+    -fx-border-color: rgba(212, 160, 23, 0.25);
+}
+
+.game-chat-input {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-border-color: rgba(212, 160, 23, 0.25);
+    -fx-text-fill: #f5eedc;
+    -fx-prompt-text-fill: rgba(245, 238, 222, 0.45);
+}
+
+.game-over-panel {
+    -fx-background-color: rgba(36, 22, 13, 0.92);
+    -fx-border-color: rgba(212, 160, 23, 0.35);
+}
+
+.game-over-rank-label {
+    -fx-text-fill: #f1c40f;
+}
+
+.game-over-ranking-row-left {
+    -fx-background-color: rgba(80, 60, 40, 0.2);
 }
 
 .game-over-overlay {
     -fx-background-color: rgba(10, 5, 2, 0.65);
 }
 
-.game-over-panel {
-    -fx-background-color: rgba(36, 22, 13, 0.92);
-    -fx-background-radius: 18;
-    -fx-border-color: rgba(212, 160, 23, 0.35);
-    -fx-border-width: 1.5;
-    -fx-border-radius: 18;
-    -fx-padding: 22 28 22 28;
-}
-
-.game-over-title {
-    -fx-text-fill: #f5eedc;
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-}
-
-.game-over-ranking-list {
-    -fx-alignment: center-left;
-}
-
-.game-over-ranking-row {
-    -fx-alignment: center-left;
-    -fx-spacing: 12;
-    -fx-background-color: rgba(255, 255, 255, 0.05);
-    -fx-background-radius: 10;
-    -fx-padding: 8 12 8 12;
-}
-
-.game-over-ranking-row-left {
-    -fx-opacity: 0.5;
-    -fx-background-color: rgba(80, 60, 40, 0.2);
-}
-
-.game-over-rank-label {
-    -fx-text-fill: #f1c40f;
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-min-width: 34;
-}
-
-.game-over-name-label {
-    -fx-text-fill: #f5eedc;
-    -fx-font-size: 18px;
-    -fx-font-weight: 600;
-}
-
-.game-over-back-button {
-    -fx-background-color: linear-gradient(to bottom, #c28e38, #8c581e);
-    -fx-text-fill: #fff8e8;
-    -fx-font-weight: bold;
-    -fx-font-size: 16px;
-    -fx-padding: 10 18 10 18;
-    -fx-background-radius: 16;
-    -fx-border-color: rgba(255, 220, 150, 0.4);
-    -fx-border-radius: 16;
-    -fx-border-width: 1;
-}
-
-.game-over-back-button:hover {
-    -fx-background-color: linear-gradient(to bottom, #d49f45, #9e6424);
-    -fx-cursor: hand;
-}
-
 .yourTurnLabel {
     -fx-text-fill: #d32f2f;
-    -fx-font-size: 30px;
-    -fx-font-weight: bold;
-    -fx-alignment: center;
-}
-
-.game-chat-bubble {
-    -fx-background-color: linear-gradient(to bottom, rgba(160, 105, 52, 0.98), rgba(115, 68, 28, 0.95));
-    -fx-background-radius: 38px;
-    -fx-border-radius: 38px;
-    -fx-border-color: rgba(255, 215, 130, 0.45);
-    -fx-border-width: 1.2;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(15, 8, 3, 0.45), 12, 0.2, 0, 6);
-}
-
-.game-chat-unread-badge {
-    -fx-background-color: #c0392b;
-    -fx-background-radius: 50%;
-    -fx-text-fill: white;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 4, 0.2, 0, 1);
-}
-
-.game-chat-key {
-    -fx-font-size: 10px;
-    -fx-text-fill: #f5eedc;
-    -fx-font-weight: bold;
-    -fx-background-color: rgba(30, 16, 8, 0.62);
-    -fx-background-radius: 6px;
-    -fx-padding: 2 5 2 5;
-}
-
-.game-chat-panel {
-    -fx-background-color: linear-gradient(to bottom, rgba(38, 23, 14, 0.88), rgba(24, 14, 8, 0.85));
-    -fx-background-radius: 18px;
-    -fx-border-color: rgba(212, 160, 23, 0.25);
-    -fx-border-width: 1;
-    -fx-border-radius: 18px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.55), 14, 0.2, 0, 8);
-}
-
-.game-chat-list {
-    -fx-background-color: transparent;
-    -fx-control-inner-background: transparent;
-    -fx-control-inner-background-alt: transparent;
-    -fx-padding: 0;
-}
-
-.game-chat-list .list-cell {
-    -fx-background-color: transparent;
-    -fx-padding: 0;
-}
-
-.game-chat-list .list-cell:selected,
-.game-chat-list .list-cell:filled:selected:hover {
-    -fx-background-color: transparent;
-}
-
-.game-chat-list .scroll-bar:vertical {
-    -fx-opacity: 0;
-}
-
-.game-chat-input {
-    -fx-background-color: rgba(255, 255, 255, 0.06);
-    -fx-background-radius: 12px;
-    -fx-border-radius: 12px;
-    -fx-border-color: rgba(212, 160, 23, 0.25);
-    -fx-text-fill: #f5eedc;
-    -fx-prompt-text-fill: rgba(245, 238, 222, 0.45);
-    -fx-padding: 8 10 8 10;
-}
-
-.game-chat-sender {
-    -fx-text-fill: rgba(245, 238, 222, 0.72);
-    -fx-font-size: 10px;
-    -fx-font-weight: bold;
-}
-
-.game-chat-bubble-mine {
-    -fx-background-color: linear-gradient(to bottom, rgba(160, 105, 52, 0.95), rgba(115, 68, 28, 0.95));
-    -fx-text-fill: #f5eedc;
-    -fx-padding: 9 12 9 12;
-    -fx-background-radius: 14px;
-    -fx-border-radius: 14px;
-    -fx-border-color: rgba(255, 215, 130, 0.3);
-    -fx-border-width: 0.8;
-}
-
-.game-chat-bubble-other {
-    -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-    -fx-text-fill: #f5eedc;
-    -fx-padding: 9 12 9 12;
-    -fx-background-radius: 14px;
-    -fx-border-radius: 14px;
-    -fx-border-color: rgba(255, 255, 255, 0.12);
-    -fx-border-width: 0.8;
 }
 
 .game-theme-picker {
     -fx-background-color: linear-gradient(to bottom, rgba(119, 78, 42, 0.96), rgba(74, 44, 24, 0.97));
-    -fx-background-radius: 9;
     -fx-border-color: rgba(224, 184, 119, 0.58);
-    -fx-border-radius: 9;
-    -fx-border-width: 1;
-    -fx-padding: 2 6 2 10;
-    -fx-pref-width: 140;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.42), 8, 0.15, 0, 2);
 }
 
 .game-theme-picker:hover {
@@ -291,38 +113,23 @@
 }
 
 .game-theme-picker > .list-cell {
-    -fx-background-color: transparent;
     -fx-text-fill: #fff4df;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
+}
+
+.game-theme-picker .arrow {
+    -fx-background-color: #f1d29e;
 }
 
 .game-theme-options {
     -fx-background-color: #321f12;
-    -fx-background-insets: 0;
-    -fx-padding: 4;
     -fx-border-color: rgba(224, 184, 119, 0.58);
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
 }
 
 .game-theme-options .game-theme-option {
-    -fx-background-color: transparent;
     -fx-text-fill: #fff4df;
-    -fx-padding: 8 12 8 12;
-    -fx-font-size: 13px;
 }
 
 .game-theme-options .game-theme-option:hover,
 .game-theme-options .game-theme-option:filled:selected {
     -fx-background-color: rgba(183, 129, 58, 0.42);
-    -fx-text-fill: white;
-}
-
-.game-theme-picker .arrow-button {
-    -fx-background-color: transparent;
-}
-
-.game-theme-picker .arrow {
-    -fx-background-color: #f1d29e;
 }

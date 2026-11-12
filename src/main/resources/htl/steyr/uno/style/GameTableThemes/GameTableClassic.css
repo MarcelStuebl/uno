@@ -1,30 +1,15 @@
-/* Root Hintergrund */
+/* Gemeinsames Layout aller Themes */
 .root {
-    -fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
-
-    /* Seitenabstand links/rechts + oben/unten */
-    -fx-padding: 75px 190px 75px 190px;
-
-    /* Alle Kinder zentrieren */
+    -fx-padding: 20px 40px;
     -fx-alignment: center;
 }
 
-/* Tisch in der Mitte */
 .table {
-    -fx-background-color:
-            linear-gradient(to bottom, rgba(255,255,255,0.16), rgba(255,255,255,0.03)),
-            linear-gradient(to bottom right, #2f8f4f 0%, #267947 45%, #1d643b 100%),
-            radial-gradient(center 35% 28%, radius 80%, rgba(255,255,255,0.10), rgba(255,255,255,0.00) 60%),
-            radial-gradient(center 50% 55%, radius 115%, #1b6039 0%, #12492c 72%, #0d341f 100%);
-    -fx-background-insets: 0, 8, 20, 32;
-    -fx-background-radius: 520, 500, 480, 455;
-    -fx-border-color: rgba(255,255,255,0.24), rgba(0,0,0,0.34);
-    -fx-border-width: 2, 10;
-    -fx-border-insets: 4, 0;
-    -fx-border-radius: 500, 520;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.62), 65, 0.36, 0, 22);
-
-    /* Tischgröße */
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: none;
     -fx-pref-width: 600px;
     -fx-pref-height: 400px;
 }
