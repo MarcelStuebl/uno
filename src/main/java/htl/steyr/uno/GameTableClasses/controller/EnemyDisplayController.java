@@ -1,4 +1,4 @@
-package htl.steyr.uno.GameTableClasses;
+package htl.steyr.uno.GameTableClasses.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
