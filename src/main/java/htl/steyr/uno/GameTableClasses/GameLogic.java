@@ -1,5 +1,6 @@
 package htl.steyr.uno.GameTableClasses;
 
+import htl.steyr.uno.GameTableClasses.controller.EnemyDisplayController;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.*;
 import javafx.application.Platform;
@@ -69,7 +70,7 @@ public class GameLogic {
      * @param card             The card that the player is attempting to play.
      * @param drawPenaltyValue The current draw penalty value.
      */
-    void playCard(Card card, Integer drawPenaltyValue) {
+    public void playCard(Card card, Integer drawPenaltyValue) {
         String chosenColor = null;
         if (card.getCardColour().equals("black") && card.getChosenColour() != null && !card.getChosenColour().isBlank()) {
             chosenColor = card.getChosenColour();

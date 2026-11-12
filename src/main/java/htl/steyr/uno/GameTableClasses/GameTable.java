@@ -1,8 +1,11 @@
 package htl.steyr.uno.GameTableClasses;
 
-import htl.steyr.uno.HelloApplication;
-import htl.steyr.uno.LobbyController;
-import htl.steyr.uno.UiStyleUtil;
+import htl.steyr.uno.GameTableClasses.controller.CardStackController;
+import htl.steyr.uno.GameTableClasses.controller.EnemyDisplayController;
+import htl.steyr.uno.GameTableClasses.controller.GameChatController;
+import htl.steyr.uno.GameTableClasses.controller.GameOverController;
+import htl.steyr.uno.GameTableClasses.controller.GameThemeController;
+import htl.steyr.uno.GameTableClasses.controller.PlayerHandController;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.GameOverResponse;
 import htl.steyr.uno.requests.server.GameTurnResponse;
@@ -21,33 +24,17 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.TextField;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -57,22 +44,20 @@ public class GameTable implements Initializable {
     private final Client client;
     @FXML
     private StackPane root;
-    // Default theme; can be changed with the theme dropdown.
-    private String theme = "Classic";
-    CardStack cardStack = new CardStack(this);
+    private GameThemeController themeController;
+    private GameChatController chatController;
+    private GameOverController gameOverController;
+    CardStackController cardStack = new CardStackController(this);
     private final StartGameResponse startGameResponse;
     private GameLogic gameLogic;
     private Player player;
     private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
-    private boolean gameOverOverlayShown = false;
     private boolean withdrawalButtonCooldown = false;
     @FXML
     private Label yourTurnLabel;
 
-    // Variables used for the player hand UI.
-    private VBox handVBox; // VBox holding multiple rows of cards
-    private int maxCardsPerRow = 30; // maximum cards in one row
+    private PlayerHandController handController;
 
     @FXML
     private StackPane enemy1;
@@ -87,17 +72,8 @@ public class GameTable implements Initializable {
     private boolean unoTimeActive = false; // Indicates if the UNO countdown is active
     private Timeline unoCountdownTimer; // Timer for the UNO countdown
 
-    private StackPane chatBubbleButton;
-    private Label unreadBadge;
-    private VBox chatPanel;
-    private ListView<ChatMessage> chatListView;
-    private TextField chatInput;
-    private boolean chatOpen = false;
-    private int unreadMessageCount = 0;
     private StackPane overlayLayer;
-    private HBox ownProfileDock;
     private Pane reactionPopupLayer;
-    private boolean keepingChatOnTop;
 
 
     public GameTable(Client client, StartGameResponse msg) {
@@ -108,10 +84,12 @@ public class GameTable implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        initBackground(root);
-        switchGameTableTheme(theme);
+        themeController = new GameThemeController(root);
+        themeController.initializeBackground();
         updatePlayerFromStartGameResponse();
         gameLogic = new GameLogic(this);
+        handController = new PlayerHandController(this, client);
+        gameOverController = new GameOverController(this, client);
 
         Platform.runLater(() -> {
             Stage stage = (Stage) root.getScene().getWindow();
@@ -127,16 +105,11 @@ public class GameTable implements Initializable {
             root.getChildren().add(overlayLayer);
             overlayLayer.toFront();
 
-            chatBubbleButton = createChatBubble();
-            overlayLayer.getChildren().add(chatBubbleButton);
-            chatBubbleButton.toFront();
+            chatController = new GameChatController(client, root, overlayLayer);
+            chatController.install(stage);
 
-            chatPanel = createChatPanel();
-            overlayLayer.getChildren().add(chatPanel);
-            chatPanel.toFront();
-
-            if (handVBox != null) {
-                handVBox.toFront();
+            if (handController.getHandNode() != null) {
+                handController.getHandNode().toFront();
             }
             if (withdrawalButton != null) {
                 withdrawalButton.toFront();
@@ -148,59 +121,11 @@ public class GameTable implements Initializable {
             reactionPopupLayer.setPickOnBounds(false);
             reactionPopupLayer.setMouseTransparent(true);
             overlayLayer.getChildren().add(reactionPopupLayer);
-            root.getChildren().addListener((javafx.collections.ListChangeListener<Node>) change ->
-                    keepChatOnTop());
-            overlayLayer.getChildren().addListener((javafx.collections.ListChangeListener<Node>) change ->
-                    keepChatOnTop());
-
-            root.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-                if (!chatOpen) {
-                    return;
-                }
-
-                Object target = event.getTarget();
-                if (target instanceof Node node && isInsideChatInteraction(node)) {
-                    return;
-                }
-
-                closeChatPanel();
-            });
-
-            root.addEventFilter(ScrollEvent.SCROLL, event -> {
-                if (!chatOpen || chatListView == null || !chatListView.localToScene(chatListView.getBoundsInLocal()).contains(event.getSceneX(), event.getSceneY())) {
-                    return;
-                }
-
-                Optional<ScrollBar> verticalScrollBar = chatListView.lookupAll(".scroll-bar").stream().filter(ScrollBar.class::isInstance).map(ScrollBar.class::cast).filter(scrollBar -> scrollBar.getOrientation() == javafx.geometry.Orientation.VERTICAL).findFirst();
-                if (verticalScrollBar.isPresent()) {
-                    int scrollSteps = (int) Math.max(1, Math.abs(event.getDeltaY()) / 40);
-                    ScrollBar scrollBar = verticalScrollBar.get();
-                    for (int i = 0; i < scrollSteps; i++) {
-                        if (event.getDeltaY() > 0) {
-                            scrollBar.decrement();
-                        } else if (event.getDeltaY() < 0) {
-                            scrollBar.increment();
-                        }
-                    }
-                }
-                event.consume();
-            });
-
-            // Key-Listener für 'T'
-            stage.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                if (event.getCode() == KeyCode.T && !event.isConsumed()) {
-                    if (chatInput != null && chatInput.isFocused()) {
-                        return;
-                    }
-                    animateBubbleClick(chatBubbleButton);
-                    toggleChatPanel();
-                }
-            });
 
             addCloseButton(root, stage);
             createWithdrawalStack(root);
             createSayUnoButton(root);
-            createThemeDropdownList(root);
+            themeController.installThemePicker();
 
             if (yourTurnLabel != null) {
                 StackPane.setAlignment(yourTurnLabel, Pos.TOP_CENTER);
@@ -239,7 +164,7 @@ public class GameTable implements Initializable {
             return;
         }
 
-        ImageView popup = createReactionImageView(emoji, 88);
+        ImageView popup = PlayerHandController.createReactionImageView(emoji, 88);
         popup.setMouseTransparent(true);
         popup.setManaged(false);
         reactionPopupLayer.getChildren().add(popup);
@@ -284,235 +209,10 @@ public class GameTable implements Initializable {
 
 
 
-    private StackPane createChatBubble() {
-        Label chatIcon = new Label("💬");
-        chatIcon.setStyle("-fx-font-size: 22px;");
-
-        Label keyHint = new Label("[T]");
-        keyHint.getStyleClass().add("game-chat-key");
-
-        VBox bubbleContent = new VBox(2, chatIcon, keyHint);
-        bubbleContent.setAlignment(Pos.CENTER);
-
-        unreadBadge = new Label();
-        unreadBadge.getStyleClass().add("game-chat-unread-badge");
-        unreadBadge.setMinSize(22, 22);
-        unreadBadge.setPrefSize(22, 22);
-        unreadBadge.setMaxSize(22, 22);
-        unreadBadge.setAlignment(Pos.CENTER);
-        unreadBadge.setVisible(false);
-        unreadBadge.setManaged(false);
-
-        StackPane chatBubbleButton = new StackPane(bubbleContent, unreadBadge);
-        chatBubbleButton.setPrefSize(76, 76);
-        chatBubbleButton.setMaxSize(76, 76);
-        chatBubbleButton.getStyleClass().add("game-chat-bubble");
-        StackPane.setAlignment(unreadBadge, Pos.TOP_RIGHT);
-        StackPane.setMargin(unreadBadge, new Insets(2, 2, 0, 0));
-
-        chatBubbleButton.setOnMouseClicked(e -> {
-            animateBubbleClick(chatBubbleButton);
-            toggleChatPanel();
-        });
-
-        StackPane.setAlignment(chatBubbleButton, Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(chatBubbleButton, new Insets(0, -8, 18, 0));
-
-        return chatBubbleButton;
-    }
-
-    private VBox createChatPanel() {
-        chatListView = new ListView<>();
-        chatListView.getStyleClass().add("game-chat-list");
-        chatListView.setPrefSize(320, 260);
-        chatListView.setMaxSize(320, 260);
-        chatListView.setMinSize(320, 260);
-        chatListView.setCellFactory(list -> new ListCell<ChatMessage>() {
-            @Override
-            protected void updateItem(ChatMessage item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                    return;
-                }
-
-                String currentUser = client.getConn() != null && client.getConn().getUser() != null ? client.getConn().getUser().getUsername() : "";
-                boolean mine = currentUser.equals(item.sender());
-
-                Label senderLabel = new Label(item.sender());
-                senderLabel.getStyleClass().add("game-chat-sender");
-
-                Label bubble = new Label(item.text());
-                bubble.setWrapText(true);
-                bubble.setMaxWidth(220);
-                bubble.getStyleClass().add(mine ? "game-chat-bubble-mine" : "game-chat-bubble-other");
-
-                VBox body = new VBox(3, senderLabel, bubble);
-                body.setFillWidth(false);
-                body.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-
-                HBox row = new HBox(body);
-                row.setPadding(new Insets(4, 8, 4, 8));
-                row.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-
-                setText(null);
-                setGraphic(row);
-            }
-        });
-
-        chatInput = new TextField();
-        chatInput.setPromptText("Nachricht senden...");
-        chatInput.getStyleClass().add("game-chat-input");
-        chatInput.setOnAction(event -> sendCurrentChatMessage());
-
-        VBox panel = new VBox(8, chatListView, chatInput);
-        panel.setPadding(new Insets(10));
-        panel.setPrefSize(340, 320);
-        panel.setMaxSize(340, 320);
-        panel.getStyleClass().add("game-chat-panel");
-
-        panel.setVisible(false);
-        panel.setManaged(false);
-        panel.setOpacity(0.0);
-        StackPane.setAlignment(panel, Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(panel, new Insets(0, -20, 90, 0));
-
-        return panel;
-    }
-
-    private boolean isInsideChatInteraction(Node node) {
-        for (Node current = node; current != null; current = current.getParent()) {
-            if (current == chatPanel || current == chatBubbleButton || current == chatInput || current == chatListView) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void toggleChatPanel() {
-        if (chatPanel == null) {
-            return;
-        }
-
-        if (chatOpen) {
-            closeChatPanel();
-            return;
-        }
-
-        chatOpen = true;
-        clearUnreadMessages();
-        chatPanel.setVisible(true);
-        chatPanel.setManaged(true);
-        keepChatOnTop();
-
-        FadeTransition fade = new FadeTransition(Duration.millis(150), chatPanel);
-        fade.setFromValue(0.0);
-        fade.setToValue(1.0);
-        fade.setOnFinished(event -> {
-            chatInput.requestFocus();
-        });
-        fade.play();
-    }
-
-    private void keepChatOnTop() {
-        if (!chatOpen || keepingChatOnTop || root == null || overlayLayer == null || chatPanel == null) {
-            return;
-        }
-
-        keepingChatOnTop = true;
-        try {
-            if (!root.getChildren().isEmpty()
-                    && root.getChildren().get(root.getChildren().size() - 1) != overlayLayer) {
-                overlayLayer.toFront();
-            }
-            if (!overlayLayer.getChildren().isEmpty()
-                    && overlayLayer.getChildren().get(overlayLayer.getChildren().size() - 1) != chatPanel) {
-                chatPanel.toFront();
-            }
-        } finally {
-            keepingChatOnTop = false;
-        }
-    }
-
-    private void closeChatPanel() {
-        if (chatPanel == null || !chatOpen) {
-            return;
-        }
-
-        chatOpen = false;
-        FadeTransition fade = new FadeTransition(Duration.millis(120), chatPanel);
-        fade.setFromValue(1.0);
-        fade.setToValue(0.0);
-        fade.setOnFinished(event -> {
-            chatPanel.setVisible(false);
-            chatPanel.setManaged(false);
-        });
-        fade.play();
-    }
-
-    private void sendCurrentChatMessage() {
-        if (chatInput == null) {
-            return;
-        }
-
-        String text = chatInput.getText();
-        if (text == null || text.isBlank()) {
-            return;
-        }
-
-        String trimmed = text.trim();
-        chatInput.clear();
-
-        if (client.getConn() != null && client.getConn().getUser() != null) {
-            client.sendChatMessage(trimmed);
-        }
-    }
-
     public void receiveChatMessage(ReceiveChatMessageResponse msg) {
-        if (chatListView == null) {
-            return;
+        if (chatController != null) {
+            chatController.receiveMessage(msg);
         }
-
-        Platform.runLater(() -> {
-            chatListView.getItems().add(new ChatMessage(msg.user().getUsername(), msg.message()));
-
-            if (!chatOpen) {
-                chatListView.scrollTo(chatListView.getItems().size() - 1);
-                unreadMessageCount++;
-                updateUnreadBadge();
-            }
-        });
-    }
-
-    private void clearUnreadMessages() {
-        unreadMessageCount = 0;
-        updateUnreadBadge();
-    }
-
-    private void updateUnreadBadge() {
-        if (unreadBadge == null) {
-            return;
-        }
-
-        unreadBadge.setText(unreadMessageCount > 9 ? "9+" : Integer.toString(unreadMessageCount));
-        boolean hasUnreadMessages = unreadMessageCount > 0;
-        unreadBadge.setVisible(hasUnreadMessages);
-        unreadBadge.setManaged(hasUnreadMessages);
-    }
-
-    private void animateBubbleClick(Node node) {
-        ScaleTransition scaleDown = new ScaleTransition(Duration.millis(80), node);
-        scaleDown.setToX(0.85);
-        scaleDown.setToY(0.85);
-
-        ScaleTransition scaleUp = new ScaleTransition(Duration.millis(80), node);
-        scaleUp.setToX(1.0);
-        scaleUp.setToY(1.0);
-
-        SequentialTransition bounce = new SequentialTransition(scaleDown, scaleUp);
-        bounce.play();
     }
 
     private void setupCentralStack() {
@@ -624,20 +324,7 @@ public class GameTable implements Initializable {
      * Creates the player's hand card display at the bottom of the scene.
      */
     public void open() {
-        handVBox = new VBox();
-        handVBox.setAlignment(Pos.BOTTOM_CENTER);
-        handVBox.setSpacing(-200);
-        handVBox.setMouseTransparent(false);
-
-        updatePlayerHandUI();
-
-        StackPane.setAlignment(handVBox, Pos.BOTTOM_CENTER);
-        StackPane.setMargin(handVBox, new Insets(40));
-        root.getChildren().add(handVBox);
-        if (ownProfileDock == null) {
-            ownProfileDock = createOwnProfileDock();
-            root.getChildren().add(ownProfileDock);
-        }
+        handController.open();
 
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
@@ -645,206 +332,24 @@ public class GameTable implements Initializable {
         if (sayUnoButton != null) {
             sayUnoButton.toFront();
         }
-        ownProfileDock.toFront();
-    }
-
-    private HBox createOwnProfileDock() {
-        HBox emojiBar = new HBox(4);
-        emojiBar.setAlignment(Pos.CENTER);
-        String[][] reactions = {
-                {"🖕", "Mittelfinger"},
-                {"❤️", "Herz"},
-                {"😠", "Wütend"},
-                {"😭", "Weinen"}
-        };
-        for (String[] reaction : reactions) {
-            Button reactionButton = new Button();
-            reactionButton.setPadding(Insets.EMPTY);
-            reactionButton.getStyleClass().add("game-reaction-button");
-            reactionButton.setMinSize(48, 48);
-            reactionButton.setPrefSize(48, 48);
-            reactionButton.setMaxSize(48, 48);
-            reactionButton.setAlignment(Pos.CENTER);
-            reactionButton.setAccessibleText(reaction[1]);
-            reactionButton.setFocusTraversable(false);
-            reactionButton.setOnAction(event -> client.sendEmojiReaction(reaction[0]));
-
-            ImageView emojiImage = createReactionImageView(reaction[0], 36);
-            emojiImage.setMouseTransparent(true);
-            StackPane reactionButtonStack = new StackPane(reactionButton, emojiImage);
-            reactionButtonStack.setAlignment(Pos.CENTER);
-            reactionButtonStack.setMinSize(48, 48);
-            reactionButtonStack.setPrefSize(48, 48);
-            reactionButtonStack.setMaxSize(48, 48);
-            emojiBar.getChildren().add(reactionButtonStack);
-        }
-
-        HBox dock = new HBox(emojiBar);
-        dock.setAlignment(Pos.CENTER_LEFT);
-        dock.setPickOnBounds(false);
-        dock.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        StackPane.setAlignment(dock, Pos.BOTTOM_LEFT);
-        StackPane.setMargin(dock, new Insets(0, 0, 24, 20));
-        return dock;
-    }
-
-    private ImageView createReactionImageView(String emoji, double size) {
-        String imagePath = switch (emoji) {
-            case "🖕" -> "/htl/steyr/uno/emojis/middlefinger.png";
-            case "❤️" -> "/htl/steyr/uno/emojis/heart.png";
-            case "😠" -> "/htl/steyr/uno/emojis/angry.png";
-            case "😭" -> "/htl/steyr/uno/emojis/crying.png";
-            default -> throw new IllegalArgumentException("Unsupported emoji reaction: " + emoji);
-        };
-
-        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(size);
-        imageView.setFitHeight(size);
-        imageView.setPreserveRatio(true);
-        imageView.setSmooth(true);
-        switch (emoji) {
-            case "🖕" -> imageView.setTranslateX(size * 11 / 160);
-            case "😠" -> imageView.setTranslateY(size / 160);
-            case "😭" -> imageView.setTranslateY(-size * 1.5 / 96);
-            default -> {
-            }
-        }
-        return imageView;
-    }
-
-    /**
-     * Calculates the horizontal spacing between cards based on the number of cards in the row.
-     */
-    private double calculateSpacing(int cardCount) {
-        double minSpacing = -140;
-        double maxSpacing = -50;
-
-        if (cardCount <= 5) return maxSpacing;
-        if (cardCount >= maxCardsPerRow) return minSpacing;
-
-        return maxSpacing - ((cardCount - 5) * (Math.abs(maxSpacing - minSpacing) / (maxCardsPerRow - 5)));
     }
 
     /**
      * Updates the player's hand card display.
      */
     public void updatePlayerHandUI() {
-        if (handVBox == null) return;
-
-        handVBox.getChildren().clear();
-
-        List<Card> cards = new ArrayList<>(player.getHand());
-        int index = 0;
-        int rowNumber = 0;
-
-        while (index < cards.size()) {
-            HBox row = new HBox();
-            row.setAlignment(Pos.BOTTOM_CENTER);
-            row.setPickOnBounds(false);
-
-            int remaining = cards.size() - index;
-            int cardsInThisRow = Math.min(remaining, maxCardsPerRow);
-
-            double spacing = calculateSpacing(cardsInThisRow);
-            row.setSpacing(spacing);
-
-            for (int i = 0; i < cardsInThisRow; i++) {
-                Button cardButton = createCardButton(cards.get(index));
-                cardButton.setTranslateY(40 * rowNumber);
-                row.getChildren().add(cardButton);
-                index++;
-            }
-
-            row.setTranslateY(10 * rowNumber);
-            rowNumber++;
-
-            handVBox.getChildren().add(row);
+        handController.updatePlayerHandUI();
+        if (handController.getHandNode() != null) {
+            handController.getHandNode().toFront();
         }
-
-        handVBox.toFront();
         if (withdrawalButton != null) {
             withdrawalButton.toFront();
         }
         if (sayUnoButton != null) {
             sayUnoButton.toFront();
         }
-        if (ownProfileDock != null) {
-            ownProfileDock.toFront();
-        }
-    }
-
-    /**
-     * Creates a card button for the player's hand.
-     */
-    private Button createCardButton(Card c) {
-        Image cardImage = loadCardImage(c);
-        ImageView iv = cardImage == null ? new ImageView() : new ImageView(cardImage);
-        iv.setFitWidth(137);
-        iv.setFitHeight(192);
-        iv.setPreserveRatio(true);
-        UiStyleUtil.applyRoundedCardClip(iv, 137, 192, 18);
-
-        StackPane cardPane = new StackPane(iv);
-        cardPane.setPrefSize(137, 192);
-        cardPane.setStyle("-fx-background-color: transparent;" + "-fx-border-color: transparent;" + "-fx-padding: 0;");
-
-        Button cardBtn = new Button();
-        cardBtn.setGraphic(cardPane);
-        cardBtn.setPadding(javafx.geometry.Insets.EMPTY);
-        cardBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-
-        cardBtn.setOnAction(e -> cardStack.layCard(c, cardBtn, player));
-
-        ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), cardPane);
-        ScaleTransition stExit = new ScaleTransition(Duration.millis(200), cardPane);
-
-        DropShadow shadow = new DropShadow();
-        shadow.setRadius(15);
-        shadow.setOffsetX(0);
-        shadow.setOffsetY(0);
-        shadow.setColor(Color.BLACK);
-
-        cardBtn.setOnMouseEntered(e -> {
-            stExit.stop();
-            stEnter.setToX(1.1);
-            stEnter.setToY(1.1);
-            stEnter.playFromStart();
-            cardPane.setEffect(shadow);
-        });
-
-        cardBtn.setOnMouseExited(e -> {
-            stEnter.stop();
-            stExit.setToX(1.0);
-            stExit.setToY(1.0);
-            stExit.playFromStart();
-            cardPane.setEffect(null);
-        });
-
-        return cardBtn;
-    }
-
-    private Image loadCardImage(Card card) {
-        String path = "/htl/steyr/uno/Uno_Cards/" + card.getCardColour() + "/" + card.getCardColour() + card.getCardValue() + ".png";
-        Image image = readImage(path);
-        if (image != null) {
-            return image;
-        }
-        System.err.println("Warnung: Kartenbild nicht gefunden: " + path);
-        String fallbackPath = "/htl/steyr/uno/Uno_Cards/backside.png";
-        Image fallbackImage = readImage(fallbackPath);
-        if (fallbackImage == null) {
-            System.err.println("Warnung: Kartenrueckseite konnte nicht geladen werden: " + fallbackPath);
-        }
-        return fallbackImage;
-    }
-
-    private Image readImage(String path) {
-        try (InputStream imageStream = getClass().getResourceAsStream(path)) {
-            return imageStream == null ? null : new Image(imageStream);
-        } catch (IOException e) {
-            System.err.println("Warnung: Bild konnte nicht geladen werden: " + path);
-            return null;
+        if (handController.getOwnProfileDock() != null) {
+            handController.getOwnProfileDock().toFront();
         }
     }
 
@@ -1070,178 +575,7 @@ public class GameTable implements Initializable {
      * Shows the player ranking once the game has ended.
      */
     public void showGameOverOverlay(GameOverResponse msg) {
-        if (msg == null || gameOverOverlayShown || root == null) {
-            return;
-        }
-        gameOverOverlayShown = true;
-
-        VBox rankingList = new VBox(8);
-        rankingList.getStyleClass().add("game-over-ranking-list");
-
-        int rank = 1;
-        for (Player rankedPlayer : msg.getPlayers()) {
-            if (rankedPlayer == null || rankedPlayer.getUsername() == null) {
-                continue;
-            }
-
-            HBox row = new HBox();
-            row.getStyleClass().add("game-over-ranking-row");
-
-            Label rankLabel = new Label(rank + ".");
-            rankLabel.getStyleClass().add("game-over-rank-label");
-
-            Label nameLabel = new Label(rankedPlayer.getUsername());
-            nameLabel.getStyleClass().add("game-over-name-label");
-
-            row.getChildren().addAll(rankLabel, nameLabel);
-
-            if (msg.isLeftPlayer(rankedPlayer.getUsername())) {
-                row.getStyleClass().add("game-over-ranking-row-left");
-            }
-
-            rankingList.getChildren().add(row);
-            rank++;
-        }
-
-        Label titleLabel = new Label("Spiel beendet - Ranking");
-        titleLabel.getStyleClass().add("game-over-title");
-
-        Button backToLobbyButton = new Button("Zurück zur Lobby");
-        backToLobbyButton.getStyleClass().add("game-over-back-button");
-        backToLobbyButton.setOnAction(e -> switchBackToLobby());
-
-        VBox panel = new VBox(16, titleLabel, rankingList, backToLobbyButton);
-        panel.getStyleClass().add("game-over-panel");
-        panel.setAlignment(Pos.CENTER);
-        panel.setMaxWidth(500);
-
-        StackPane overlay = new StackPane(panel);
-        overlay.getStyleClass().add("game-over-overlay");
-        overlay.setPickOnBounds(true);
-        overlay.setOnMouseClicked(e -> e.consume());
-
-        root.getChildren().add(overlay);
-        overlay.toFront();
-    }
-
-    /**
-     * Switches back to the lobby after the game ends.
-     */
-    private void switchBackToLobby() {
-        try {
-            if (client.getConn() != null) {
-                client.getConn().leaveLobby();
-            }
-
-            Stage stage = new Stage();
-            Stage currentStage = (Stage) root.getScene().getWindow();
-
-            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("lobby.fxml"));
-            LobbyController controller = new LobbyController(client);
-            loader.setController(controller);
-
-            client.setLobbyController(controller);
-            client.setLobbyWaitController(null);
-            client.setGameTable(null);
-
-            Scene scene = new Scene(loader.load());
-            UiStyleUtil.applyGlobalFocusStyle(scene);
-
-            stage.setTitle("UNO - Lobby");
-            stage.setScene(scene);
-            UiStyleUtil.setAppIcon(stage);
-            stage.setMaximized(true);
-            stage.show();
-
-            currentStage.close();
-        } catch (IOException e) {
-            System.err.println("Fehler beim Zurueckkehren zur Lobby: " + e.getMessage());
-        }
-    }
-
-    private void createThemeDropdownList(StackPane root) {
-        ComboBox<String> themeDropdown = new ComboBox<>();
-        themeDropdown.getItems().addAll("Western", "Classic", "Aurora");
-        themeDropdown.setValue(theme);
-        themeDropdown.getStyleClass().add("game-theme-picker");
-        themeDropdown.setCellFactory(listView -> {
-            listView.getStyleClass().add("game-theme-options");
-            return new ListCell<>() {
-                {
-                    getStyleClass().add("game-theme-option");
-                }
-
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty ? null : item);
-                }
-            };
-        });
-        themeDropdown.setOnAction(event -> {
-            String selectedTheme = themeDropdown.getValue();
-            if (selectedTheme != null && !selectedTheme.equals(theme)) {
-                theme = selectedTheme;
-                switchGameTableTheme(selectedTheme);
-            }
-        });
-
-        StackPane.setAlignment(themeDropdown, Pos.TOP_LEFT);
-        StackPane.setMargin(themeDropdown, new Insets(10));
-        root.getChildren().add(themeDropdown);
-        themeDropdown.toFront();
-    }
-
-    private void switchGameTableTheme(String newTheme) {
-        if (root == null) {
-            return;
-        }
-
-        Platform.runLater(() -> {
-            loadThemeStylesheet(newTheme);
-            if ("Classic".equals(newTheme)) {
-                backgroundImageView.setImage(null);
-                return;
-            }
-
-            String imagePath = "/htl/steyr/uno/img/table/" + newTheme.toLowerCase(Locale.ROOT) + ".jpg";
-
-            try {
-                var resource = getClass().getResource(imagePath);
-                if (resource != null) {
-                    Image themeImage = new Image(resource.toExternalForm());
-                    backgroundImageView.setImage(themeImage);
-                } else {
-                    System.err.println("Warnung: Bild-Datei nicht gefunden: " + imagePath);
-                }
-            } catch (Exception e) {
-                System.err.println("Fehler beim Laden des Themes: " + e.getMessage());
-            }
-        });
-    }
-
-    private void loadThemeStylesheet(String selectedTheme) {
-        String themePath = "/htl/steyr/uno/style/GameTableThemes/GameTable" + selectedTheme + ".css";
-        var themeResource = getClass().getResource(themePath);
-        if (themeResource == null) {
-            System.err.println("Warnung: Theme-Datei nicht gefunden: " + themePath);
-            return;
-        }
-
-        root.getStylesheets().setAll(themeResource.toExternalForm());
-    }
-
-    private ImageView backgroundImageView; // Als Klassenvariable deklariert
-
-    private void initBackground(StackPane root) {
-        backgroundImageView = new ImageView();
-        backgroundImageView.setPreserveRatio(false);
-        // An die Größe des StackPanes binden, damit es immer skaliert
-        backgroundImageView.fitWidthProperty().bind(root.widthProperty());
-        backgroundImageView.fitHeightProperty().bind(root.heightProperty());
-
-        // Ganz nach hinten in den StackPane legen (Index 0)
-        root.getChildren().add(0, backgroundImageView);
+        gameOverController.showOverlay(msg);
     }
 
     public GameLogic getGameLogic() {
@@ -1256,7 +590,7 @@ public class GameTable implements Initializable {
         return player;
     }
 
-    public CardStack getCardStack() {
+    public CardStackController getCardStack() {
         return cardStack;
     }
 
