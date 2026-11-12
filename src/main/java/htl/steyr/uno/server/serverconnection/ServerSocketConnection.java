@@ -33,6 +33,8 @@ public class ServerSocketConnection {
     private PasswordForgotten passwordForgotten;
     private Integer createAccountCode;
 
+    private ArrayList<UserRequestsJoinLobbyResponse> pendingJoinRequests = new ArrayList<>();
+
 
     /**
      * Attaches a WebSocket connection to the server-side request dispatcher.
@@ -144,6 +146,8 @@ public class ServerSocketConnection {
                 case "SetProfileImageRequest" -> setProfileImageRequest(JsonMessageCodec.convert(message, SetProfileImageRequest.class));
                 case "HeartbeatPingRequest" -> heartbeatPingRequest(JsonMessageCodec.convert(message, HeartbeatPingRequest.class));
                 case "GetMatchesStatisticsRequest" -> getMatchesStatisticsRequest(JsonMessageCodec.convert(message, GetMatchesStatisticsRequest.class));
+                case "ChangeLobbySettingsRequest" -> changeLobbySettingsRequest(JsonMessageCodec.convert(message, ChangeLobbySettingsRequest.class));
+                case "UserRequestsJoinLobbyRequest" -> userRequestsJoinLobbyRequest(JsonMessageCodec.convert(message, UserRequestsJoinLobbyRequest.class));
                 default -> System.out.println("Unknown UNO message type from " + remoteAddress() + ": " + message.type());
             }
         } catch (Exception e) {
@@ -151,7 +155,9 @@ public class ServerSocketConnection {
             closeWithReason("Invalid message");
         }
     }
-    
+
+
+
     /**
      * Cleanup method to ensure the connection is properly closed and removed from server.
      * This method is called in the finally block of the receive thread to guarantee that cleanup operations
@@ -297,6 +303,7 @@ public class ServerSocketConnection {
      * If the lobby is found but cannot be joined (i.e., it is full), it sends a LobbyJoinRefusedResponse back to the client, including the lobby information in the response.
      * If the lobby is not found, it sends a LobbyNotFoundResponse back to the client.
      * The method also logs the outcome of the join attempt using the sendLogMessage method to provide feedback on the server side.
+     * It also handles different join methods (open, on_request, only_code) and manages pending join requests with a timeout mechanism for the on_request method.
      *
      * @param msg
      */
@@ -304,10 +311,34 @@ public class ServerSocketConnection {
         sendLogMessage(msg);
         Lobby lobby = server.getLobbies().stream().filter(l -> l.getLobbyId() == msg.lobbyId()).findFirst().orElse(null);
         if (lobby != null && lobby.canJoin()) {
-            lobby.addConnection(this);
-            lobby.updateJoined();
+            if (msg.joinMethod() == 0 || msg.joinMethod() == 2 ) { // open or only_code
+                lobby.addConnection(this);
+                lobby.updateJoined();
+            } else if (msg.joinMethod() == 1) { // on_request
+                User waitingUser = new User(getUser().getUsername(), getUser().getLastName(), getUser().getFirstName(), getUser().getProfileImageData());
+                UserRequestsJoinLobbyResponse response = new UserRequestsJoinLobbyResponse(waitingUser);
+                getPendingJoinRequests().add(response);
+                lobby.getConnections().getFirst().sendMessage(response);
+
+                // Start a new thread to handle the timeout for the join request
+                Thread timeoutThread = new Thread(() -> {
+                    try {
+                        Thread.sleep(15000); // Wait for 15 seconds
+                        if (getPendingJoinRequests().contains(response)) {
+                            getPendingJoinRequests().remove(response);
+                            LobbyJoinRefusedResponse timeoutResponse = new LobbyJoinRefusedResponse(getUser(), lobby.getLobbyInfoResponse(), 2);
+                            sendMessage(timeoutResponse);
+                            sendLogMessage(timeoutResponse);
+                        }
+                    } catch (InterruptedException e) {
+                        // Thread was interrupted, likely because the user responded in time
+                        Thread.currentThread().interrupt();
+                    }
+                });
+                timeoutThread.start();
+            }
         } else if (lobby != null && !lobby.canJoin()) {
-            LobbyJoinRefusedResponse msg2 = new LobbyJoinRefusedResponse(getUser(), lobby.getLobbyInfoResponse());
+            LobbyJoinRefusedResponse msg2 = new LobbyJoinRefusedResponse(getUser(), lobby.getLobbyInfoResponse(), 0);
             sendMessage(msg2);
             sendLogMessage(msg2);
         } else {
@@ -316,6 +347,43 @@ public class ServerSocketConnection {
             sendLogMessage(msg2);
         }
     }
+
+
+    /**
+     * The userRequestsJoinLobbyRequest method handles the process of a client responding to a join request from another user who wants to join the lobby.
+     * It takes a UserRequestsJoinLobbyRequest object as a parameter, which contains the response from the lobby owner (accept or reject) regarding the join request.
+     * The method first retrieves the lobby that the current connection (this) is part of by searching through the server's list of lobbies and checking if the connection is included in any of them.
+     * If the lobby is found, it checks if there is a pending join request from the user who wants to join the lobby. If such a request exists, it removes the pending request from the list.
+     * If the lobby owner accepted the join request, it adds the current connection (this) to the lobby and updates the lobby information for all connected clients.
+     * If the lobby owner rejected the join request, it sends a LobbyJoinRefusedResponse back to the user who requested to join, indicating that their request was refused by the lobby owner.
+     * The method also logs the outcome of the join request response using the sendLogMessage method to provide feedback on the server side.
+     *
+     * @param msg
+     */
+    private void userRequestsJoinLobbyRequest (UserRequestsJoinLobbyRequest msg) {
+        sendLogMessage(msg);
+        Lobby lobby = server.getLobbies().stream().filter(l -> l.getConnections().contains(this)).findFirst().orElse(null);
+        if (lobby != null) {
+            UserRequestsJoinLobbyResponse pendingRequest = getPendingJoinRequests().stream()
+                    .filter(r -> r.user().getUsername().equals(msg.response().user().getUsername()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (pendingRequest != null) {
+                getPendingJoinRequests().remove(pendingRequest);
+                if (msg.isAccepted()) {
+                    lobby.addConnection(this);
+                    lobby.updateJoined();
+                } else {
+                    LobbyJoinRefusedResponse refusedResponse = new LobbyJoinRefusedResponse(msg.response().user(), lobby.getLobbyInfoResponse(), 1);
+                    sendMessage(refusedResponse);
+                    sendLogMessage(refusedResponse);
+                }
+            }
+        }
+    }
+
+
 
 
     /**
@@ -551,6 +619,17 @@ public class ServerSocketConnection {
     }
 
 
+    private void changeLobbySettingsRequest(ChangeLobbySettingsRequest msg) {
+        sendLogMessage(msg);
+        Lobby lobby = server.getLobbyByConnection(this);
+        if (lobby != null) {
+            lobby.setMode(msg.mode());
+            lobby.setType(msg.type());
+            lobby.sendInfoToAll(new LobbyInfoResponse(lobby.getLobbyId(), lobby.getStatus(), lobby.getMode(), lobby.getType(), lobby.getConnections().stream().map(ServerSocketConnection::getUser).toList()));
+        }
+    }
+
+
     /**
      * Loads the profile images of all players that appear in the given matches and scales them down to thumbnails.
      * Every image is only contained once (not once per match) to keep the response small.
@@ -659,5 +738,13 @@ public class ServerSocketConnection {
 
     private String remoteAddress() {
         return String.valueOf(webSocket.getRemoteSocketAddress());
+    }
+
+    public ArrayList<UserRequestsJoinLobbyResponse> getPendingJoinRequests() {
+        return pendingJoinRequests;
+    }
+
+    public void setPendingJoinRequests(ArrayList<UserRequestsJoinLobbyResponse> pendingJoinRequests) {
+        this.pendingJoinRequests = pendingJoinRequests;
     }
 }
