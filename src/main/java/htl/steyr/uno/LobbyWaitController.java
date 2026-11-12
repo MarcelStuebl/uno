@@ -5,6 +5,7 @@ import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
+import htl.steyr.uno.requests.server.UserRequestsJoinLobbyResponse;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -343,7 +344,44 @@ public class LobbyWaitController implements Initializable {
         for (User u : users) {
             playerListView.getItems().add(u.getUsername());
         }
+
+
+        /**
+         * @TODO: Implementiere die Logik um die Lobby-Informationen zu aktualisieren(LobbyMode und LobbyType) und die Buttons entsprechend zu setzen.
+         * Die Buttons sollten den aktuellen Status der Lobby widerspiegeln und es dem Host ermöglichen, die Einstellungen zu ändern.
+         * Die Buttons sollten nur durch den Server aktualisiert werden, wenn der Host die Einstellungen ändert.
+         * Der gelbe Rand um die Buttons sollte nur durch Server aktualisiert werden, wenn der Host die Einstellungen ändert.
+         * NICHT DURCH DEN CLIENT!
+         * Somit weiß der Client immer, dass die Einstellungen vom Server richtig übernommen wurden.
+         */
+        Integer lobbyMode = lobby.mode(); // 0 = UNO Classic, 1 = UNO Does
+        Integer lobbyType = lobby.type(); // 0 = open, 1 = on_request, 2 = only_code
     }
+
+
+    /**
+     * Wird aufgerufen, wenn der Server eine Anfrage eines Spielers sendet, der die Lobby betreten möchte.
+     * Der Lobby-Leiter kann dann entscheiden, ob er den Spieler akzeptiert oder ablehnt.
+     *
+     * @param msg
+     */
+    public void userRequestsJoinLobbyResponse(UserRequestsJoinLobbyResponse msg) {
+        String username = msg.user().getUsername();
+
+        /** @TODO: Implementiere hier die Logic um den LobbyLeiter zu benachrichtigen, dass ein Spieler die Lobby betreten möchte.
+         * Der LobbyLeiter kann dann entscheiden, ob er den Spieler akzeptiert oder ablehnt.
+         * Hier ein Beispiel wie man die Nachricht an den Server sendet, dass der Spieler akzeptiert wurde
+         *
+         * !!!!!!!!!!!!ACHTUNG!!!!!!!!!!!!!
+         * Wenn der LobbyLeiter innerhalb 15 Sekunden keine Entscheidung trifft, wird der Spieler automatisch abgelehnt.
+         * Das Popup sollte also nur ca. 14 Sekunden angezeigt werden, damit der LobbyLeiter genug Zeit hat zu reagieren.
+         * Implementiere also eine Timer, der nach 14 Sekunden das Popup schließt.
+         * Es wird Serverseitig automatisch abgelehnt, wenn der LobbyLeiter keine Entscheidung trifft.
+         */
+
+        client.sendUserRequestsJoinLobbyRequest(msg, true);
+    }
+
 
     /**
      * Lädt das Profilbild eines Benutzers.
