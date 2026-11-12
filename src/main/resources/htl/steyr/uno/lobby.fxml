@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
@@ -17,43 +18,48 @@
    <center>
       <StackPane fx:id="centerPane" styleClass="background" BorderPane.alignment="CENTER">
          <children>
-            <VBox alignment="CENTER" maxWidth="800.0" spacing="10.0" styleClass="centerContent">
+            <VBox alignment="CENTER" maxWidth="1250.0" spacing="14.0" styleClass="centerContent">
                <children>
                   <Label styleClass="welcomeLable" text="Wilkommen bei UNO!" />
                   <Label styleClass="subtitle" text="Erstelle eine Party oder tritt einer bei" />
-                  <HBox alignment="CENTER" spacing="40.0">
+                  <HBox alignment="CENTER" spacing="36.0">
                      <children>
-                        <StackPane prefHeight="260.0" prefWidth="300.0" styleClass="joinAndCreate">
+                        <VBox alignment="CENTER" prefWidth="360.0" spacing="16.0">
                            <children>
-                              <VBox alignment="CENTER" spacing="12.0">
+                              <StackPane prefHeight="230.0" prefWidth="360.0" styleClass="joinAndCreate">
                                  <children>
-                                    <Label styleClass="partyLable" text="Party erstellen" />
-                                    <Label maxWidth="240.0" styleClass="subtitle" text="Erstelle eine neue Party und lade deine Freunde mit dem code ein" textAlignment="CENTER" wrapText="true" />
-                                    <Button fx:id="createPartyButton" defaultButton="true" mnemonicParsing="false" onAction="#onCreatePartyButtonClicked" styleClass="createPartyButton" text="Party erstellen" />
+                                    <VBox alignment="CENTER" spacing="14.0">
+                                       <children>
+                                          <Label styleClass="partyLable" text="Party erstellen" />
+                                          <Label maxWidth="280.0" styleClass="subtitle" text="Erstelle eine neue Party und lade deine Freunde mit dem code ein" textAlignment="CENTER" wrapText="true" />
+                                          <Button fx:id="createPartyButton" defaultButton="true" mnemonicParsing="false" onAction="#onCreatePartyButtonClicked" styleClass="createPartyButton" text="Party erstellen" />
+                                       </children>
+                                    </VBox>
                                  </children>
-                              </VBox>
-                           </children>
-                        </StackPane>
-                        <VBox alignment="CENTER" spacing="8.0">
-                           <children>
-                              <Line endX="80.0" startX="0.0" styleClass="lines" />
-                              <Label styleClass="subtitle" text="oder" />
-                              <Line endX="80.0" startX="0.0" styleClass="lines" />
+                              </StackPane>
+                              <StackPane prefHeight="230.0" prefWidth="360.0" styleClass="joinAndCreate">
+                                 <children>
+                                    <VBox alignment="CENTER" spacing="14.0">
+                                       <children>
+                                          <Label styleClass="partyLable" text="Party beitreten" />
+                                          <Label styleClass="subtitle" text="Gib den 6 stelligen Party Code ein" />
+                                          <TextField fx:id="partyCodeField" alignment="CENTER" onAction="#onJoinButtonClicked" promptText="000000" styleClass="partyCodeLable" />
+                                          <Button fx:id="joinPartyButton" mnemonicParsing="false" onAction="#onJoinButtonClicked" styleClass="joinLobbyButton" text="Beitreten" />
+                                          <Label fx:id="errorLabel" maxWidth="280.0" styleClass="errorLabel" wrapText="true" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </StackPane>
                            </children>
                         </VBox>
-                        <StackPane prefHeight="260.0" prefWidth="300.0" styleClass="joinAndCreate">
+                        <VBox alignment="CENTER" prefWidth="110.0" spacing="10.0">
                            <children>
-                              <VBox alignment="CENTER" spacing="12.0">
-                                 <children>
-                                    <Label styleClass="partyLable" text="Party beitreten" />
-                                    <Label styleClass="subtitle" text="Gib den 6 stelligen Party Code ein" />
-                                    <TextField fx:id="partyCodeField" alignment="CENTER" onAction="#onJoinButtonClicked" promptText="000000" styleClass="partyCodeLable" />
-                                    <Button fx:id="joinPartyButton" mnemonicParsing="false" onAction="#onJoinButtonClicked" styleClass="joinLobbyButton" text="Beitreten" />
-                                    <Label fx:id="errorLabel" maxWidth="240.0" styleClass="errorLabel" wrapText="true" />
-                                 </children>
-                              </VBox>
+                              <Line endX="100.0" startX="0.0" styleClass="lines" />
+                              <Label styleClass="subtitle" text="oder" />
+                              <Line endX="100.0" startX="0.0" styleClass="lines" />
                            </children>
-                        </StackPane>
+                        </VBox>
+                        <ListView fx:id="lobbyListView" prefHeight="500.0" prefWidth="400.0" styleClass="lobbyListView" />
                      </children>
                   </HBox>
                </children>
