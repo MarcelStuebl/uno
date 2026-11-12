@@ -48,6 +48,61 @@
     -fx-font-size: 11px;
 }
 
+.lobbyListView {
+    -fx-background-color: rgba(26, 29, 50, 0.85);
+    -fx-background-insets: 0;
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-padding: 8;
+}
+
+.lobbyListView .viewport,
+.lobbyListView .corner {
+    -fx-background-color: transparent;
+}
+
+.lobbyListView .list-cell {
+    -fx-background-color: rgba(0, 0, 0, 0.22);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-border-radius: 10;
+    -fx-text-fill: #cfcfe6;
+    -fx-padding: 10 14 10 14;
+}
+
+.lobbyListView .list-cell:filled:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+}
+
+.lobbyListView .list-cell:filled:selected {
+    -fx-background-color: rgba(255, 90, 90, 0.8);
+    -fx-text-fill: white;
+}
+
+.lobbyListView .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+
+.lobbyListView .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.18);
+    -fx-background-radius: 4;
+}
+
+.lobbyListView .scroll-bar .increment-button,
+.lobbyListView .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.lobbyListView .scroll-bar .increment-arrow,
+.lobbyListView .scroll-bar .decrement-arrow {
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+
 .partyCodeLable {
     -fx-background-color: rgba(0, 0, 0, 0.45);
     -fx-text-fill: white;
