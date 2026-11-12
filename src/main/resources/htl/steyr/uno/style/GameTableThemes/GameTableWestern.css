@@ -1,22 +1,14 @@
 .root {
-    -fx-background-color: linear-gradient(to bottom right, #2c1d11, #1a100a, #0d0805);
     -fx-padding: 75px 190px 75px 190px;
     -fx-alignment: center;
 }
 
 .table {
-    -fx-background-color:
-            linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(0,0,0,0.25)),
-            linear-gradient(to bottom right, #5c3a21 0%, #482a17 45%, #2d180c 100%),
-            radial-gradient(center 35% 28%, radius 80%, rgba(255,180,100,0.06), rgba(0,0,0,0.00) 60%),
-            radial-gradient(center 50% 55%, radius 115%, #3d2313 0%, #221209 72%, #120904 100%);
-    -fx-background-insets: 0, 8, 20, 32;
-    -fx-background-radius: 520, 500, 480, 455;
-    -fx-border-color: rgba(212, 160, 23, 0.4), rgba(20, 10, 5, 0.8);
-    -fx-border-width: 3, 10;
-    -fx-border-insets: 4, 0;
-    -fx-border-radius: 500, 520;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.85), 65, 0.45, 0, 25);
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: none;
     -fx-pref-width: 600px;
     -fx-pref-height: 400px;
 }
