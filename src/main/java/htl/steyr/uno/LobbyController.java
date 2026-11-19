@@ -16,6 +16,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -62,6 +64,8 @@ public class LobbyController implements Initializable {
 
     @FXML private Button createPartyButton;
     @FXML private Button joinPartyButton;
+    @FXML private Button refreshLobbyList;
+    @FXML private ListView<LobbyInfoResponse> lobbyListView;
     @FXML private TextField partyCodeField;
     @FXML private Label errorLabel;
     @FXML private Label gamesPlayedLabel;
@@ -132,6 +136,7 @@ public class LobbyController implements Initializable {
 
         setProfileImage();
         getClient().setLobbyController(this);
+        getClient().getConn().requestAllLobbies();
 
         int wonGames = getClient().getConn().getUser().getGamesWon();
         int lostGames = getClient().getConn().getUser().getGamesLost();
@@ -228,20 +233,38 @@ public class LobbyController implements Initializable {
         }
     }
 
-    private void getAllLobbies() {
-        client.getConn().requestAllLobbies();
-        /**
-         * @TODO: Diese Funktion soll die Anfrage an den Server senden, um alle verfügbaren Lobbys abzurufen.
-         * In Folge wird getAllLobbiesResponse() aufgerufen, um die Antwort zu verarbeiten und die Lobbys in der Benutzeroberfläche anzuzeigen.
-         */
-    }
-
-
     public void getAllLobbiesResponse(GetAllLobbiesResponse msg) {
         ArrayList<LobbyInfoResponse> lobbies = msg.lobbies();
-        /**
-         * @TODO: Implementieren Sie die Logik, um die erhaltenen Lobbys in der Benutzeroberfläche anzuzeigen.
-         */
+
+        Platform.runLater(() -> {
+            lobbyListView.setCellFactory(view -> new ListCell<>() {
+                @Override
+                protected void updateItem(LobbyInfoResponse lobby, boolean empty) {
+                    super.updateItem(lobby, empty);
+
+                    if (empty || lobby == null) {
+                        setText(null);
+                        setDisable(false);
+                        return;
+                    }
+
+                    int playerCount = lobby.users() == null ? 0 : lobby.users().size();
+                    String username = lobby.users() == null || lobby.users().isEmpty()
+                            ? "Unbekannt"
+                            : lobby.users().getFirst().getUsername();
+
+                    setText(username + "'s lobby (" + playerCount + "/4)");
+                    setDisable(playerCount == 4);
+                }
+            });
+
+            lobbyListView.getItems().setAll(lobbies);
+        });
+    }
+
+    @FXML
+    private void refreshLobbyListClicked(ActionEvent actionEvent) {
+        client.getConn().requestAllLobbies();
     }
 
     /**
