@@ -19,11 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -41,6 +37,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Controller für die Lobby-Warteansicht des UNO-Spiels.
@@ -345,17 +342,32 @@ public class LobbyWaitController implements Initializable {
             playerListView.getItems().add(u.getUsername());
         }
 
-
-        /**
-         * @TODO: Implementiere die Logik um die Lobby-Informationen zu aktualisieren(LobbyMode und LobbyType) und die Buttons entsprechend zu setzen.
-         * Die Buttons sollten den aktuellen Status der Lobby widerspiegeln und es dem Host ermöglichen, die Einstellungen zu ändern.
-         * Die Buttons sollten nur durch den Server aktualisiert werden, wenn der Host die Einstellungen ändert.
-         * Der gelbe Rand um die Buttons sollte nur durch Server aktualisiert werden, wenn der Host die Einstellungen ändert.
-         * NICHT DURCH DEN CLIENT!
-         * Somit weiß der Client immer, dass die Einstellungen vom Server richtig übernommen wurden.
-         */
         Integer lobbyMode = lobby.mode(); // 0 = UNO Classic, 1 = UNO Does
         Integer lobbyType = lobby.type(); // 0 = open, 1 = on_request, 2 = only_code
+
+        // Setze die Buttons entsprechend dem aktuellen LobbyMode
+        if (lobbyMode == 0) {
+            unoClassicButton.getStyleClass().add("selectedOption");
+            unoDosButton.getStyleClass().remove("selectedOption");
+        } else if (lobbyMode == 1) {
+            unoDosButton.getStyleClass().add("selectedOption");
+            unoClassicButton.getStyleClass().remove("selectedOption");
+        }
+
+        // Setze die Buttons entsprechend dem aktuellen LobbyType
+        if (lobbyType == 0) {
+            openLobbyButton.getStyleClass().add("selectedOption");
+            onRequestLobbyButton.getStyleClass().remove("selectedOption");
+            codeOnlyButton.getStyleClass().remove("selectedOption");
+        } else if (lobbyType == 1) {
+            onRequestLobbyButton.getStyleClass().add("selectedOption");
+            openLobbyButton.getStyleClass().remove("selectedOption");
+            codeOnlyButton.getStyleClass().remove("selectedOption");
+        } else if (lobbyType == 2) {
+            codeOnlyButton.getStyleClass().add("selectedOption");
+            openLobbyButton.getStyleClass().remove("selectedOption");
+            onRequestLobbyButton.getStyleClass().remove("selectedOption");
+        }
     }
 
 
@@ -367,19 +379,36 @@ public class LobbyWaitController implements Initializable {
      */
     public void userRequestsJoinLobbyResponse(UserRequestsJoinLobbyResponse msg) {
         String username = msg.user().getUsername();
+        Platform.runLater(() -> {
+            ButtonType acceptButton = new ButtonType("Annehmen");
+            ButtonType rejectButton = new ButtonType("Ablehnen");
 
-        /** @TODO: Implementiere hier die Logic um den LobbyLeiter zu benachrichtigen, dass ein Spieler die Lobby betreten möchte.
-         * Der LobbyLeiter kann dann entscheiden, ob er den Spieler akzeptiert oder ablehnt.
-         * Hier ein Beispiel wie man die Nachricht an den Server sendet, dass der Spieler akzeptiert wurde
-         *
-         * !!!!!!!!!!!!ACHTUNG!!!!!!!!!!!!!
-         * Wenn der LobbyLeiter innerhalb 15 Sekunden keine Entscheidung trifft, wird der Spieler automatisch abgelehnt.
-         * Das Popup sollte also nur ca. 14 Sekunden angezeigt werden, damit der LobbyLeiter genug Zeit hat zu reagieren.
-         * Implementiere also eine Timer, der nach 14 Sekunden das Popup schließt.
-         * Es wird Serverseitig automatisch abgelehnt, wenn der LobbyLeiter keine Entscheidung trifft.
-         */
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Lobby-Anfrage");
+            alert.setHeaderText(null);
+            alert.setContentText("Spieler " + username + " möchte die Lobby betreten.");
+            alert.getButtonTypes().setAll(acceptButton, rejectButton);
 
-        client.sendUserRequestsJoinLobbyRequest(msg, true);
+            AtomicBoolean decisionMade = new AtomicBoolean(false);
+            Timeline timeout = new Timeline(new KeyFrame(
+                    Duration.seconds(14),
+                    event -> {
+                        if (!decisionMade.get()) {
+                            decisionMade.set(true);
+                            alert.close();
+                        }
+                    }
+            ));
+            timeout.play();
+
+            ButtonType result = alert.showAndWait().orElse(rejectButton);
+            timeout.stop();
+
+            if (!decisionMade.get()) {
+                decisionMade.set(true);
+            }
+            client.sendUserRequestsJoinLobbyRequest(msg, result == acceptButton);
+        });
     }
 
 
