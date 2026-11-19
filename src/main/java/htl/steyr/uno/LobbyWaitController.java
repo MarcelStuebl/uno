@@ -241,6 +241,11 @@ public class LobbyWaitController implements Initializable {
 
         String currentUsername = client.getConn().getUser().getUsername();
         ArrayList<User> users = new ArrayList<>(lobby.users());
+        currentPlayerReady = users.stream()
+                .filter(user -> currentUsername.equals(user.getUsername()))
+                .findFirst()
+                .map(User::isReady)
+                .orElse(false);
 
         String hostUsername = users.isEmpty() ? null : users.getFirst().getUsername();
         boolean isHost = currentUsername.equals(hostUsername);
@@ -321,9 +326,10 @@ public class LobbyWaitController implements Initializable {
                 HBox playerInfo = new HBox(10, profileImageView, nameLabel);
                 playerInfo.setAlignment(Pos.CENTER_LEFT);
                 rootPane.setLeft(playerInfo);
-                readyLabel.setText(item.equals(currentUsername) && currentPlayerReady
-                        ? "Bereit"
-                        : "Nicht bereit");
+                boolean playerReady = item.equals(currentUsername)
+                        ? currentPlayerReady
+                        : matchedUser != null && matchedUser.isReady();
+                readyLabel.setText(playerReady ? "Bereit" : "Nicht bereit");
                 statusAndActions.getChildren().setAll(readyLabel);
                 rootPane.setRight(statusAndActions);
 
@@ -447,15 +453,12 @@ public class LobbyWaitController implements Initializable {
     }
 
     /**
-     * Startet das Spiel auf Anfrage des Hosts.
-     *
-     * <p>Wird ignoriert, wenn die Lobby nicht existiert oder weniger
-     * als zwei Spieler vorhanden sind.</p>
+     * Schaltet den eigenen Ready-Status um und sendet ihn an den Server.
+     * Der Server startet das Spiel, sobald alle Spieler bereit sind.
      *
      * @param actionEvent das ausgelöste ActionEvent
-     * @throws IOException wenn das Laden der Spielansicht fehlschlägt
      */
-    public void readyButtonClicked(ActionEvent actionEvent) throws IOException {
+    public void readyButtonClicked(ActionEvent actionEvent) {
         if (lobby == null || lobby.users() == null || lobby.users().size() < 2) {
             return;
         }
@@ -465,29 +468,6 @@ public class LobbyWaitController implements Initializable {
         } else {
             userReady();
         }
-
-        if (checkIfReady()) {
-            client.getConn().startGame();
-        }
-    }
-
-    private boolean checkIfReady(){
-
-        //if (lobby.users().stream().allMatch(user -> user.ready())) {
-        //    return true;
-       // } else {
-       //     Platform.runLater(() -> {
-                // Show a popup or alert to inform the user that not all players are ready
-        //        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-         //       alert.setTitle("Spielstart");
-          //      alert.setHeaderText(null);
-           //     alert.setContentText("Nicht alle Spieler sind bereit. Bitte warten Sie, bis alle Spieler bereit sind.");
-            //    alert.showAndWait();
-           // });
-
-
-            return false;
-        //}
     }
 
     private void userReady(){

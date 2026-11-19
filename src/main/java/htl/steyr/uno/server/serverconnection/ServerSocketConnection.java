@@ -144,6 +144,7 @@ public class ServerSocketConnection {
                 case "SetProfileImageRequest" -> setProfileImageRequest(JsonMessageCodec.convert(message, SetProfileImageRequest.class));
                 case "HeartbeatPingRequest" -> heartbeatPingRequest(JsonMessageCodec.convert(message, HeartbeatPingRequest.class));
                 case "GetMatchesStatisticsRequest" -> getMatchesStatisticsRequest(JsonMessageCodec.convert(message, GetMatchesStatisticsRequest.class));
+                case "UserReadyRequest" -> userReadyRequest(JsonMessageCodec.convert(message, UserReadyRequest.class));
                 default -> System.out.println("Unknown UNO message type from " + remoteAddress() + ": " + message.type());
             }
         } catch (Exception e) {
@@ -460,17 +461,29 @@ public class ServerSocketConnection {
         sendMessage(new CheckIfUserAlreadyExistsResponse(username, email, userAlreadyExists, emailAlreadyExists));
     }
 
+    private void userReadyRequest(UserReadyRequest msg) {
+        sendLogMessage(msg);
+        Lobby lobby = server.getLobbyByConnection(this);
+        if (getUser() != null && lobby != null && !Integer.valueOf(2).equals(lobby.getStatus())) {
+            setReady(msg.ready());
+            lobby.updateJoined();
+            lobby.checkAllPlayersReady();
+        }
+    }
+
 
     private void startGameRequest(StartGameRequest msg) {
         sendLogMessage(msg);
         Lobby lobby = server.getLobbyByConnection(this);
-        lobby.startGame();
+        if (lobby != null) {
+            lobby.checkAllPlayersReady();
+        }
     }
 
 
     private void leftLobbyRequest(LeaveLobbyRequest msg) {
         sendLogMessage(msg);
-        server.leaveLobby(this);
+        server.leaveLobby(this, true);
     }
 
     private void kickPlayerFromLobbyRequest(KickPlayerFromLobbyRequest msg) {
@@ -588,7 +601,15 @@ public class ServerSocketConnection {
 
     public User getUser() {
         if (user == null) return null;
-        return new User(user.getUsername(), user.getLastName(), user.getFirstName(), user.getProfileImageData());
+        User userCopy = new User(user.getUsername(), user.getLastName(), user.getFirstName(), user.getProfileImageData());
+        userCopy.setReady(user.isReady());
+        return userCopy;
+    }
+
+    void setReady(boolean ready) {
+        if (user != null) {
+            user.setReady(ready);
+        }
     }
 
 
