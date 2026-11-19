@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ServerSocketConnection {
 
@@ -149,6 +150,7 @@ public class ServerSocketConnection {
                 case "UserReadyRequest" -> userReadyRequest(JsonMessageCodec.convert(message, UserReadyRequest.class));
                 case "ChangeLobbySettingsRequest" -> changeLobbySettingsRequest(JsonMessageCodec.convert(message, ChangeLobbySettingsRequest.class));
                 case "UserRequestsJoinLobbyRequest" -> userRequestsJoinLobbyRequest(JsonMessageCodec.convert(message, UserRequestsJoinLobbyRequest.class));
+                case "GetAllLobbiesRequest" -> getAllLobbiesRequest(JsonMessageCodec.convert(message, GetAllLobbiesRequest.class));
                 default -> System.out.println("Unknown UNO message type from " + remoteAddress() + ": " + message.type());
             }
         } catch (Exception e) {
@@ -540,6 +542,13 @@ public class ServerSocketConnection {
     }
 
 
+    /**
+     * Handles requests from the client to start a game in the lobby.
+     * The server retrieves the lobby associated with the current connection and calls the startGame method in the lobby,
+     * which initiates the game logic and transitions the lobby into the game state.
+     *
+     * @param msg the request indicating that the client wants to start the game
+     */
     private void startGameRequest(StartGameRequest msg) {
         sendLogMessage(msg);
         Lobby lobby = server.getLobbyByConnection(this);
@@ -549,11 +558,26 @@ public class ServerSocketConnection {
     }
 
 
+    /**
+     * Handles requests from the client to leave the lobby they are currently in.
+     * The server retrieves the lobby associated with the current connection and calls the leaveLobby method in the server,
+     * passing the current connection (this) to it. This allows the server to remove the connection from the lobby and update the lobby state accordingly.
+     *
+     * @param msg the request indicating that the client wants to leave the lobby
+     */
     private void leftLobbyRequest(LeaveLobbyRequest msg) {
         sendLogMessage(msg);
         server.leaveLobby(this, true);
     }
 
+
+    /**
+     * Handles requests from the client to kick a player from the lobby.
+     * The server retrieves the lobby associated with the current connection and calls the kickPlayer method in the lobby,
+     * passing the username of the player to be kicked. This allows the lobby to remove the specified player from the game and update the lobby state accordingly.
+     *
+     * @param msg the request containing information about the player to be kicked
+     */
     private void kickPlayerFromLobbyRequest(KickPlayerFromLobbyRequest msg) {
         sendLogMessage(msg);
         Lobby lobby = server.getLobbyByConnection(this);
@@ -563,6 +587,13 @@ public class ServerSocketConnection {
     }
 
 
+    /**
+     * Handles requests from the client to play a card during a game.
+     * The server retrieves the lobby associated with the current connection and calls the cardPlayed method in the game logic,
+     * passing the CardPlayedRequest message to it. This allows the game logic to process the card play action and update the game state accordingly.
+     *
+     * @param msg the request containing information about the card being played
+     */
     private void cardPlayedRequest(CardPlayedRequest msg) {
         Lobby lobby = server.getLobbyByConnection(this);
         if (lobby != null) {
@@ -571,6 +602,13 @@ public class ServerSocketConnection {
     }
 
 
+    /**
+     * Handles requests from the client to indicate that they are ready in the game table.
+     * The server retrieves the lobby associated with the current connection and calls the readyInGameTable method in the game logic,
+     * passing the ReadyInGameTableRequest message to it. This allows the game logic to process the readiness of the player and update the game state accordingly.
+     *
+     * @param msg the request containing information about the player's readiness
+     */
     private void readyInGameTableRequest(ReadyInGameTableRequest msg) {
         sendLogMessage(msg);
         Lobby lobby = server.getLobbyByConnection(this);
@@ -580,6 +618,13 @@ public class ServerSocketConnection {
     }
 
 
+    /**
+     * Handles requests from the client to draw a card during a game.
+     * The server retrieves the lobby associated with the current connection and calls the requestCard method in the game logic,
+     * passing the RequestCardRequest message to it. This allows the game logic to process the card draw action and update the game state accordingly.
+     *
+     * @param msg the request containing information about the card draw action
+     */
     private void requestCardRequest(RequestCardRequest msg) {
         Lobby lobby = server.getLobbyByConnection(this);
         if (lobby != null) {
@@ -588,6 +633,13 @@ public class ServerSocketConnection {
     }
 
 
+    /**
+     * Handles requests from the client to say "UNO" during a game.
+     * The server retrieves the lobby associated with the current connection and calls the sayUno method in the game logic,
+     * passing the SayUnoRequest message to it. This allows the game logic to process the "UNO" action and update the game state accordingly.
+     *
+     * @param msg the request containing information about the "UNO" action
+     */
     private void sayUnoRequest(SayUnoRequest msg) {
         Lobby lobby = server.getLobbyByConnection(this);
         if (lobby != null) {
@@ -596,6 +648,13 @@ public class ServerSocketConnection {
     }
 
 
+    /**
+     * Handles requests from the client to set or update their profile image.
+     * The server receives the image data from the client and updates the user's profile image in the database.
+     * If an error occurs during the database update, it logs the error message to the console.
+     *
+     * @param msg the request containing the new profile image data
+     */
     private void setProfileImageRequest(SetProfileImageRequest msg) {
         sendLogMessage(msg);
         DatabaseUser db = new DatabaseUser();
@@ -605,6 +664,7 @@ public class ServerSocketConnection {
             System.out.println("Error updating profile image for user " + getUser().getUsername() + ": " + e.getMessage());
         }
     }
+
 
     /**
      * Handles heartbeat ping requests from the client.
@@ -632,6 +692,13 @@ public class ServerSocketConnection {
     }
 
 
+    /**
+     * Handles requests from the client to change the settings of the lobby they are currently in.
+     * The server retrieves the lobby associated with the current connection and updates its mode and type based
+     * on the values provided in the ChangeLobbySettingsRequest message. It then sends an updated LobbyInfoResponse to all clients in the lobby to reflect the new settings.
+     *
+     * @param msg
+     */
     private void changeLobbySettingsRequest(ChangeLobbySettingsRequest msg) {
         sendLogMessage(msg);
         Lobby lobby = server.getLobbyByConnection(this);
@@ -640,6 +707,23 @@ public class ServerSocketConnection {
             lobby.setType(msg.type());
             lobby.sendInfoToAll(new LobbyInfoResponse(lobby.getLobbyId(), lobby.getStatus(), lobby.getMode(), lobby.getType(), lobby.getConnections().stream().map(ServerSocketConnection::getUser).toList()));
         }
+    }
+
+
+    /**
+     * Handles requests from the client to retrieve information about all available lobbies on the server.
+     * The server collects the lobby information, including lobby ID, status, mode, type, and the list of users in each lobby,
+     * and sends a GetAllLobbiesResponse back to the client with this data.
+     * This allows the client to display a list of available lobbies for the user to join.
+     *
+     * @param msg
+     */
+    private void getAllLobbiesRequest(GetAllLobbiesRequest msg) {
+        sendLogMessage(msg);
+        ArrayList<LobbyInfoResponse> lobbies = server.getLobbies().stream()
+                .map(lobby -> new LobbyInfoResponse(lobby.getLobbyId(), lobby.getStatus(), lobby.getMode(), lobby.getType(), lobby.getConnections().stream().map(ServerSocketConnection::getUser).toList()))
+                .collect(Collectors.toCollection(ArrayList::new));
+        sendMessage(new GetAllLobbiesResponse(lobbies));
     }
 
 

@@ -228,6 +228,22 @@ public class LobbyController implements Initializable {
         }
     }
 
+    private void getAllLobbies() {
+        client.getConn().requestAllLobbies();
+        /**
+         * @TODO: Diese Funktion soll die Anfrage an den Server senden, um alle verfügbaren Lobbys abzurufen.
+         * In Folge wird getAllLobbiesResponse() aufgerufen, um die Antwort zu verarbeiten und die Lobbys in der Benutzeroberfläche anzuzeigen.
+         */
+    }
+
+
+    public void getAllLobbiesResponse(GetAllLobbiesResponse msg) {
+        ArrayList<LobbyInfoResponse> lobbies = msg.lobbies();
+        /**
+         * @TODO: Implementieren Sie die Logik, um die erhaltenen Lobbys in der Benutzeroberfläche anzuzeigen.
+         */
+    }
+
     /**
      * Wird aufgerufen, wenn das Beitreten zu einer Lobby fehlschlägt.
      *
