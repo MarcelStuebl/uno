@@ -6,6 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 public class EnemyDisplayController {
 
@@ -17,6 +18,8 @@ public class EnemyDisplayController {
     private ImageView profileImageView;
     @FXML
     private Pane cardPane;
+    @FXML
+    private StackPane reactionSlot;
 
     private static final double CARD_W = 28.0;
     private static final double CARD_H = 44.0;
@@ -41,6 +44,14 @@ public class EnemyDisplayController {
 
     public String getUsername() {
         return usernameLabel.getText();
+    }
+
+    public HBox getRootPanel() {
+        return rootPanel;
+    }
+
+    public StackPane getReactionSlot() {
+        return reactionSlot;
     }
 
     public void setProfileImage(Image image) {

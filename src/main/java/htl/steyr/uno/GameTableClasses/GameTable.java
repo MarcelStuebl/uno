@@ -155,25 +155,41 @@ public class GameTable implements Initializable {
             if (msg == null || msg.emoji() == null || msg.emoji().isBlank()) {
                 return;
             }
-            showFloatingReaction(msg.emoji());
+            showFloatingReaction(msg);
         });
     }
 
-    private void showFloatingReaction(String emoji) {
-        if (reactionPopupLayer == null || emoji == null) {
+    private void showFloatingReaction(EmojiReactionResponse reaction) {
+        if (reactionPopupLayer == null || reaction.emoji() == null) {
             return;
         }
 
-        ImageView popup = PlayerHandController.createReactionImageView(emoji, 88);
+        String localUsername = client.getConn() != null && client.getConn().getUser() != null
+                ? client.getConn().getUser().getUsername()
+                : null;
+        boolean isLocalReaction = reaction.senderUsername() != null
+                && reaction.senderUsername().equalsIgnoreCase(localUsername);
+        StackPane targetSlot = isLocalReaction ? null : findReactionSlot(reaction.senderUsername());
+        if (!isLocalReaction && targetSlot == null) {
+            return;
+        }
+
+        ImageView popup = PlayerHandController.createReactionImageView(reaction.emoji(), isLocalReaction ? 88 : 46);
         popup.setMouseTransparent(true);
-        popup.setManaged(false);
-        reactionPopupLayer.getChildren().add(popup);
-        double maxX = Math.max(0, reactionPopupLayer.getWidth() - 100);
-        double maxY = Math.max(0, reactionPopupLayer.getHeight() - 100);
-        popup.setLayoutX(ThreadLocalRandom.current().nextDouble(maxX + 1));
-        popup.setLayoutY(ThreadLocalRandom.current().nextDouble(maxY + 1));
-        overlayLayer.toFront();
-        reactionPopupLayer.toFront();
+        Pane popupLayer;
+        if (isLocalReaction) {
+            popup.setManaged(false);
+            popupLayer = reactionPopupLayer;
+            popupLayer.getChildren().add(popup);
+            positionLocalReaction(popup);
+            overlayLayer.toFront();
+            reactionPopupLayer.toFront();
+        } else {
+            popupLayer = targetSlot;
+            popupLayer.getChildren().add(popup);
+            popup.setTranslateX(ThreadLocalRandom.current().nextDouble(-3, 4));
+            popup.setTranslateY(ThreadLocalRandom.current().nextDouble(-3, 4));
+        }
 
         Timeline popIn = new Timeline(
                 new KeyFrame(Duration.ZERO,
@@ -192,10 +208,30 @@ public class GameTable implements Initializable {
         fadeOut.setDelay(Duration.millis(1300));
         fadeOut.setToValue(0);
         TranslateTransition floatUp = new TranslateTransition(Duration.seconds(2), popup);
-        floatUp.setByY(-75);
+        floatUp.setByY(isLocalReaction ? -35 : -6);
         ParallelTransition animation = new ParallelTransition(popIn, fadeOut, floatUp);
-        animation.setOnFinished(event -> reactionPopupLayer.getChildren().remove(popup));
+        animation.setOnFinished(event -> popupLayer.getChildren().remove(popup));
         animation.play();
+    }
+
+    private void positionLocalReaction(ImageView popup) {
+        double maxX = Math.max(0, reactionPopupLayer.getWidth() - popup.getFitWidth());
+        double maxY = Math.max(0, reactionPopupLayer.getHeight() - popup.getFitHeight());
+        popup.setLayoutX(ThreadLocalRandom.current().nextDouble(maxX + 1));
+        popup.setLayoutY(ThreadLocalRandom.current().nextDouble(maxY + 1));
+    }
+
+    private StackPane findReactionSlot(String senderUsername) {
+        if (senderUsername == null) {
+            return null;
+        }
+        for (EnemyDisplayController controller : enemyControllers) {
+            if (controller == null || !senderUsername.equalsIgnoreCase(controller.getUsername())) {
+                continue;
+            }
+            return controller.getReactionSlot();
+        }
+        return null;
     }
 
     private void updatePlayerFromStartGameResponse() {

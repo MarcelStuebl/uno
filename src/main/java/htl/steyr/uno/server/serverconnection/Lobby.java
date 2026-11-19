@@ -67,7 +67,7 @@ public class Lobby {
             return;
         }
 
-        sendInfoToAll(new EmojiReactionResponse(emoji));
+        sendInfoToAll(new EmojiReactionResponse(emoji, sender.getUser().getUsername()));
     }
 
 
