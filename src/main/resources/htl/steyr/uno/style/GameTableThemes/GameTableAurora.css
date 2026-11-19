@@ -16,6 +16,15 @@
     -fx-border-color: rgba(185, 231, 245, 0.28);
 }
 
+.reaction-slot {
+    -fx-background-color: linear-gradient(to bottom right, rgba(34, 79, 99, 0.96), rgba(13, 37, 57, 0.98));
+    -fx-border-color: rgba(185, 231, 245, 0.5);
+}
+
+.reaction-slot-mark {
+    -fx-text-fill: rgba(220, 248, 255, 0.75);
+}
+
 .player-panel.turn-active {
     -fx-border-color: #b9f1ff;
     -fx-effect: dropshadow(gaussian, rgba(147, 226, 246, 0.7), 16, 0.3, 0, 0);

@@ -35,6 +35,15 @@
     -fx-text-fill: #f5e8d2;
 }
 
+.reaction-slot {
+    -fx-background-color: linear-gradient(to bottom right, rgba(92, 59, 42, 0.96), rgba(48, 34, 27, 0.98));
+    -fx-border-color: rgba(231, 195, 151, 0.58);
+}
+
+.reaction-slot-mark {
+    -fx-text-fill: rgba(255, 226, 178, 0.72);
+}
+
 .game-reaction-button {
     -fx-background-color: rgba(49, 35, 27, 0.94);
     -fx-border-color: rgba(218, 175, 125, 0.4);

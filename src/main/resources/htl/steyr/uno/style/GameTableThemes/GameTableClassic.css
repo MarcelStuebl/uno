@@ -67,6 +67,21 @@
     -fx-font-family: "Segoe UI";
 }
 
+.reaction-slot {
+    -fx-background-color: linear-gradient(to bottom right, rgba(28, 48, 36, 0.96), rgba(11, 25, 20, 0.96));
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(181, 240, 168, 0.38);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 7, 0.18, 0, 2);
+}
+
+.reaction-slot-mark {
+    -fx-text-fill: rgba(220, 245, 208, 0.56);
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
 .game-reaction-button {
     -fx-background-color: rgba(12, 38, 25, 0.88);
     -fx-border-color: rgba(142, 214, 162, 0.35);
