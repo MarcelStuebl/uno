@@ -85,6 +85,10 @@
     -fx-text-fill: white;
 }
 
+.lobbyListView .list-cell:disabled {
+    -fx-opacity: 0.45;
+}
+
 .lobbyListView .scroll-bar:vertical {
     -fx-background-color: transparent;
     -fx-pref-width: 8;

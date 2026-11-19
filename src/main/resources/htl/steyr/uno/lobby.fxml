@@ -59,7 +59,12 @@
                               <Line endX="100.0" startX="0.0" styleClass="lines" />
                            </children>
                         </VBox>
-                        <ListView fx:id="lobbyListView" prefHeight="500.0" prefWidth="360.0" styleClass="lobbyListView" />
+                        <VBox alignment="TOP_CENTER" prefHeight="500.0" prefWidth="360.0" spacing="10.0">
+                           <children>
+                              <ListView fx:id="lobbyListView" prefHeight="450.0" prefWidth="360.0" maxWidth="360.0" styleClass="lobbyListView" VBox.vgrow="ALWAYS" />
+                              <Button fx:id="refreshLobbyList" mnemonicParsing="false" onAction="#refreshLobbyListClicked" prefHeight="40.0" prefWidth="360.0" styleClass="joinLobbyButton" text="Refresh" />
+                           </children>
+                        </VBox>
                      </children>
                   </HBox>
                </children>
