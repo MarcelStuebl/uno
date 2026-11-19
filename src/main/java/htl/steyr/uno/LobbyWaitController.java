@@ -397,7 +397,6 @@ public class LobbyWaitController implements Initializable {
         }
     }
 
-
     /** @TODO
      * Sendet eine Anfrage an den Server, um die Lobby-Konfiguration zu ändern.
      *
@@ -407,7 +406,6 @@ public class LobbyWaitController implements Initializable {
     private void updateLobbyConfig(Integer lobbyMode, Integer lobbyType) {
         client.getConn().sendMessage(new ChangeLobbyConfigRequest(lobbyMode, lobbyType));
     }
-
 
     /**
      * Wird aufgerufen, wenn der Server eine Anfrage eines Spielers sendet, der die Lobby betreten möchte.
