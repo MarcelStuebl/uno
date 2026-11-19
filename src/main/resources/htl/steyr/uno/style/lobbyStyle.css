@@ -29,6 +29,8 @@
     -fx-text-fill: white;
     -fx-font-size: 20px;
     -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
 }
 
 .UnoTitleTop {
@@ -46,6 +48,8 @@
 .subtitle {
     -fx-text-fill: #8f93a3;
     -fx-font-size: 11px;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
 }
 
 .lobbyListView {

@@ -20,13 +20,13 @@
          <children>
             <VBox alignment="CENTER" maxWidth="1250.0" spacing="14.0" styleClass="centerContent">
                <children>
-                  <Label styleClass="welcomeLable" text="Wilkommen bei UNO!" />
-                  <Label styleClass="subtitle" text="Erstelle eine Party oder tritt einer bei" />
-                  <HBox alignment="CENTER" spacing="36.0">
+                  <Label maxWidth="Infinity" prefWidth="1250.0" styleClass="welcomeLable" text="Wilkommen bei UNO!" textAlignment="CENTER" />
+                  <Label maxWidth="Infinity" prefWidth="1250.0" styleClass="subtitle" text="Erstelle eine Party oder tritt einer bei" textAlignment="CENTER" />
+                  <HBox alignment="TOP_CENTER" prefHeight="500.0" spacing="36.0">
                      <children>
-                        <VBox alignment="CENTER" prefWidth="360.0" spacing="16.0">
+                        <VBox alignment="TOP_CENTER" prefHeight="500.0" prefWidth="360.0" spacing="14.0">
                            <children>
-                              <StackPane prefHeight="230.0" prefWidth="360.0" styleClass="joinAndCreate">
+                              <StackPane prefHeight="243.0" prefWidth="360.0" styleClass="joinAndCreate" VBox.vgrow="ALWAYS">
                                  <children>
                                     <VBox alignment="CENTER" spacing="14.0">
                                        <children>
@@ -37,7 +37,7 @@
                                     </VBox>
                                  </children>
                               </StackPane>
-                              <StackPane prefHeight="230.0" prefWidth="360.0" styleClass="joinAndCreate">
+                              <StackPane prefHeight="243.0" prefWidth="360.0" styleClass="joinAndCreate" VBox.vgrow="ALWAYS">
                                  <children>
                                     <VBox alignment="CENTER" spacing="14.0">
                                        <children>
@@ -59,7 +59,7 @@
                               <Line endX="100.0" startX="0.0" styleClass="lines" />
                            </children>
                         </VBox>
-                        <ListView fx:id="lobbyListView" prefHeight="500.0" prefWidth="400.0" styleClass="lobbyListView" />
+                        <ListView fx:id="lobbyListView" prefHeight="500.0" prefWidth="360.0" styleClass="lobbyListView" />
                      </children>
                   </HBox>
                </children>
