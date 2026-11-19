@@ -2,6 +2,7 @@ package htl.steyr.uno;
 
 import htl.steyr.uno.GameTableClasses.GameTable;
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.client.ChangeLobbyConfigRequest;
 import htl.steyr.uno.requests.client.UserReadyRequest;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
@@ -378,6 +379,17 @@ public class LobbyWaitController implements Initializable {
          */
         Integer lobbyMode = lobby.mode(); // 0 = UNO Classic, 1 = UNO Does
         Integer lobbyType = lobby.type(); // 0 = open, 1 = on_request, 2 = only_code
+    }
+
+
+    /** @TODO
+     * Sendet eine Anfrage an den Server, um die Lobby-Konfiguration zu ändern.
+     *
+     * @param lobbyMode
+     * @param lobbyType
+     */
+    private void updateLobbyConfig(Integer lobbyMode, Integer lobbyType) {
+        client.getConn().sendMessage(new ChangeLobbyConfigRequest(lobbyMode, lobbyType));
     }
 
 
