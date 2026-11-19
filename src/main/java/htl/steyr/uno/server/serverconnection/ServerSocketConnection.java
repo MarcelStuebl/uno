@@ -320,6 +320,7 @@ public class ServerSocketConnection {
             } else if (msg.joinMethod() == 1) { // on_request
                 User waitingUser = new User(getUser().getUsername(), getUser().getLastName(), getUser().getFirstName(), getUser().getProfileImageData());
                 UserRequestsJoinLobbyResponse response = new UserRequestsJoinLobbyResponse(waitingUser);
+                lobby.addPendingJoinRequest(waitingUser.getUsername(), this);
                 getPendingJoinRequests().add(response);
                 lobby.getConnections().getFirst().sendMessage(response);
 
@@ -327,8 +328,10 @@ public class ServerSocketConnection {
                 Thread timeoutThread = new Thread(() -> {
                     try {
                         Thread.sleep(15000); // Wait for 15 seconds
-                        if (getPendingJoinRequests().contains(response)) {
+                        if (getPendingJoinRequests().contains(response)
+                                && lobby.containsPendingJoinRequest(waitingUser.getUsername())) {
                             getPendingJoinRequests().remove(response);
+                            lobby.removePendingJoinRequest(waitingUser.getUsername());
                             LobbyJoinRefusedResponse timeoutResponse = new LobbyJoinRefusedResponse(getUser(), lobby.getLobbyInfoResponse(), 2);
                             sendMessage(timeoutResponse);
                             sendLogMessage(timeoutResponse);
@@ -367,20 +370,17 @@ public class ServerSocketConnection {
         sendLogMessage(msg);
         Lobby lobby = server.getLobbies().stream().filter(l -> l.getConnections().contains(this)).findFirst().orElse(null);
         if (lobby != null) {
-            UserRequestsJoinLobbyResponse pendingRequest = getPendingJoinRequests().stream()
-                    .filter(r -> r.user().getUsername().equals(msg.response().user().getUsername()))
-                    .findFirst()
-                    .orElse(null);
+            String username = msg.response().user().getUsername();
+            ServerSocketConnection waitingConnection = lobby.removePendingJoinRequest(username);
 
-            if (pendingRequest != null) {
-                getPendingJoinRequests().remove(pendingRequest);
+            if (waitingConnection != null) {
                 if (msg.isAccepted()) {
-                    lobby.addConnection(this);
+                    lobby.addConnection(waitingConnection);
                     lobby.updateJoined();
                 } else {
                     LobbyJoinRefusedResponse refusedResponse = new LobbyJoinRefusedResponse(msg.response().user(), lobby.getLobbyInfoResponse(), 1);
-                    sendMessage(refusedResponse);
-                    sendLogMessage(refusedResponse);
+                    waitingConnection.sendMessage(refusedResponse);
+                    waitingConnection.sendLogMessage(refusedResponse);
                 }
             }
         }
