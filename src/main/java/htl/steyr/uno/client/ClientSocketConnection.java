@@ -86,6 +86,7 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
                 case "EnemyDrawnCardsResponse" -> enemyDrawnCardsResponse(JsonMessageCodec.convert(decoded, EnemyDrawnCardsResponse.class));
                 case "MatchesStatisticsResponse" -> matchesStatisticsResponse(JsonMessageCodec.convert(decoded, MatchesStatisticsResponse.class));
                 case "UserRequestsJoinLobbyResponse" -> userRequestsJoinLobbyResponse(JsonMessageCodec.convert(decoded, UserRequestsJoinLobbyResponse.class));
+                case "GetAllLobbiesResponse" -> getAllLobbiesResponse(JsonMessageCodec.convert(decoded, GetAllLobbiesResponse.class));
             }
         } catch (Exception e) {
         }
@@ -262,6 +263,17 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
     private void userRequestsJoinLobbyResponse(UserRequestsJoinLobbyResponse msg) {
         if (client.getLobbyWaitController() != null) {
             client.getLobbyWaitController().userRequestsJoinLobbyResponse(msg);
+        }
+    }
+
+    public void requestAllLobbies() {
+        sendMessage(new GetAllLobbiesRequest());
+    }
+
+
+    private void getAllLobbiesResponse(GetAllLobbiesResponse msg) {
+        if (client.getLobbyController() != null) {
+            client.getLobbyController().getAllLobbiesResponse(msg);
         }
     }
 
