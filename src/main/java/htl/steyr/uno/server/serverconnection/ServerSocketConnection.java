@@ -150,6 +150,7 @@ public class ServerSocketConnection {
                 case "ChangeLobbySettingsRequest" -> changeLobbySettingsRequest(JsonMessageCodec.convert(message, ChangeLobbySettingsRequest.class));
                 case "UserRequestsJoinLobbyRequest" -> userRequestsJoinLobbyRequest(JsonMessageCodec.convert(message, UserRequestsJoinLobbyRequest.class));
                 case "GetAllLobbiesRequest" -> getAllLobbiesRequest(JsonMessageCodec.convert(message, GetAllLobbiesRequest.class));
+                case "ChangeLobbyConfigRequest" -> changeLobbyConfigRequest(JsonMessageCodec.convert(message, ChangeLobbyConfigRequest.class));
                 default -> System.out.println("Unknown UNO message type from " + remoteAddress() + ": " + message.type());
             }
         } catch (Exception e) {
@@ -741,6 +742,20 @@ public class ServerSocketConnection {
             System.out.println("Failed to load profile images for match statistics: " + e.getMessage());
         }
         return thumbnails;
+    }
+
+    private void changeLobbyConfigRequest(ChangeLobbyConfigRequest msg) {
+        sendLogMessage(msg);
+        Lobby lobby = server.getLobbyByConnection(this);
+        if (lobby.getConnections().getFirst() == this) {
+            if (msg.lobbyMode() != null) {
+                lobby.setMode(msg.lobbyMode());
+            }
+            if (msg.LobbyType() != null) {
+                lobby.setType(msg.LobbyType());
+            }
+            lobby.sendInfoToAll(new LobbyInfoResponse(lobby.getLobbyId(), lobby.getStatus(), lobby.getMode(), lobby.getType(), lobby.getConnections().stream().map(ServerSocketConnection::getUser).toList()));
+        }
     }
 
 
