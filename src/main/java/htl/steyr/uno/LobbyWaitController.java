@@ -2,6 +2,7 @@ package htl.steyr.uno;
 
 import htl.steyr.uno.GameTableClasses.GameTable;
 import htl.steyr.uno.client.Client;
+import htl.steyr.uno.requests.client.UserReadyRequest;
 import htl.steyr.uno.requests.server.LobbyInfoResponse;
 import htl.steyr.uno.requests.server.ReceiveChatMessageResponse;
 import htl.steyr.uno.requests.server.StartGameResponse;
@@ -18,11 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -60,8 +57,10 @@ public class LobbyWaitController implements Initializable {
     /** Zeigt den Lobby-Code an. */
     public Label lobbyCodeLabel;
 
-    /** Button zum Starten des Spiels (nur für den Host sichtbar). */
-    public Button playButton;
+    /** Button zum Setzen des eigenen Ready-Status. */
+    public Button readyButton;
+
+    private boolean currentPlayerReady;
 
     /** Zeigt den eingeloggten Benutzernamen an. */
     public Label AccNameDisplayLabel;
@@ -126,8 +125,8 @@ public class LobbyWaitController implements Initializable {
         codeOnlyButton.getStyleClass().add("selectedOption");
 
         Platform.runLater(() -> {
-            if (playButton.getScene() != null && playButton.getScene().getWindow() != null) {
-                playButton.getScene().getWindow().setOnCloseRequest(event -> {
+            if (readyButton.getScene() != null && readyButton.getScene().getWindow() != null) {
+                readyButton.getScene().getWindow().setOnCloseRequest(event -> {
                     if (!intentionalClose) onSceneClose();
                 });
             }
@@ -247,21 +246,29 @@ public class LobbyWaitController implements Initializable {
         boolean isHost = currentUsername.equals(hostUsername);
         boolean hasEnoughPlayersToStart = users.size() >= 2;
 
-        playButton.setVisible(isHost);
-        playButton.setDisable(!isHost || !hasEnoughPlayersToStart);
+        readyButton.setVisible(true);
+        readyButton.setDisable(!hasEnoughPlayersToStart);
 
         playerListView.setCellFactory(list -> new ListCell<String>() {
             private final BorderPane rootPane = new BorderPane();
             private final Label nameLabel = new Label();
+            private final Label readyLabel = new Label();
+            private final HBox statusAndActions = new HBox(10);
             private final HBox buttonBox = new HBox(10);
             private final Button kickButton = new Button("Kick");
             private final Button muteButton = new Button("Mute");
 
             {
-                nameLabel.setMinWidth(180);
-                nameLabel.setMaxWidth(180);
+                nameLabel.setMinWidth(0);
                 nameLabel.setPrefWidth(180);
+                nameLabel.setMaxWidth(220);
                 nameLabel.setAlignment(Pos.CENTER_LEFT);
+
+                readyLabel.setMinWidth(100);
+                readyLabel.setMaxWidth(140);
+                readyLabel.setPrefWidth(120);
+                readyLabel.setAlignment(Pos.CENTER);
+                readyLabel.getStyleClass().add("readyStatusLabel");
 
                 kickButton.setPrefWidth(120);
                 kickButton.setMinWidth(120);
@@ -269,11 +276,15 @@ public class LobbyWaitController implements Initializable {
                 kickButton.setAlignment(Pos.CENTER);
                 kickButton.getStyleClass().addAll("playButton", "kickButton");
                 buttonBox.setAlignment(Pos.CENTER);
+                statusAndActions.setAlignment(Pos.CENTER_RIGHT);
 
                 buttonBox.getChildren().add(kickButton);
+                statusAndActions.getChildren().add(readyLabel);
 
                 rootPane.setPadding(new Insets(6, 10, 6, 10));
                 BorderPane.setAlignment(nameLabel, Pos.CENTER_LEFT);
+                BorderPane.setAlignment(buttonBox, Pos.CENTER);
+                BorderPane.setAlignment(statusAndActions, Pos.CENTER_RIGHT);
                 rootPane.getStyleClass().add("playerCellRoot");
 
                 setPrefHeight(85);
@@ -307,13 +318,18 @@ public class LobbyWaitController implements Initializable {
                 profileImageView.setPreserveRatio(true);
                 profileImageView.setPickOnBounds(true);
 
-                HBox nameAndImage = new HBox(10, profileImageView, nameLabel);
-                nameAndImage.setAlignment(Pos.CENTER_LEFT);
-                rootPane.setLeft(nameAndImage);
+                HBox playerInfo = new HBox(10, profileImageView, nameLabel);
+                playerInfo.setAlignment(Pos.CENTER_LEFT);
+                rootPane.setLeft(playerInfo);
+                readyLabel.setText(item.equals(currentUsername) && currentPlayerReady
+                        ? "Bereit"
+                        : "Nicht bereit");
+                statusAndActions.getChildren().setAll(readyLabel);
+                rootPane.setRight(statusAndActions);
 
                 if (item.equals(currentUsername)) {
                     kickButton.setOnAction(null);
-                    rootPane.setRight(null);
+                    rootPane.setCenter(null);
                     nameLabel.setText(item);
                 } else {
                     if (isHost) {
@@ -327,11 +343,11 @@ public class LobbyWaitController implements Initializable {
                                     }
                         }); // Setzt die OnAction für den Kick-Button, um den Spieler zu kicken weil man den Player name hier kennt.
 
-                        rootPane.setRight(buttonBox);
-                        BorderPane.setAlignment(buttonBox, Pos.CENTER);
+                        statusAndActions.getChildren().setAll(buttonBox, readyLabel);
+                        rootPane.setCenter(null);
                     } else {
                         kickButton.setOnAction(null);
-                        rootPane.setRight(null);
+                        rootPane.setCenter(null);
                     }
                     nameLabel.setText(item);
                 }
@@ -439,12 +455,57 @@ public class LobbyWaitController implements Initializable {
      * @param actionEvent das ausgelöste ActionEvent
      * @throws IOException wenn das Laden der Spielansicht fehlschlägt
      */
-    public void playButtonClicked(ActionEvent actionEvent) throws IOException {
+    public void readyButtonClicked(ActionEvent actionEvent) throws IOException {
         if (lobby == null || lobby.users() == null || lobby.users().size() < 2) {
             return;
         }
-        client.getConn().startGame();
+
+        if (currentPlayerReady) {
+            userNotReady();
+        } else {
+            userReady();
+        }
+
+        if (checkIfReady()) {
+            client.getConn().startGame();
+        }
     }
+
+    private boolean checkIfReady(){
+
+        //if (lobby.users().stream().allMatch(user -> user.ready())) {
+        //    return true;
+       // } else {
+       //     Platform.runLater(() -> {
+                // Show a popup or alert to inform the user that not all players are ready
+        //        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+         //       alert.setTitle("Spielstart");
+          //      alert.setHeaderText(null);
+           //     alert.setContentText("Nicht alle Spieler sind bereit. Bitte warten Sie, bis alle Spieler bereit sind.");
+            //    alert.showAndWait();
+           // });
+
+
+            return false;
+        //}
+    }
+
+    private void userReady(){
+        currentPlayerReady = true;
+        playerListView.refresh();
+        // Notify the server that the user is ready
+        client.getConn().sendReadyRequest(new UserReadyRequest(true, client.getConn().getUser().getUsername()));
+    }
+
+    private void userNotReady(){
+        currentPlayerReady = false;
+        playerListView.refresh();
+        // Notify the server that the user is not ready
+        client.getConn().sendReadyRequest(new UserReadyRequest(false, client.getConn().getUser().getUsername()));
+    }
+
+
+
 
     /**
      * Wechselt zur Spielansicht nachdem der Server den Spielstart bestätigt hat.
@@ -459,7 +520,7 @@ public class LobbyWaitController implements Initializable {
         intentionalClose = true;
 
         Stage stage = new Stage();
-        Stage thisStage = (Stage) playButton.getScene().getWindow();
+        Stage thisStage = (Stage) readyButton.getScene().getWindow();
 
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("gameTable.fxml"));
 

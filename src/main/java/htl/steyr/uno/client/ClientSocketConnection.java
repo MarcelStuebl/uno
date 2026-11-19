@@ -256,6 +256,10 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
         sendMessage(new GetMatchesStatisticsRequest(getUser()));
     }
 
+    public void sendReadyRequest(UserReadyRequest msg) {
+        sendMessage(msg);
+    }
+
     private void startHeartbeat() {
         heartbeatThread = new Thread(() -> {
             while (running) {
@@ -286,6 +290,12 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
     public void kickPlayerFromLobby(String username) {
         System.out.println("Sending KickPlayerFromLobbyRequest for username: " + username);
         sendMessage(new KickPlayerFromLobbyRequest(username));
+    }
+
+    public synchronized void setUserReady(boolean ready, User user) {
+        if (getUser() == null) return;
+        UserReadyRequest msg = new UserReadyRequest(ready, user.getUsername());
+        sendMessage(msg);
     }
 
     @Override

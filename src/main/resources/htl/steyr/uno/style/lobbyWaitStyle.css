@@ -71,6 +71,17 @@
     -fx-text-fill: white;
 }
 
+.readyStatusLabel {
+    -fx-background-color: rgba(255, 190, 75, 0.16);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 190, 75, 0.6);
+    -fx-border-radius: 14;
+    -fx-text-fill: rgba(255, 220, 160, 1);
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 12 8 12;
+}
+
 
 /* =========================
    PLAY BUTTON
