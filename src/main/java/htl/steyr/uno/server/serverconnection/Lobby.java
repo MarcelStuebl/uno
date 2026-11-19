@@ -6,7 +6,9 @@ import htl.steyr.uno.requests.server.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -21,6 +23,7 @@ public class Lobby {
     private Integer type = 2; // 0 = open, 1 = on_request, 2 = only_code
 
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
+    private final Map<String, ServerSocketConnection> pendingJoinRequests = Collections.synchronizedMap(new HashMap<>());
     private final GameLogic gameLogic = new GameLogic(this);
 
     private static final Set<String> ALLOWED_EMOJI_REACTIONS = Set.of("🖕", "❤️", "😠", "😭");
@@ -61,6 +64,18 @@ public class Lobby {
 
     void sendChatMessage(SendChatMessageRequest obj) {
         sendInfoToAll(new ReceiveChatMessageResponse(obj.message(), obj.user()));
+    }
+
+    void addPendingJoinRequest(String username, ServerSocketConnection connection) {
+        pendingJoinRequests.put(username, connection);
+    }
+
+    ServerSocketConnection removePendingJoinRequest(String username) {
+        return pendingJoinRequests.remove(username);
+    }
+
+    boolean containsPendingJoinRequest(String username) {
+        return pendingJoinRequests.containsKey(username);
     }
 
     void sendEmojiReaction(ServerSocketConnection sender, String emoji) {
