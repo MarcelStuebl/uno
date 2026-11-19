@@ -12,13 +12,18 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Lobby {
-    private static final Set<String> ALLOWED_EMOJI_REACTIONS = Set.of("🖕", "❤️", "😠", "😭");
 
     private final Server server;
     private Integer lobbyId;
+
     private Integer status = 0; // 0 = waiting for players, 1 = full, 2 = in game
+    private Integer mode = 0; // 0 = UNO Classic, 1 = UNO Does
+    private Integer type = 2; // 0 = open, 1 = on_request, 2 = only_code
+
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
     private final GameLogic gameLogic = new GameLogic(this);
+
+    private static final Set<String> ALLOWED_EMOJI_REACTIONS = Set.of("🖕", "❤️", "😠", "😭");
 
 
     /**
@@ -44,7 +49,7 @@ public class Lobby {
     LobbyInfoResponse getLobbyInfoResponse() {
         synchronized (connections) {
             List<User> users = connections.stream().map(ServerSocketConnection::getUser).toList();
-            return new LobbyInfoResponse(lobbyId, status, users);
+            return new LobbyInfoResponse(lobbyId, status, mode, type, users);
         }
     }
 
@@ -194,5 +199,21 @@ public class Lobby {
 
     GameLogic getGameLogic() {
         return gameLogic;
+    }
+
+    public Integer getMode() {
+        return mode;
+    }
+
+    public void setMode(Integer mode) {
+        this.mode = mode;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

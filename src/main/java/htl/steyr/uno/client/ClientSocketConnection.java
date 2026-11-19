@@ -85,6 +85,8 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
                 case "HeartbeatPongResponse" -> heartbeatPongResponse(JsonMessageCodec.convert(decoded, HeartbeatPongResponse.class));
                 case "EnemyDrawnCardsResponse" -> enemyDrawnCardsResponse(JsonMessageCodec.convert(decoded, EnemyDrawnCardsResponse.class));
                 case "MatchesStatisticsResponse" -> matchesStatisticsResponse(JsonMessageCodec.convert(decoded, MatchesStatisticsResponse.class));
+                case "UserRequestsJoinLobbyResponse" -> userRequestsJoinLobbyResponse(JsonMessageCodec.convert(decoded, UserRequestsJoinLobbyResponse.class));
+                case "GetAllLobbiesResponse" -> getAllLobbiesResponse(JsonMessageCodec.convert(decoded, GetAllLobbiesResponse.class));
             }
         } catch (Exception e) {
         }
@@ -131,6 +133,8 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
                 client.getLobbyWaitController().setLobby(msg);
             } else if (client.getLobbyController() != null) {
                 client.getLobbyController().createOrJoinPartySuccess(msg);
+            } else if (client.getLobbyWaitController() != null) {
+                client.getLobbyWaitController().setLobby(msg);
             }
         }
     }
@@ -254,6 +258,23 @@ public class ClientSocketConnection extends WebSocketClient implements Closeable
 
     public void requestMatchesStatistics() {
         sendMessage(new GetMatchesStatisticsRequest(getUser()));
+    }
+
+    private void userRequestsJoinLobbyResponse(UserRequestsJoinLobbyResponse msg) {
+        if (client.getLobbyWaitController() != null) {
+            client.getLobbyWaitController().userRequestsJoinLobbyResponse(msg);
+        }
+    }
+
+    public void requestAllLobbies() {
+        sendMessage(new GetAllLobbiesRequest());
+    }
+
+
+    private void getAllLobbiesResponse(GetAllLobbiesResponse msg) {
+        if (client.getLobbyController() != null) {
+            client.getLobbyController().getAllLobbiesResponse(msg);
+        }
     }
 
     private void startHeartbeat() {
