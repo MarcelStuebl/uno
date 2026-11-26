@@ -1,11 +1,6 @@
 package htl.steyr.uno.GameTableClasses;
 
-import htl.steyr.uno.GameTableClasses.controller.CardStackController;
-import htl.steyr.uno.GameTableClasses.controller.EnemyDisplayController;
-import htl.steyr.uno.GameTableClasses.controller.GameChatController;
-import htl.steyr.uno.GameTableClasses.controller.GameOverController;
-import htl.steyr.uno.GameTableClasses.controller.GameThemeController;
-import htl.steyr.uno.GameTableClasses.controller.PlayerHandController;
+import htl.steyr.uno.GameTableClasses.controller.*;
 import htl.steyr.uno.client.Client;
 import htl.steyr.uno.requests.server.GameOverResponse;
 import htl.steyr.uno.requests.server.GameTurnResponse;
@@ -32,6 +27,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import lombok.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -41,21 +37,21 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GameTable implements Initializable {
 
-    private final Client client;
+    @Getter private final Client client;
     @FXML
-    private StackPane root;
+    @Getter private StackPane root;
     private GameThemeController themeController;
     private GameChatController chatController;
     private GameOverController gameOverController;
-    CardStackController cardStack = new CardStackController(this);
+    @Getter CardStackController cardStack = new CardStackController(this);
     private final StartGameResponse startGameResponse;
-    private GameLogic gameLogic;
-    private Player player;
-    private GameTurnResponse gameTurnResponse;
+    @Getter private GameLogic gameLogic;
+    @Getter @Setter private Player player;
+    @Getter @Setter private GameTurnResponse gameTurnResponse;
     private Button withdrawalButton;
     private boolean withdrawalButtonCooldown = false;
     @FXML
-    private Label yourTurnLabel;
+    @Getter private Label yourTurnLabel;
 
     private PlayerHandController handController;
 
@@ -66,10 +62,10 @@ public class GameTable implements Initializable {
     @FXML
     private StackPane enemy3;
 
-    private final ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
+    @Getter private final ArrayList<EnemyDisplayController> enemyControllers = new ArrayList<>();
 
     private Button sayUnoButton; // Button to say "UNO"
-    private boolean unoTimeActive = false; // Indicates if the UNO countdown is active
+    @Getter private boolean unoTimeActive = false; // Indicates if the UNO countdown is active
     private Timeline unoCountdownTimer; // Timer for the UNO countdown
 
     private StackPane overlayLayer;
@@ -421,7 +417,7 @@ public class GameTable implements Initializable {
         withdrawalButton.setPadding(Insets.EMPTY);
         withdrawalButton.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
 
-        String path = "/htl/steyr/uno/Uno_Cards/backside.png";
+        String path = "/htl/steyr/uno/img/Uno_Cards/backside.png";
         ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
         iv.setFitWidth(137);
         iv.setFitHeight(192);
@@ -549,10 +545,6 @@ public class GameTable implements Initializable {
         });
     }
 
-    public boolean isUnoTimeActive() {
-        return unoTimeActive;
-    }
-
     public void cancelUnoCountdown() {
         Platform.runLater(() -> {
             if (unoCountdownTimer != null) {
@@ -571,7 +563,7 @@ public class GameTable implements Initializable {
     public void showEmptyDrawStack() {
         Platform.runLater(() -> {
             if (withdrawalButton != null && withdrawalButton.getGraphic() instanceof ImageView iv) {
-                String path = "/htl/steyr/uno/Uno_Cards/emptyStack.png";
+                String path = "/htl/steyr/uno/img/Uno_Cards/emptyStack.png";
                 try {
                     Image emptyImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
                     iv.setImage(emptyImage);
@@ -588,7 +580,7 @@ public class GameTable implements Initializable {
     public void restoreDrawStackImage() {
         Platform.runLater(() -> {
             if (withdrawalButton != null && withdrawalButton.getGraphic() instanceof ImageView iv) {
-                String path = "/htl/steyr/uno/Uno_Cards/backside.png";
+                String path = "/htl/steyr/uno/img/Uno_Cards/backside.png";
                 try {
                     Image backSideImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
                     iv.setImage(backSideImage);
@@ -612,46 +604,6 @@ public class GameTable implements Initializable {
      */
     public void showGameOverOverlay(GameOverResponse msg) {
         gameOverController.showOverlay(msg);
-    }
-
-    public GameLogic getGameLogic() {
-        return gameLogic;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public CardStackController getCardStack() {
-        return cardStack;
-    }
-
-    public StackPane getRoot() {
-        return root;
-    }
-
-    public ArrayList<EnemyDisplayController> getEnemyControllers() {
-        return enemyControllers;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public GameTurnResponse getGameTurnResponse() {
-        return gameTurnResponse;
-    }
-
-    public void setGameTurnResponse(GameTurnResponse gameTurnResponse) {
-        this.gameTurnResponse = gameTurnResponse;
-    }
-
-    public Label getYourTurnLabel() {
-        return yourTurnLabel;
     }
 
     public record ChatMessage(String sender, String text) {

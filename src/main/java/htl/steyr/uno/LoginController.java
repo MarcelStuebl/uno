@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import lombok.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -153,7 +154,7 @@ public class LoginController implements Initializable {
     @FXML private HBox rootContainer;
 
     /** Der Client, der die Netzwerkkommunikation mit dem Server übernimmt. */
-    private Client client;
+    @Getter @Setter private Client client;
 
     /**
      * Zwischengespeicherter Benutzername für mehrstufige Abläufe
@@ -943,10 +944,6 @@ public class LoginController implements Initializable {
      * @return der Client, der für die Netzwerkkommunikation mit dem Server
      *         zuständig ist
      */
-    public Client getClient() {
-        return client;
-    }
-
     /**
      * Setzt die {@link Client}-Instanz.
      *
@@ -955,8 +952,4 @@ public class LoginController implements Initializable {
      *
      * @param client der zu verwendende Client; darf nicht {@code null} sein
      */
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
 }

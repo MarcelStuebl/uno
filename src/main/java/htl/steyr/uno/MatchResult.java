@@ -2,11 +2,13 @@ package htl.steyr.uno;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+@Getter
 public class MatchResult implements Serializable {
     private final int matchId;
     private final ArrayList<MatchPlayer> players;
@@ -24,18 +26,6 @@ public class MatchResult implements Serializable {
         this.matchId = matchId;
         this.players = players;
         this.timestamp = timestamp;
-    }
-
-    public int getMatchId() {
-        return matchId;
-    }
-
-    public ArrayList<MatchPlayer> getPlayers() {
-        return players;
-    }
-
-    public Timestamp getTimestamp() {
-        return timestamp;
     }
 
 }

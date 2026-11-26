@@ -4,30 +4,28 @@ import htl.steyr.uno.GameTableClasses.GameTable;
 import htl.steyr.uno.LobbyWaitController;
 import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.LoginController;
-import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import htl.steyr.uno.requests.server.UserRequestsJoinLobbyResponse;
 import javafx.application.Platform;
+import lombok.*;
 
 import java.io.IOException;
 
+@RequiredArgsConstructor
 public class Client {
 
-    private final String host = "ws://server.uno.clouddb.at"; // ws://server.uno.clouddb.at
+    private final String host = "ws://localhost"; // ws://server.uno.clouddb.at
     private final int port = 59362;
 
-    private volatile ClientSocketConnection conn;
+    @Getter private volatile ClientSocketConnection conn;
+    @Getter @NonNull
     private final LoginController loginController;
-    private LobbyController lobbyController;
-    private LobbyWaitController lobbyWaitController;
-    private GameTable gameTable;
+    @Getter @Setter private LobbyController lobbyController;
+    @Getter @Setter private LobbyWaitController lobbyWaitController;
+    @Getter @Setter private GameTable gameTable;
 
     private volatile boolean running = true;
     private Thread connectionThread;
-
-    public Client(LoginController controller) {
-        this.loginController = controller;
-    }
 
     /**
      * Initializes the connection to the server in a separate background thread.
@@ -173,35 +171,4 @@ public class Client {
         getConn().sendMessage(new UserRequestsJoinLobbyRequest(response, isAccepted));
     }
 
-    public ClientSocketConnection getConn() {
-        return conn;
-    }
-
-    public LoginController getLoginController() {
-        return loginController;
-    }
-
-    public LobbyController getLobbyController() {
-        return lobbyController;
-    }
-
-    public void setLobbyController(LobbyController lobbyController) {
-        this.lobbyController = lobbyController;
-    }
-
-    public LobbyWaitController getLobbyWaitController() {
-        return lobbyWaitController;
-    }
-
-    public void setLobbyWaitController(LobbyWaitController lobbyWaitController) {
-        this.lobbyWaitController = lobbyWaitController;
-    }
-
-    public GameTable getGameTable() {
-        return gameTable;
-    }
-
-    public void setGameTable(GameTable gameTable) {
-        this.gameTable = gameTable;
-    }
 }

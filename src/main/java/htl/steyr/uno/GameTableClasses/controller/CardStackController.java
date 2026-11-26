@@ -20,13 +20,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import lombok.*;
 
 import java.util.Objects;
 
 public class CardStackController {
-    private Card topCard;
-    private StackPane visual;
-    private GameTable gameTable;
+    @Getter private Card topCard;
+    @Getter private StackPane visual;
+    @Getter(AccessLevel.PRIVATE) private GameTable gameTable;
 
     public CardStackController(GameTable gameTable) {
         this.visual = new StackPane();
@@ -35,11 +36,6 @@ public class CardStackController {
         this.visual.setStyle("-fx-background-color: transparent;" + "-fx-border-color: transparent;");
         this.gameTable = gameTable;
     }
-
-    public StackPane getVisual() {
-        return visual;
-    }
-
 
     public void layCard(Card c, Button handButton, Player p) {
         if (c == null) return;
@@ -202,9 +198,9 @@ public class CardStackController {
 
         String path;
         if (c.getCardColour().equals("black") && c.getChosenColour() != null && !c.getChosenColour().isBlank()) {
-            path = "/htl/steyr/uno/Uno_Cards/black/black" + c.getCardValue() + "-" + c.getChosenColour() + ".png";
+            path = "/htl/steyr/uno/img/Uno_Cards/black/black" + c.getCardValue() + "-" + c.getChosenColour() + ".png";
         } else {
-            path = "/htl/steyr/uno/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
+            path = "/htl/steyr/uno/img/Uno_Cards/" + c.getCardColour() + "/" + c.getCardColour() + c.getCardValue() + ".png";
         }
 
         ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
@@ -231,11 +227,4 @@ public class CardStackController {
         tt.playFromStart();
     }
 
-    public Card getTopCard() {
-        return topCard;
-    }
-
-    private GameTable getGameTable() {
-        return gameTable;
-    }
 }

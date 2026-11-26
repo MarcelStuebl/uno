@@ -32,6 +32,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.*;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
 
@@ -89,7 +90,7 @@ public class LobbyController implements Initializable {
     private static final double PLAYER_AVATAR_SIZE = 20;
 
     /** Client zur Kommunikation mit dem Server */
-    private Client client;
+    @Getter @Setter private Client client;
 
     /** Aktuelle Lobby-Informationen */
     private LobbyInfoResponse lobby;
@@ -779,24 +780,6 @@ public class LobbyController implements Initializable {
 
         thisStage.close();
         onSceneClose();
-    }
-
-    /**
-     * Gibt den aktuellen Client zurück.
-     *
-     * @return Client
-     */
-    public Client getClient() {
-        return client;
-    }
-
-    /**
-     * Setzt den Client.
-     *
-     * @param client Client
-     */
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     /**

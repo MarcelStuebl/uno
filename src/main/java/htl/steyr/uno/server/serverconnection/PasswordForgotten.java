@@ -1,29 +1,12 @@
 package htl.steyr.uno.server.serverconnection;
 
+import lombok.*;
+
 import java.sql.Timestamp;
 
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class PasswordForgotten {
 
-    private Integer code;
-    private Timestamp requestTime;
-
-
-    protected PasswordForgotten(Integer code, Timestamp requestTime) {
-        setCode(code);
-        setRequestTime(requestTime);
-    }
-
-    protected void setCode(Integer codes) {
-        code = codes;
-    }
-    protected Integer getCode() {
-        return code;
-    }
-
-    protected void setRequestTime(Timestamp requestTime) {
-        this.requestTime = requestTime;
-    }
-    protected Timestamp getRequestTime() {
-        return requestTime;
-    }
+    @Getter(AccessLevel.PROTECTED) @Setter(AccessLevel.PROTECTED) private Integer code;
+    @Getter(AccessLevel.PROTECTED) @Setter(AccessLevel.PROTECTED) private Timestamp requestTime;
 }

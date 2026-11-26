@@ -2,7 +2,6 @@ package htl.steyr.uno.GameTableClasses.controller;
 
 import htl.steyr.uno.GameTableClasses.Card;
 import htl.steyr.uno.GameTableClasses.GameTable;
-import htl.steyr.uno.GameTableClasses.Player;
 import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.client.Client;
 import javafx.animation.ScaleTransition;
@@ -18,6 +17,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import lombok.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +31,7 @@ public final class PlayerHandController {
     private final GameTable gameTable;
     private final Client client;
     private VBox handVBox;
-    private HBox ownProfileDock;
+    @Getter private HBox ownProfileDock;
 
     public PlayerHandController(GameTable gameTable, Client client) {
         this.gameTable = gameTable;
@@ -89,10 +89,6 @@ public final class PlayerHandController {
         return handVBox;
     }
 
-    public HBox getOwnProfileDock() {
-        return ownProfileDock;
-    }
-
     private HBox createOwnProfileDock() {
         HBox emojiBar = new HBox(4);
         emojiBar.setAlignment(Pos.CENTER);
@@ -135,10 +131,10 @@ public final class PlayerHandController {
 
     public static ImageView createReactionImageView(String emoji, double size) {
         String imagePath = switch (emoji) {
-            case "🖕" -> "/htl/steyr/uno/emojis/middlefinger.png";
-            case "❤️" -> "/htl/steyr/uno/emojis/heart.png";
-            case "😠" -> "/htl/steyr/uno/emojis/angry.png";
-            case "😭" -> "/htl/steyr/uno/emojis/crying.png";
+            case "🖕" -> "/htl/steyr/uno/img/emojis/middlefinger.png";
+            case "❤️" -> "/htl/steyr/uno/img/emojis/heart.png";
+            case "😠" -> "/htl/steyr/uno/img/emojis/angry.png";
+            case "😭" -> "/htl/steyr/uno/img/emojis/crying.png";
             default -> throw new IllegalArgumentException("Unsupported emoji reaction: " + emoji);
         };
 
@@ -214,13 +210,13 @@ public final class PlayerHandController {
     }
 
     private Image loadCardImage(Card card) {
-        String path = "/htl/steyr/uno/Uno_Cards/" + card.getCardColour() + "/" + card.getCardColour() + card.getCardValue() + ".png";
+        String path = "/htl/steyr/uno/img/Uno_Cards/" + card.getCardColour() + "/" + card.getCardColour() + card.getCardValue() + ".png";
         Image image = readImage(path);
         if (image != null) {
             return image;
         }
         System.err.println("Warnung: Kartenbild nicht gefunden: " + path);
-        String fallbackPath = "/htl/steyr/uno/Uno_Cards/backside.png";
+        String fallbackPath = "/htl/steyr/uno/img/Uno_Cards/backside.png";
         Image fallbackImage = readImage(fallbackPath);
         if (fallbackImage == null) {
             System.err.println("Warnung: Kartenrueckseite konnte nicht geladen werden: " + fallbackPath);

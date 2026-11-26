@@ -30,6 +30,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import lombok.*;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -96,7 +97,7 @@ public class LobbyWaitController implements Initializable {
     private final Client client;
 
     /** Die aktuellen Lobby-Informationen vom Server. */
-    private LobbyInfoResponse lobby;
+    @Getter private LobbyInfoResponse lobby;
 
     /** Steuert, ob der Lobby-Code in die Zwischenablage kopiert werden kann. */
     private boolean copyToClipboardEnabled = true;
@@ -685,15 +686,6 @@ public class LobbyWaitController implements Initializable {
         stage.setResizable(false);
         stage.show();
         thisStage.close();
-    }
-
-    /**
-     * Gibt die aktuellen Lobby-Informationen zurück.
-     *
-     * @return die aktuelle {@link LobbyInfoResponse}
-     */
-    public LobbyInfoResponse getLobby() {
-        return lobby;
     }
 
     /**
