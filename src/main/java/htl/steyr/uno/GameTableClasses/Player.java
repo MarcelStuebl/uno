@@ -3,10 +3,12 @@ package htl.steyr.uno.GameTableClasses;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import htl.steyr.uno.User;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
+@Data
 public class Player implements Serializable {
     private String username;
     private boolean isCurrentTurn;
@@ -15,7 +17,7 @@ public class Player implements Serializable {
     private Integer playerIndex;
     private boolean isReady = false;
     private boolean isPassive;
-    private byte[] imageBytes;
+    @EqualsAndHashCode.Exclude @ToString.Exclude private byte[] imageBytes;
 
     public Player(String username, boolean isCurrentTurn, ArrayList<Card> hand, ArrayList<Enemy> enemies,
                   Integer playerIndex, boolean isPassive, byte[] imageBytes) {
@@ -77,64 +79,6 @@ public class Player implements Serializable {
     }
 
 
-    @Override
-    public String toString() {
-        return "Player{" +
-                "username='" + username + '\'' +
-                ", isCurrentTurn=" + isCurrentTurn +
-                ", hand=" + hand +
-                ", enemies=" + enemies +
-                ", playerIndex=" + playerIndex +
-                ", isReady=" + isReady +
-                ", isPassive=" + isPassive +
-                '}';
-    }
-
-
-    public String getUsername() {
-        return this.username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Integer getPlayerIndex() {
-        return playerIndex;
-    }
-
-    public void setPlayerIndex(Integer playerIndex) {
-        this.playerIndex = playerIndex;
-    }
-
-    public boolean isReady() {
-        return isReady;
-    }
-
-    public void setReady(boolean ready) {
-        isReady = ready;
-    }
-
-    public boolean isPassive() {
-        return isPassive;
-    }
-
-    public void setPassive(boolean passive) {
-        isPassive = passive;
-    }
-
-    public boolean isCurrentTurn() {
-        return isCurrentTurn;
-    }
-
-    public void setCurrentTurn(boolean currentTurn) {
-        this.isCurrentTurn = currentTurn;
-    }
-
-    public ArrayList<Enemy> getEnemies() {
-        return this.enemies;
-    }
-
     public void setEnemies(ArrayList<Enemy> enemies) {
         this.enemies.clear();
         this.enemies.addAll(enemies);
@@ -147,10 +91,6 @@ public class Player implements Serializable {
             }
         }
         return null;
-    }
-
-    public ArrayList<Card> getHand() {
-        return this.hand;
     }
 
     public void addCardToHand(Card card) {
@@ -168,13 +108,6 @@ public class Player implements Serializable {
                 return;
             }
         }
-    }
-
-    public byte[] getImageBytes() {
-        return imageBytes;
-    }
-    public void setImageBytes(byte[] imageBytes) {
-        this.imageBytes = imageBytes;
     }
 
 }

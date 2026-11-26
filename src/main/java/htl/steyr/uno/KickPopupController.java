@@ -1,9 +1,10 @@
 package htl.steyr.uno;
 
 import javafx.event.ActionEvent;
+import lombok.*;
 
 public class KickPopupController {
-    private Runnable onReturn;
+    @Setter private Runnable onReturn;
 
     public void returnToLobbySelection(ActionEvent event) {
         if (onReturn == null) {
@@ -12,7 +13,4 @@ public class KickPopupController {
         onReturn.run();
     }
 
-    public void setOnReturn(Runnable onReturn) {
-        this.onReturn = onReturn;
-    }
 }

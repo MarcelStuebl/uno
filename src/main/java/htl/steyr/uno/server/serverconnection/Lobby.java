@@ -3,6 +3,7 @@ package htl.steyr.uno.server.serverconnection;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.SendChatMessageRequest;
 import htl.steyr.uno.requests.server.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,15 +18,15 @@ import java.util.stream.Collectors;
 public class Lobby {
 
     private final Server server;
-    private Integer lobbyId;
+    @Getter(AccessLevel.PACKAGE) private Integer lobbyId;
 
-    private Integer status = 0; // 0 = waiting for players, 1 = full, 2 = in game
-    private Integer mode = 0; // 0 = UNO Classic, 1 = UNO Does
-    private Integer type = 2; // 0 = open, 1 = on_request, 2 = only_code
+    @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE) private Integer status = 0; // 0 = waiting for players, 1 = full, 2 = in game
+    @Getter @Setter private Integer mode = 0; // 0 = UNO Classic, 1 = UNO Does
+    @Getter @Setter private Integer type = 2; // 0 = open, 1 = on_request, 2 = only_code
 
-    private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
+    @Getter(AccessLevel.PACKAGE) private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
     private final Map<String, ServerSocketConnection> pendingJoinRequests = Collections.synchronizedMap(new HashMap<>());
-    private final GameLogic gameLogic = new GameLogic(this);
+    @Getter(AccessLevel.PACKAGE) private final GameLogic gameLogic = new GameLogic(this);
 
     private static final Set<String> ALLOWED_EMOJI_REACTIONS = Set.of("🖕", "❤️", "😠", "😭");
 
@@ -247,20 +248,10 @@ public class Lobby {
     }
 
 
-    Integer getStatus() {
-        return status;
-    }
-    void setStatus(Integer status) {
-        this.status = status;
-    }
-
     boolean canJoin() {
         return status == 0;
     }
 
-    List<ServerSocketConnection> getConnections() {
-        return connections;
-    }
     void addConnection(ServerSocketConnection connection) {
         connections.add(connection);
     }
@@ -268,27 +259,4 @@ public class Lobby {
         connections.remove(connection);
     }
 
-    Integer getLobbyId() {
-        return lobbyId;
-    }
-
-    GameLogic getGameLogic() {
-        return gameLogic;
-    }
-
-    public Integer getMode() {
-        return mode;
-    }
-
-    public void setMode(Integer mode) {
-        this.mode = mode;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
 }

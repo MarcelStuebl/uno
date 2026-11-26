@@ -1,10 +1,12 @@
 package htl.steyr.uno;
 
 import htl.steyr.uno.server.PasswordUtil;
+import lombok.*;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+@Getter @Setter
 public class User implements Serializable {
 
     private int id;
@@ -18,7 +20,7 @@ public class User implements Serializable {
     private Timestamp lastLogin;
     private String passwordHash;
     private String passwordSalt;
-    private byte[] profileImage;
+    @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE) private byte[] profileImage;
     private boolean isReady;
 
 
@@ -167,99 +169,11 @@ public class User implements Serializable {
     }
 
 
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public int getGamesWon() {
-        return gamesWon;
-    }
-    public void setGamesWon(int gamesWon) {
-        this.gamesWon = gamesWon;
-    }
-
-    public int getGamesLost() {
-        return gamesLost;
-    }
-    public void setGamesLost(int gamesLost) {
-        this.gamesLost = gamesLost;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Timestamp getLastLogin() {
-        return lastLogin;
-    }
-    public void setLastLogin(Timestamp lastLogin) {
-        this.lastLogin = lastLogin;
-    }
-
-    public String getPasswordSalt() {
-        return passwordSalt;
-    }
-    public void setPasswordSalt(String passwordSalt) {
-        this.passwordSalt = passwordSalt;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
     public byte[] getProfileImageData() {
         return profileImage;
     }
+
     public void setProfileImageData(byte[] profileImage) {
         this.profileImage = profileImage;
     }
-
-    public boolean isReady() {
-        return isReady;
-    }
-
-    public void setReady(boolean ready) {
-        isReady = ready;
-    }
 }
-
-
-
-

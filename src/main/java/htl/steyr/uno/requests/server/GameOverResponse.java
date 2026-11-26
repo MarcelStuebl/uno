@@ -3,6 +3,7 @@ package htl.steyr.uno.requests.server;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import htl.steyr.uno.GameTableClasses.Player;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 public class GameOverResponse implements Serializable {
     
-    private ArrayList<Player> players;
+    @Getter @Setter private ArrayList<Player> players;
     private final Set<String> leftPlayers = new HashSet<>();
     
     @JsonCreator
@@ -31,10 +32,6 @@ public class GameOverResponse implements Serializable {
                 "'}";
     }
 
-    public ArrayList<Player> getPlayers() {
-        return players;
-    }
-
     public boolean isLeftPlayer(String username) {
         return username != null && leftPlayers.contains(username);
     }
@@ -45,10 +42,6 @@ public class GameOverResponse implements Serializable {
     
     public Player getPlayerByPosition(Integer position) {
         return players.get(position);
-    }
-    
-    public void setPlayers(ArrayList<Player> players) {
-        this.players = players;
     }
     
     public void addPlayer(Player player) {

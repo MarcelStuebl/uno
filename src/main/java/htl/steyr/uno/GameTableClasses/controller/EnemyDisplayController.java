@@ -7,11 +7,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import lombok.*;
 
 public class EnemyDisplayController {
 
     @FXML
-    private HBox rootPanel;
+    @Getter private HBox rootPanel;
     @FXML
     private Label usernameLabel;
     @FXML
@@ -19,13 +20,13 @@ public class EnemyDisplayController {
     @FXML
     private Pane cardPane;
     @FXML
-    private StackPane reactionSlot;
+    @Getter private StackPane reactionSlot;
 
     private static final double CARD_W = 28.0;
     private static final double CARD_H = 44.0;
     private static final double PANE_MAX_W = 150.0;
 
-    private static final String CARD_IMAGE_PATH = "/htl/steyr/uno/Uno_Cards/backside.png";
+    private static final String CARD_IMAGE_PATH = "/htl/steyr/uno/img/Uno_Cards/backside.png";
     private static final String ACTIVE_TURN_STYLE_CLASS = "turn-active";
     private static final String PASSIVE_STYLE_CLASS = "passive";
 
@@ -44,14 +45,6 @@ public class EnemyDisplayController {
 
     public String getUsername() {
         return usernameLabel.getText();
-    }
-
-    public HBox getRootPanel() {
-        return rootPanel;
-    }
-
-    public StackPane getReactionSlot() {
-        return reactionSlot;
     }
 
     public void setProfileImage(Image image) {

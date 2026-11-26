@@ -7,10 +7,11 @@ import javafx.application.Platform;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+import lombok.*;
 
 public class GameLogic {
 
-    private GameTable gameTable;
+    @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE) private GameTable gameTable;
 
 
     /**
@@ -281,11 +282,4 @@ public class GameLogic {
         });
     }
 
-    GameTable getGameTable() {
-        return gameTable;
-    }
-
-    void setGameTable(GameTable gameTable) {
-        this.gameTable = gameTable;
-    }
 }

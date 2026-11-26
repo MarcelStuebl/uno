@@ -12,6 +12,7 @@ import htl.steyr.uno.server.database.DatabaseUser;
 import htl.steyr.uno.server.exceptions.database.UserAlreadyExistsException;
 import htl.steyr.uno.protocol.JsonMessageCodec;
 import org.java_websocket.WebSocket;
+import lombok.*;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -29,13 +30,13 @@ public class ServerSocketConnection {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final int PROFILE_THUMBNAIL_SIZE = 64;
     private final Server server;
-    private final WebSocket webSocket;
-    private volatile boolean running;
+    @Getter private final WebSocket webSocket;
+    @Getter private volatile boolean running;
     private User user;
     private PasswordForgotten passwordForgotten;
     private Integer createAccountCode;
 
-    private ArrayList<UserRequestsJoinLobbyResponse> pendingJoinRequests = new ArrayList<>();
+    @Getter @Setter private ArrayList<UserRequestsJoinLobbyResponse> pendingJoinRequests = new ArrayList<>();
 
 
     /**
@@ -852,14 +853,6 @@ public class ServerSocketConnection {
         heartbeatThread.start();
     }
 
-    public boolean isRunning() {
-        return running;
-    }
-
-    public WebSocket getWebSocket() {
-        return webSocket;
-    }
-
     public void close() {
         cleanupConnection();
     }
@@ -872,11 +865,4 @@ public class ServerSocketConnection {
         return String.valueOf(webSocket.getRemoteSocketAddress());
     }
 
-    public ArrayList<UserRequestsJoinLobbyResponse> getPendingJoinRequests() {
-        return pendingJoinRequests;
-    }
-
-    public void setPendingJoinRequests(ArrayList<UserRequestsJoinLobbyResponse> pendingJoinRequests) {
-        this.pendingJoinRequests = pendingJoinRequests;
-    }
 }

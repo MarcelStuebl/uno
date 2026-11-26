@@ -2,10 +2,12 @@ package htl.steyr.uno.GameTableClasses;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.UUID;
 
+@Getter
 public class Card implements Serializable {
     //CardValue 0 bis 9 stands for the Number on the Card
     /**
@@ -17,9 +19,8 @@ public class Card implements Serializable {
      * 14. Draw 4 and Choose Colour
      */
     private final int CardValue;
-    //Colours: yellow, green, blue, red
-    private final String CardColour;
-    private String chosenColour;
+    private final String CardColour; //Colors: yellow, green, blue, red
+    @Setter private String chosenColour;
     private final String cardId;
 
     public Card(int value, String colour) {
@@ -57,26 +58,5 @@ public class Card implements Serializable {
     public int hashCode() {
         return java.util.Objects.hash(cardId);
     }
-
-    public int getCardValue() {
-        return this.CardValue;
-    }
-
-    public String getCardColour() {
-        return this.CardColour;
-    }
-
-    public String getChosenColour() {
-        return this.chosenColour;
-    }
-
-    public void setChosenColour(String chosenColour) {
-        this.chosenColour = chosenColour;
-    }
-
-    public String getCardId() {
-        return this.cardId;
-    }
-
 
 }
