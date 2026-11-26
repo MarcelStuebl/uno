@@ -14,7 +14,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class Client {
 
-    private final String host = "ws://localhost"; // ws://server.uno.clouddb.at
+    private final String host = "ws://server.uno.clouddb.at"; // ws://server.uno.clouddb.at
     private final int port = 59362;
 
     @Getter private volatile ClientSocketConnection conn;
