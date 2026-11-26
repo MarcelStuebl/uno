@@ -64,7 +64,6 @@ public class LobbyController implements Initializable {
 
     @FXML private Button createPartyButton;
     @FXML private Button joinPartyButton;
-    @FXML private Button refreshLobbyList;
     @FXML private ListView<LobbyInfoResponse> lobbyListView;
     @FXML private TextField partyCodeField;
     @FXML private Label errorLabel;
@@ -137,6 +136,12 @@ public class LobbyController implements Initializable {
         setProfileImage();
         getClient().setLobbyController(this);
         getClient().getConn().requestAllLobbies();
+        lobbyListView.setOnMouseClicked(event -> {
+            LobbyInfoResponse selectedLobby = lobbyListView.getSelectionModel().getSelectedItem();
+            if (selectedLobby != null) {
+                joinLobbyFromList(selectedLobby);
+            }
+        });
 
         int wonGames = getClient().getConn().getUser().getGamesWon();
         int lostGames = getClient().getConn().getUser().getGamesLost();
@@ -244,6 +249,7 @@ public class LobbyController implements Initializable {
 
                     if (empty || lobby == null) {
                         setText(null);
+                        setGraphic(null);
                         setDisable(false);
                         return;
                     }
@@ -253,7 +259,40 @@ public class LobbyController implements Initializable {
                             ? "Unbekannt"
                             : lobby.users().getFirst().getUsername();
 
-                    setText(username + "'s lobby (" + playerCount + "/4)");
+                    String lobbyType = switch (lobby.type() == null ? -1 : lobby.type()) {
+                        case 0 -> "🌐";
+                        case 1 -> "✋";
+                        case 2 -> "🔒";
+                        default -> "❔";
+                    };
+                    String gameMode = switch (lobby.mode() == null ? -1 : lobby.mode()) {
+                        case 0 -> "UNO Classic";
+                        case 1 -> "UNO Dos";
+                        default -> "Unbekannt";
+                    };
+
+                    Label typeEmoji = new Label(lobbyType);
+                    typeEmoji.getStyleClass().add("lobby-list-type");
+                    typeEmoji.setTooltip(new Tooltip(switch (lobby.type() == null ? -1 : lobby.type()) {
+                        case 0 -> "Offen für alle";
+                        case 1 -> "Auf Anfrage";
+                        case 2 -> "Mit Code";
+                        default -> "Unbekannter Lobby-Typ";
+                    }));
+
+                    Label lobbyInfo = new Label(username + "'s Lobby · " + gameMode);
+                    lobbyInfo.getStyleClass().add("lobby-list-info");
+
+                    Region spacer = new Region();
+                    HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                    Label players = new Label(playerCount + "/4");
+                    players.getStyleClass().add("lobby-list-players");
+
+                    HBox content = new HBox(12, typeEmoji, lobbyInfo, spacer, players);
+                    content.setAlignment(Pos.CENTER_LEFT);
+                    setText(null);
+                    setGraphic(content);
                     setDisable(playerCount == 4);
                 }
             });
@@ -262,9 +301,24 @@ public class LobbyController implements Initializable {
         });
     }
 
-    @FXML
-    private void refreshLobbyListClicked(ActionEvent actionEvent) {
-        client.getConn().requestAllLobbies();
+    private void joinLobbyFromList(LobbyInfoResponse lobby) {
+        if (lobby.type() == null) {
+            errorLabel.setText("Der Lobby-Typ ist unbekannt.");
+            errorLabel.setVisible(true);
+            errorLabel.setManaged(true);
+            return;
+        }
+
+        if (lobby.type() == 2) {
+            errorLabel.setText("Diese Lobby kann nur mit ihrem Lobby-Code betreten werden.");
+            errorLabel.setVisible(true);
+            errorLabel.setManaged(true);
+            return;
+        }
+
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
+        client.joinLobby(lobby.lobbyId(), lobby.type());
     }
 
     /**
@@ -274,7 +328,10 @@ public class LobbyController implements Initializable {
      */
     public void joinPartyFailed(LobbyJoinRefusedResponse msg) {
         Platform.runLater(() -> {
-            if (msg.lobbyInfo().status() == 1) {
+            if (Objects.equals(msg.error(), 3)) {
+                errorLabel.setText("Die Lobby-Einstellungen wurden geändert. Bitte aktualisiere die Liste.");
+                client.getConn().requestAllLobbies();
+            } else if (msg.lobbyInfo().status() == 1) {
                 errorLabel.setText("Lobby is full. Please try again.");
             } else if (msg.lobbyInfo().status() == 2) {
                 errorLabel.setText("Game already started. Please try again.");

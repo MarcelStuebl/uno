@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -315,10 +316,10 @@ public class ServerSocketConnection {
         sendLogMessage(msg);
         Lobby lobby = server.getLobbies().stream().filter(l -> l.getLobbyId() == msg.lobbyId()).findFirst().orElse(null);
         if (lobby != null && lobby.canJoin()) {
-            if (msg.joinMethod() == 0 || msg.joinMethod() == 2 ) { // open or only_code
+            if (Objects.equals(lobby.getType(), 0)) { // open
                 lobby.addConnection(this);
                 lobby.updateJoined();
-            } else if (msg.joinMethod() == 1) { // on_request
+            } else if (Objects.equals(lobby.getType(), 1)) { // on_request
                 User waitingUser = new User(getUser().getUsername(), getUser().getLastName(), getUser().getFirstName(), getUser().getProfileImageData());
                 UserRequestsJoinLobbyResponse response = new UserRequestsJoinLobbyResponse(waitingUser);
                 lobby.addPendingJoinRequest(waitingUser.getUsername(), this);
@@ -343,6 +344,13 @@ public class ServerSocketConnection {
                     }
                 });
                 timeoutThread.start();
+            } else if (Objects.equals(lobby.getType(), 2) && msg.joinMethod() == 2) { // only_code
+                lobby.addConnection(this);
+                lobby.updateJoined();
+            } else {
+                LobbyJoinRefusedResponse refusedResponse = new LobbyJoinRefusedResponse(getUser(), lobby.getLobbyInfoResponse(), 3);
+                sendMessage(refusedResponse);
+                sendLogMessage(refusedResponse);
             }
         } else if (lobby != null && !lobby.canJoin()) {
             LobbyJoinRefusedResponse msg2 = new LobbyJoinRefusedResponse(getUser(), lobby.getLobbyInfoResponse(), 0);
@@ -376,8 +384,15 @@ public class ServerSocketConnection {
 
             if (waitingConnection != null) {
                 if (msg.isAccepted()) {
-                    lobby.addConnection(waitingConnection);
-                    lobby.updateJoined();
+                    if (Objects.equals(lobby.getType(), 2)) {
+                        LobbyJoinRefusedResponse refusedResponse = new LobbyJoinRefusedResponse(
+                                waitingConnection.getUser(), lobby.getLobbyInfoResponse(), 3);
+                        waitingConnection.sendMessage(refusedResponse);
+                        waitingConnection.sendLogMessage(refusedResponse);
+                    } else {
+                        lobby.addConnection(waitingConnection);
+                        lobby.updateJoined();
+                    }
                 } else {
                     LobbyJoinRefusedResponse refusedResponse = new LobbyJoinRefusedResponse(msg.response().user(), lobby.getLobbyInfoResponse(), 1);
                     waitingConnection.sendMessage(refusedResponse);
@@ -706,7 +721,7 @@ public class ServerSocketConnection {
         if (lobby != null) {
             lobby.setMode(msg.mode());
             lobby.setType(msg.type());
-            lobby.sendInfoToAll(new LobbyInfoResponse(lobby.getLobbyId(), lobby.getStatus(), lobby.getMode(), lobby.getType(), lobby.getConnections().stream().map(ServerSocketConnection::getUser).toList()));
+            lobby.updateJoined();
         }
     }
 
@@ -721,10 +736,7 @@ public class ServerSocketConnection {
      */
     private void getAllLobbiesRequest(GetAllLobbiesRequest msg) {
         sendLogMessage(msg);
-        ArrayList<LobbyInfoResponse> lobbies = server.getLobbies().stream()
-                .map(lobby -> new LobbyInfoResponse(lobby.getLobbyId(), lobby.getStatus(), lobby.getMode(), lobby.getType(), lobby.getConnections().stream().map(ServerSocketConnection::getUser).toList()))
-                .collect(Collectors.toCollection(ArrayList::new));
-        sendMessage(new GetAllLobbiesResponse(lobbies));
+        Lobby.sendLobbyListTo(server, this);
     }
 
 
@@ -767,7 +779,7 @@ public class ServerSocketConnection {
             if (msg.LobbyType() != null) {
                 lobby.setType(msg.LobbyType());
             }
-            lobby.sendInfoToAll(new LobbyInfoResponse(lobby.getLobbyId(), lobby.getStatus(), lobby.getMode(), lobby.getType(), lobby.getConnections().stream().map(ServerSocketConnection::getUser).toList()));
+            lobby.updateJoined();
         }
     }
 

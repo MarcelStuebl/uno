@@ -136,8 +136,12 @@ public class Client {
     }
 
     public synchronized void joinLobbyWithCode(int lobbyId) {
+        joinLobby(lobbyId, 2);
+    }
+
+    public synchronized void joinLobby(int lobbyId, int joinMethod) {
         if (getConn() == null) return;
-        JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId, 2);
+        JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId, joinMethod);
         getConn().sendMessage(msg);
     }
 

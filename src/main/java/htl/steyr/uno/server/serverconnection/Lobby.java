@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class Lobby {
 
@@ -56,9 +57,38 @@ public class Lobby {
         }
     }
 
+    static void broadcastLobbyList(Server server) {
+        GetAllLobbiesResponse response = getLobbyListResponse(server);
+        List<ServerSocketConnection> clientConnections = server.getClientConnections();
+        synchronized (clientConnections) {
+            for (ServerSocketConnection connection : clientConnections) {
+                if (connection.getUser() != null) {
+                    connection.sendMessage(response);
+                }
+            }
+        }
+    }
+
+    static void sendLobbyListTo(Server server, ServerSocketConnection connection) {
+        connection.sendMessage(getLobbyListResponse(server));
+    }
+
+    private static GetAllLobbiesResponse getLobbyListResponse(Server server) {
+        List<Lobby> lobbySnapshot;
+        List<Lobby> lobbies = server.getLobbies();
+        synchronized (lobbies) {
+            lobbySnapshot = new ArrayList<>(lobbies);
+        }
+        ArrayList<LobbyInfoResponse> lobbyInfos = lobbySnapshot.stream()
+                .map(Lobby::getLobbyInfoResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
+        return new GetAllLobbiesResponse(lobbyInfos);
+    }
+
     void updateJoined() {
         checkStatus();
         sendInfoToAll(getLobbyInfoResponse());
+        broadcastLobbyList(server);
     }
 
 

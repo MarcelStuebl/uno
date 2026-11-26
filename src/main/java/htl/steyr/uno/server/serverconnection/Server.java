@@ -97,6 +97,7 @@ public class Server extends WebSocketServer {
                 if (lobby.getConnections().isEmpty()) {
                     lobbies.remove(lobby);
                     System.out.println("Lobby " + lobby.getLobbyId() + " removed (empty)");
+                    Lobby.broadcastLobbyList(this);
                 }
                 break;
             }
@@ -128,4 +129,5 @@ public class Server extends WebSocketServer {
     List<ServerSocketConnection> getClientConnections() {
         return connections;
     }
+
 }

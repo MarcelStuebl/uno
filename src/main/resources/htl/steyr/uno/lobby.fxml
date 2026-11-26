@@ -62,7 +62,6 @@
                         <VBox alignment="TOP_CENTER" prefHeight="500.0" prefWidth="360.0" spacing="10.0">
                            <children>
                               <ListView fx:id="lobbyListView" prefHeight="450.0" prefWidth="360.0" maxWidth="360.0" styleClass="lobbyListView" VBox.vgrow="ALWAYS" />
-                              <Button fx:id="refreshLobbyList" mnemonicParsing="false" onAction="#refreshLobbyListClicked" prefHeight="40.0" prefWidth="360.0" styleClass="joinLobbyButton" text="Refresh" />
                            </children>
                         </VBox>
                      </children>
