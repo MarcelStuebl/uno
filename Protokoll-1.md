@@ -66,3 +66,37 @@
 ### 19.11
 - Die serverseitige Verarbeitung des Ready-Requests umgesetzt.
 - Die Übertragung des Ready-Status ergänzt, damit er bei allen Spielern in der Lobby korrekt angezeigt wird.
+
+## Horeth
+
+### 01.10
+- Einen Fehler bei der Zwischenablage behoben.
+- Mit der Entwicklung des Ingame-Chats begonnen.
+
+### 08.10
+- Den Ingame-Chat weiterentwickelt und die Benutzeroberfläche verbessert.
+
+### 15.10
+- Den Ingame-Chat im Game Table fertiggestellt.
+- Teammitglieder unterstützt und Ideen für Reactions gesammelt.
+
+### 22.10
+- Die Reactions implementiert.
+- Raschko bei der Gestaltung der Lobby-Auswahl unterstützt.
+
+### 05.11
+- Mit der Entwicklung von Game-Table-Themes begonnen.
+- Drei Themes vorbereitet: Classic, Western und Eiswelt.
+- Stylesheets erstellt und die Theme-Auswahl im Game Table teilweise umgesetzt.
+
+### 12.11
+- Die Themes überarbeitet und für zwei Themes JPG-Hintergrundbilder ergänzt.
+- Den Game Table umstrukturiert und einen großen Teil der Logik in separate Controller ausgelagert.
+
+### 19.11
+- Schneeflocken für das Aurora-Theme und einen Tumbleweed-Effekt für das Desert-Theme ergänzt.
+- Das Western-Theme in Desert umbenannt.
+- Die Event-Bilder im Ressourcenordner organisiert.
+
+### 26.11
+- Merge-Konflikte beim Zusammenführen der Änderungen mit den Branches `HorethV3` und `master` gelöst.
