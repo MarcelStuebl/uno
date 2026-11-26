@@ -18,6 +18,7 @@ import java.util.Set;
 public class GameLogic {
 
     private static final Set<String> CARD_COLORS = Set.of("red", "green", "yellow", "blue");
+    private static final Set<String> ALLOWED_EMOJI_REACTIONS = Set.of("🖕", "❤️", "😠", "😭");
 
     private Lobby lobby;
     private ArrayList<Player> players = new ArrayList<>();
@@ -44,6 +45,17 @@ public class GameLogic {
 
     GameLogic(Lobby lobby) {
         setLobby(lobby);
+    }
+
+    void sendEmojiReaction(ServerSocketConnection sender, String emoji) {
+        if (sender == null || sender.getUser() == null || sender.getUser().getUsername() == null
+                || emoji == null || !ALLOWED_EMOJI_REACTIONS.contains(emoji)
+                || !Objects.equals(lobby.getStatus(), 2)
+                || !lobby.getConnections().contains(sender)) {
+            return;
+        }
+
+        lobby.sendInfoToAll(new EmojiReactionResponse(emoji, sender.getUser().getUsername()));
     }
 
 

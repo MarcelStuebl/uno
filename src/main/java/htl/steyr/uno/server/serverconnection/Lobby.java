@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -26,9 +25,6 @@ public class Lobby {
     private final List<ServerSocketConnection> connections = Collections.synchronizedList(new ArrayList<>());
     private final Map<String, ServerSocketConnection> pendingJoinRequests = Collections.synchronizedMap(new HashMap<>());
     private final GameLogic gameLogic = new GameLogic(this);
-
-    private static final Set<String> ALLOWED_EMOJI_REACTIONS = Set.of("🖕", "❤️", "😠", "😭");
-
 
     /**
      * Creates a new lobby with a random ID and adds it to the server's list of lobbies.
@@ -107,19 +103,6 @@ public class Lobby {
     boolean containsPendingJoinRequest(String username) {
         return pendingJoinRequests.containsKey(username);
     }
-
-    void sendEmojiReaction(ServerSocketConnection sender, String emoji) {
-        if (sender == null || !connections.contains(sender)) {
-            return;
-        }
-
-        if (!ALLOWED_EMOJI_REACTIONS.contains(emoji)) {
-            return;
-        }
-
-        sendInfoToAll(new EmojiReactionResponse(emoji, sender.getUser().getUsername()));
-    }
-
 
     void playerLeft(ServerSocketConnection connection) {
         playerLeft(connection, false);

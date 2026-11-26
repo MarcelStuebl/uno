@@ -101,6 +101,10 @@ public class GameLogic {
         getGameTable().getClient().getConn().sendMessage(new SayUnoRequest(getGameTable().getPlayer()));
     }
 
+    public void sendEmojiReaction(String emoji) {
+        getGameTable().getClient().sendEmojiReaction(emoji);
+    }
+
 
     /**
      * Handles the logic when the player receives a response to their request to draw a card from the central stack.

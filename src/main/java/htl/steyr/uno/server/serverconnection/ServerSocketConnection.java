@@ -422,13 +422,13 @@ public class ServerSocketConnection {
     }
 
     private void sendEmojiReactionRequest(SendEmojiReactionRequest msg) {
-        if (user == null || msg.emoji() == null) {
+        if (user == null || msg == null) {
             return;
         }
 
         Lobby lobby = server.getLobbyByConnection(this);
-        if (lobby != null && lobby.getStatus() == 2) {
-            lobby.sendEmojiReaction(this, msg.emoji());
+        if (lobby != null) {
+            lobby.getGameLogic().sendEmojiReaction(this, msg.emoji());
         }
     }
 

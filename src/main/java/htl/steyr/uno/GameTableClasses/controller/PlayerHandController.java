@@ -2,9 +2,7 @@ package htl.steyr.uno.GameTableClasses.controller;
 
 import htl.steyr.uno.GameTableClasses.Card;
 import htl.steyr.uno.GameTableClasses.GameTable;
-import htl.steyr.uno.GameTableClasses.Player;
 import htl.steyr.uno.UiStyleUtil;
-import htl.steyr.uno.client.Client;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -29,13 +27,11 @@ public final class PlayerHandController {
     private static final int MAX_CARDS_PER_ROW = 30;
 
     private final GameTable gameTable;
-    private final Client client;
     private VBox handVBox;
     private HBox ownProfileDock;
 
-    public PlayerHandController(GameTable gameTable, Client client) {
+    public PlayerHandController(GameTable gameTable) {
         this.gameTable = gameTable;
-        this.client = client;
     }
 
     public void open() {
@@ -112,7 +108,7 @@ public final class PlayerHandController {
             reactionButton.setAlignment(Pos.CENTER);
             reactionButton.setAccessibleText(reaction[1]);
             reactionButton.setFocusTraversable(false);
-            reactionButton.setOnAction(event -> client.sendEmojiReaction(reaction[0]));
+            reactionButton.setOnAction(event -> gameTable.getGameLogic().sendEmojiReaction(reaction[0]));
 
             ImageView emojiImage = createReactionImageView(reaction[0], 36);
             emojiImage.setMouseTransparent(true);

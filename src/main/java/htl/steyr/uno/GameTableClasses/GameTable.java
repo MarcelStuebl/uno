@@ -88,7 +88,7 @@ public class GameTable implements Initializable {
         themeController.initializeBackground();
         updatePlayerFromStartGameResponse();
         gameLogic = new GameLogic(this);
-        handController = new PlayerHandController(this, client);
+        handController = new PlayerHandController(this);
         gameOverController = new GameOverController(this, client);
 
         Platform.runLater(() -> {
