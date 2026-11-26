@@ -121,9 +121,6 @@ public class LobbyWaitController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        unoClassicButton.getStyleClass().add("selectedOption");
-        codeOnlyButton.getStyleClass().add("selectedOption");
-
         Platform.runLater(() -> {
             if (playButton.getScene() != null && playButton.getScene().getWindow() != null) {
                 playButton.getScene().getWindow().setOnCloseRequest(event -> {
@@ -239,15 +236,20 @@ public class LobbyWaitController implements Initializable {
     public void updateLobbyInfo() {
         playerListView.getItems().clear();
 
-        String currentUsername = client.getConn().getUser().getUsername();
         ArrayList<User> users = new ArrayList<>(lobby.users());
 
         String hostUsername = users.isEmpty() ? null : users.getFirst().getUsername();
+        String currentUsername = client.getConn().getUser().getUsername();
         boolean isHost = currentUsername.equals(hostUsername);
         boolean hasEnoughPlayersToStart = users.size() >= 2;
 
         playButton.setVisible(isHost);
         playButton.setDisable(!isHost || !hasEnoughPlayersToStart);
+        unoClassicButton.setDisable(!isHost);
+        unoDosButton.setDisable(!isHost);
+        openLobbyButton.setDisable(!isHost);
+        onRequestLobbyButton.setDisable(!isHost);
+        codeOnlyButton.setDisable(!isHost);
 
         playerListView.setCellFactory(list -> new ListCell<String>() {
             private final BorderPane rootPane = new BorderPane();
@@ -343,36 +345,30 @@ public class LobbyWaitController implements Initializable {
             playerListView.getItems().add(u.getUsername());
         }
 
-        Integer lobbyMode = lobby.mode(); // 0 = UNO Classic, 1 = UNO Does
-        Integer lobbyType = lobby.type(); // 0 = open, 1 = on_request, 2 = only_code
+        unoClassicButton.getStyleClass().remove("selectedOption");
+        unoDosButton.getStyleClass().remove("selectedOption");
+        openLobbyButton.getStyleClass().remove("selectedOption");
+        onRequestLobbyButton.getStyleClass().remove("selectedOption");
+        codeOnlyButton.getStyleClass().remove("selectedOption");
 
-        // Setze die Buttons entsprechend dem aktuellen LobbyMode
-        if (lobbyMode == 0) {
+        // Die Auswahl wird erst mit den vom Server bestätigten Lobby-Infos aktualisiert.
+        if (Objects.equals(lobby.mode(), 0)) {
             unoClassicButton.getStyleClass().add("selectedOption");
-            unoDosButton.getStyleClass().remove("selectedOption");
-        } else if (lobbyMode == 1) {
+        } else if (Objects.equals(lobby.mode(), 1)) {
             unoDosButton.getStyleClass().add("selectedOption");
-            unoClassicButton.getStyleClass().remove("selectedOption");
         }
 
-        // Setze die Buttons entsprechend dem aktuellen LobbyType
-        if (lobbyType == 0) {
+        if (Objects.equals(lobby.type(), 0)) {
             openLobbyButton.getStyleClass().add("selectedOption");
-            onRequestLobbyButton.getStyleClass().remove("selectedOption");
-            codeOnlyButton.getStyleClass().remove("selectedOption");
-        } else if (lobbyType == 1) {
+        } else if (Objects.equals(lobby.type(), 1)) {
             onRequestLobbyButton.getStyleClass().add("selectedOption");
-            openLobbyButton.getStyleClass().remove("selectedOption");
-            codeOnlyButton.getStyleClass().remove("selectedOption");
-        } else if (lobbyType == 2) {
+        } else if (Objects.equals(lobby.type(), 2)) {
             codeOnlyButton.getStyleClass().add("selectedOption");
-            openLobbyButton.getStyleClass().remove("selectedOption");
-            onRequestLobbyButton.getStyleClass().remove("selectedOption");
         }
     }
 
 
-    /** @TODO
+    /**
      * Sendet eine Anfrage an den Server, um die Lobby-Konfiguration zu ändern.
      *
      * @param lobbyMode
@@ -723,26 +719,46 @@ public class LobbyWaitController implements Initializable {
     // Schaltet die Spielvarianten um
     @FXML
     private void handleGameVariant(ActionEvent event) {
+        if (!isLobbyHost()) {
+            return;
+        }
+
         Button clickedButton = (Button) event.getSource();
-
-        // Entferne die Klasse bei beiden
-        unoClassicButton.getStyleClass().remove("selectedOption");
-        unoDosButton.getStyleClass().remove("selectedOption");
-
-        // Füge sie dem angeklickten hinzu
-        clickedButton.getStyleClass().add("selectedOption");
+        Integer lobbyMode;
+        if (clickedButton == unoClassicButton) {
+            lobbyMode = 0;
+        } else if (clickedButton == unoDosButton) {
+            lobbyMode = 1;
+        } else {
+            return;
+        }
+        updateLobbyConfig(lobbyMode, null);
     }
 
     @FXML
     private void handleLobbyType(ActionEvent event) {
+        if (!isLobbyHost()) {
+            return;
+        }
+
         Button clickedButton = (Button) event.getSource();
+        Integer lobbyType;
+        if (clickedButton == openLobbyButton) {
+            lobbyType = 0;
+        } else if (clickedButton == onRequestLobbyButton) {
+            lobbyType = 1;
+        } else if (clickedButton == codeOnlyButton) {
+            lobbyType = 2;
+        } else {
+            return;
+        }
+        updateLobbyConfig(null, lobbyType);
+    }
 
-        // Entferne die Klasse bei allen drei
-        openLobbyButton.getStyleClass().remove("selectedOption");
-        onRequestLobbyButton.getStyleClass().remove("selectedOption");
-        codeOnlyButton.getStyleClass().remove("selectedOption");
-
-        // Füge sie dem angeklickten hinzu
-        clickedButton.getStyleClass().add("selectedOption");
+    private boolean isLobbyHost() {
+        return lobby != null
+                && lobby.users() != null
+                && !lobby.users().isEmpty()
+                && client.getConn().getUser().getUsername().equals(lobby.users().getFirst().getUsername());
     }
 }
