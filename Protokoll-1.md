@@ -35,6 +35,12 @@
 - Jonas bei der Funktion `AllPlayersReady` unterstützt.
 - Raschko dabei geholfen, die Serverlogik mit der UI zu verbinden.
 
+### 26.11
+- Alles auf Master mergen und Server updaten.
+- Projekt auf Lombok ändern.
+
+
+
 ## Fürlinger
 
 ### 24.09 und 01.10
