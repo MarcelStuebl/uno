@@ -6,6 +6,7 @@ import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.LoginController;
 import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
+import htl.steyr.uno.requests.server.UserRequestsJoinLobbyResponse;
 import javafx.application.Platform;
 
 import java.io.IOException;
@@ -134,9 +135,13 @@ public class Client {
         getConn().sendMessage(msg);
     }
 
-    public synchronized void joinLobby(int lobbyId) {
+    public synchronized void joinLobbyWithCode(int lobbyId) {
+        joinLobby(lobbyId, 2);
+    }
+
+    public synchronized void joinLobby(int lobbyId, int joinMethod) {
         if (getConn() == null) return;
-        JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId);
+        JoinLobbyRequest msg = new JoinLobbyRequest(lobbyId, joinMethod);
         getConn().sendMessage(msg);
     }
 
@@ -161,6 +166,11 @@ public class Client {
     public void sendEmojiReaction(String emoji) {
         if (getConn() == null) return;
         getConn().sendMessage(new SendEmojiReactionRequest(emoji));
+    }
+
+    public void sendUserRequestsJoinLobbyRequest(UserRequestsJoinLobbyResponse response, Boolean isAccepted) {
+        if (getConn() == null) return;
+        getConn().sendMessage(new UserRequestsJoinLobbyRequest(response, isAccepted));
     }
 
     public ClientSocketConnection getConn() {
