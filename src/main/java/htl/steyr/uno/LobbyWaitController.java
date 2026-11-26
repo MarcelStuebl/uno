@@ -240,6 +240,7 @@ public class LobbyWaitController implements Initializable {
         playerListView.getItems().clear();
 
         ArrayList<User> users = new ArrayList<>(lobby.users());
+        String currentUsername = client.getConn().getUser().getUsername();
         currentPlayerReady = users.stream()
                 .filter(user -> currentUsername.equals(user.getUsername()))
                 .findFirst()
@@ -247,7 +248,6 @@ public class LobbyWaitController implements Initializable {
                 .orElse(false);
 
         String hostUsername = users.isEmpty() ? null : users.getFirst().getUsername();
-        String currentUsername = client.getConn().getUser().getUsername();
         boolean isHost = currentUsername.equals(hostUsername);
         boolean hasEnoughPlayersToStart = users.size() >= 2;
 
