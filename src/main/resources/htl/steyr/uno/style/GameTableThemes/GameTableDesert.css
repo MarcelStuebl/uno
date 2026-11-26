@@ -1,0 +1,177 @@
+/* Desert theme */
+@import "GameTableClassic.css";
+
+.button,
+.game-over-back-button {
+    -fx-background-color: linear-gradient(to bottom, #d6ad70, #ad7548);
+    -fx-text-fill: #2d2118;
+    -fx-border-color: rgba(255, 226, 178, 0.48);
+}
+
+.button:hover,
+.game-over-back-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #e6c58e, #c28b59);
+}
+
+.player-panel,
+.game-own-profile {
+    -fx-background-color: rgba(38, 27, 21, 0.84);
+    -fx-border-color: rgba(226, 186, 132, 0.32);
+}
+
+.player-panel.turn-active {
+    -fx-border-color: #f2c879;
+    -fx-effect: dropshadow(gaussian, rgba(242, 200, 121, 0.62), 16, 0.3, 0, 0);
+}
+
+.player-panel.passive,
+.player-panel.passive.turn-active {
+    -fx-border-color: rgba(176, 150, 126, 0.3);
+}
+
+.player-name,
+.game-over-title,
+.game-over-name-label {
+    -fx-text-fill: #f5e8d2;
+}
+
+.reaction-slot {
+    -fx-background-color: linear-gradient(to bottom right, rgba(92, 59, 42, 0.96), rgba(48, 34, 27, 0.98));
+    -fx-border-color: rgba(231, 195, 151, 0.58);
+}
+
+.reaction-slot-mark {
+    -fx-text-fill: rgba(255, 226, 178, 0.72);
+}
+
+.game-reaction-button {
+    -fx-background-color: rgba(49, 35, 27, 0.94);
+    -fx-border-color: rgba(218, 175, 125, 0.4);
+}
+
+.game-reaction-button:hover {
+    -fx-background-color: rgba(116, 72, 49, 0.98);
+    -fx-border-color: #f2c879;
+}
+
+.game-chat-bubble,
+.game-chat-bubble-mine {
+    -fx-background-color: linear-gradient(to bottom, rgba(165, 104, 69, 0.98), rgba(116, 69, 49, 0.97));
+    -fx-border-color: rgba(239, 196, 145, 0.52);
+}
+
+.game-chat-bubble-mine {
+    -fx-text-fill: #fff1dc;
+}
+
+.game-chat-bubble-other {
+    -fx-background-color: linear-gradient(to bottom, rgba(235, 213, 184, 0.12), rgba(235, 213, 184, 0.06));
+    -fx-text-fill: #f5e8d2;
+    -fx-border-color: rgba(235, 213, 184, 0.2);
+}
+
+.game-chat-key {
+    -fx-text-fill: #f5e8d2;
+    -fx-background-color: rgba(28, 20, 16, 0.76);
+}
+
+.game-chat-sender {
+    -fx-text-fill: rgba(245, 232, 210, 0.78);
+}
+
+.game-chat-panel {
+    -fx-background-color: linear-gradient(to bottom, rgba(48, 34, 27, 0.96), rgba(29, 21, 18, 0.96));
+    -fx-border-color: rgba(218, 175, 125, 0.34);
+}
+
+.game-chat-input {
+    -fx-background-color: rgba(246, 226, 200, 0.08);
+    -fx-border-color: rgba(218, 175, 125, 0.38);
+    -fx-text-fill: #fff1dc;
+    -fx-prompt-text-fill: rgba(245, 232, 210, 0.56);
+}
+
+.game-over-panel {
+    -fx-background-color: rgba(42, 30, 24, 0.97);
+    -fx-border-color: rgba(226, 186, 132, 0.46);
+}
+
+.game-over-rank-label {
+    -fx-text-fill: #f2c879;
+}
+
+.game-over-ranking-row-left {
+    -fx-background-color: rgba(176, 130, 88, 0.2);
+}
+
+.game-over-overlay {
+    -fx-background-color: rgba(19, 13, 10, 0.72);
+}
+
+.yourTurnLabel {
+    -fx-text-fill: #ffd18a;
+}
+
+.game-theme-picker {
+    -fx-background-color: linear-gradient(to bottom, rgba(113, 75, 53, 0.98), rgba(65, 45, 36, 0.99));
+    -fx-border-color: rgba(231, 195, 151, 0.62);
+}
+
+.game-theme-picker:hover {
+    -fx-background-color: linear-gradient(to bottom, rgba(139, 94, 66, 0.99), rgba(82, 56, 44, 0.99));
+    -fx-border-color: rgba(250, 220, 180, 0.86);
+}
+
+.game-theme-picker > .list-cell {
+    -fx-text-fill: #fff0d9;
+}
+
+.game-theme-picker .arrow {
+    -fx-background-color: #f2d3a6;
+}
+
+.game-theme-options {
+    -fx-background-color: #30221b;
+    -fx-border-color: rgba(231, 195, 151, 0.62);
+}
+
+.game-theme-options .game-theme-option {
+    -fx-text-fill: #fff0d9;
+}
+
+.game-theme-options .game-theme-option:hover,
+.game-theme-options .game-theme-option:filled:selected {
+    -fx-background-color: rgba(183, 125, 82, 0.48);
+}
+
+.game-close-button {
+    -fx-background-color: rgba(48, 34, 27, 0.94);
+    -fx-text-fill: #fff0d9;
+    -fx-border-color: rgba(231, 195, 151, 0.5);
+}
+
+.game-close-button:hover {
+    -fx-background-color: #a64f3c;
+}
+
+.game-sayuno-button {
+    -fx-background-color: linear-gradient(to bottom, #efd09a, #c38a55);
+    -fx-text-fill: #30221b;
+}
+
+.game-sayuno-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #f8dfb2, #d49a63);
+}
+
+.game-color-overlay {
+    -fx-background-color: rgba(25, 17, 13, 0.8);
+}
+
+.game-color-selection {
+    -fx-background-color: rgba(48, 34, 27, 0.98);
+    -fx-border-color: rgba(231, 195, 151, 0.52);
+}
+
+.game-color-title {
+    -fx-fill: #fff0d9;
+}

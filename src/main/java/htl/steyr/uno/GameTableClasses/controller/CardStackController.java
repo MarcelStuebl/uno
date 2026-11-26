@@ -1,5 +1,8 @@
-package htl.steyr.uno.GameTableClasses;
+package htl.steyr.uno.GameTableClasses.controller;
 
+import htl.steyr.uno.GameTableClasses.Card;
+import htl.steyr.uno.GameTableClasses.GameTable;
+import htl.steyr.uno.GameTableClasses.Player;
 import htl.steyr.uno.UiStyleUtil;
 import htl.steyr.uno.requests.server.GameTurnResponse;
 import javafx.animation.ScaleTransition;
@@ -20,12 +23,12 @@ import javafx.util.Duration;
 
 import java.util.Objects;
 
-public class CardStack {
+public class CardStackController {
     private Card topCard;
     private StackPane visual;
     private GameTable gameTable;
 
-    public CardStack(GameTable gameTable) {
+    public CardStackController(GameTable gameTable) {
         this.visual = new StackPane();
         this.visual.setPrefSize(137, 192);
         this.visual.setMaxSize(137, 192);
