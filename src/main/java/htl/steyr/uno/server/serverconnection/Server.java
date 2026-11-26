@@ -83,13 +83,17 @@ public class Server extends WebSocketServer {
     }
 
     void leaveLobby(ServerSocketConnection connection) {
+        leaveLobby(connection, false);
+    }
+
+    void leaveLobby(ServerSocketConnection connection, boolean announce) {
         if (connection == null) {
             return;
         }
         for (Lobby lobby : new ArrayList<>(lobbies)) {
             if (lobby.getConnections().contains(connection)) {
                 System.out.println("Removing connection from lobby " + lobby.getLobbyId());
-                lobby.playerLeft(connection);
+                lobby.playerLeft(connection, announce);
                 if (lobby.getConnections().isEmpty()) {
                     lobbies.remove(lobby);
                     System.out.println("Lobby " + lobby.getLobbyId() + " removed (empty)");

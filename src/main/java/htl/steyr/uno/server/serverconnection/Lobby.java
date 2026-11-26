@@ -72,14 +72,18 @@ public class Lobby {
 
 
     void playerLeft(ServerSocketConnection connection) {
+        playerLeft(connection, false);
+    }
+
+    void playerLeft(ServerSocketConnection connection, boolean announce) {
         if (connection == null) {
             return;
         }
-        
+
+        User user = connection.getUser();
         connections.remove(connection);
-        
+
         try {
-            User user = connection.getUser();
             if (user != null && user.getUsername() != null) {
                 if (status != null && status == 2) {
                     getGameLogic().handlePlayerLeft(user.getUsername());
@@ -90,7 +94,14 @@ public class Lobby {
         } catch (Exception e) {
             System.out.println("Error removing player from game logic: " + e.getMessage());
         }
-        
+
+        if (announce && user != null && user.getUsername() != null) {
+            sendInfoToAll(new ReceiveChatMessageResponse(
+                    "Spieler '" + user.getUsername() + "' hat die Lobby verlassen.",
+                    user
+            ));
+        }
+
         updateJoined();
     }
 
@@ -135,6 +146,9 @@ public class Lobby {
         setStatus(2);
         LobbyInfoResponse response = getLobbyInfoResponse();
         getGameLogic().createGame(response.users());
+        synchronized (connections) {
+            connections.forEach(connection -> connection.setReady(false));
+        }
         sendInfoToAll(new StartGameResponse(gameLogic.getPlayersAsEnemies()));
         updateJoined();
     }
@@ -153,6 +167,22 @@ public class Lobby {
 
             for (var failedConnection : failedConnections) {
                 playerLeft(failedConnection);
+            }
+        }
+    }
+
+    void checkAllPlayersReady() {
+        synchronized (connections) {
+            if (Objects.equals(status, 2) || connections.size() < 2) {
+                return;
+            }
+
+            boolean allReady = connections.stream()
+                    .map(ServerSocketConnection::getUser)
+                    .allMatch(user -> user != null && user.isReady());
+
+            if (allReady) {
+                startGame();
             }
         }
     }

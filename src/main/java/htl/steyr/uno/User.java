@@ -19,6 +19,7 @@ public class User implements Serializable {
     private String passwordHash;
     private String passwordSalt;
     private byte[] profileImage;
+    private boolean isReady;
 
 
     /**
@@ -248,6 +249,14 @@ public class User implements Serializable {
     }
     public void setProfileImageData(byte[] profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public boolean isReady() {
+        return isReady;
+    }
+
+    public void setReady(boolean ready) {
+        isReady = ready;
     }
 }
 

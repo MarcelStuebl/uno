@@ -4,6 +4,7 @@ import htl.steyr.uno.GameTableClasses.GameTable;
 import htl.steyr.uno.LobbyWaitController;
 import htl.steyr.uno.LobbyController;
 import htl.steyr.uno.LoginController;
+import htl.steyr.uno.User;
 import htl.steyr.uno.requests.client.*;
 import javafx.application.Platform;
 
